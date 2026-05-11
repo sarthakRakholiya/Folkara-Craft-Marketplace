@@ -24,17 +24,21 @@ export function Header() {
         <div className="flex lg:grid lg:grid-cols-[1fr_auto_1fr] items-center justify-between w-full px-4 md:px-margin-page py-unit max-w-container-max mx-auto">
           {/* Left: Logo Area */}
           <div className="flex items-center">
-            <Link href="/" aria-label="Folkara Home" className="flex items-center gap-2 group">
+            <Link
+              href="/"
+              aria-label="Folkara Home"
+              className="flex items-center gap-2 group"
+            >
               <div className="flex items-center gap-3 overflow-hidden">
-                <img 
-                  src="/logo.png" 
-                  alt="Folkara Icon" 
-                  className="h-10 md:h-12 w-auto object-contain" 
+                <img
+                  src="/logo.png"
+                  alt="Folkara Icon"
+                  className="h-10 md:h-12 w-auto object-contain"
                 />
-                <img 
-                  src="/logo-name.png" 
-                  alt="Folkara Name" 
-                  className="hidden sm:block h-5 md:h-6 w-auto object-contain -ml-1" 
+                <img
+                  src="/logo-name.png"
+                  alt="Folkara Name"
+                  className="hidden sm:block h-5 md:h-6 w-auto object-contain -ml-1"
                 />
               </div>
             </Link>
@@ -43,16 +47,18 @@ export function Header() {
           {/* Center: Navigation */}
           <nav className="hidden lg:flex gap-10 items-center justify-center">
             {navLinks.map((link) => {
-              const isActive = link.href === "/" 
-                ? pathname === "/" 
-                : pathname === link.href || pathname?.startsWith(`${link.href}/`);
+              const isActive =
+                link.href === "/"
+                  ? pathname === "/"
+                  : pathname === link.href ||
+                    pathname?.startsWith(`${link.href}/`);
               return (
                 <Link
                   key={link.name}
                   href={link.href}
                   className={cn(
                     "draw-underline text-on-surface-variant font-sans text-base transition-colors duration-300 hover:text-primary whitespace-nowrap cursor-pointer",
-                    isActive && "active text-primary font-bold"
+                    isActive && "active text-primary font-bold",
                   )}
                 >
                   {link.name}
@@ -62,11 +68,15 @@ export function Header() {
           </nav>
 
           <div className="flex items-center justify-end gap-2">
-            <Button variant="primary" size="md" className="hidden lg:flex" href="/login">
+            <Button
+              variant="primary"
+              size="md"
+              className="hidden lg:flex"
+              href="/auth"
+            >
               Join the Circle
             </Button>
 
-            
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="lg:hidden p-2 hover:bg-surface-container-high rounded-full transition-colors cursor-pointer"
@@ -79,9 +89,9 @@ export function Header() {
       </header>
 
       {/* Mobile Navigation Sidebar */}
-      <MobileNav 
-        isOpen={isMobileMenuOpen} 
-        onClose={() => setIsMobileMenuOpen(false)} 
+      <MobileNav
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
         navLinks={navLinks}
       />
     </>

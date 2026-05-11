@@ -26,41 +26,48 @@ export function MobileNav({ isOpen, onClose, navLinks }: MobileNavProps) {
       document.body.style.overflow = "hidden";
 
       const tl = gsap.timeline();
-      
+
       tl.to(overlayRef.current, {
         opacity: 1,
         visibility: "visible",
         duration: 0.3,
         ease: "power2.out",
       })
-      .to(menuRef.current, {
-        x: 0,
-        duration: 0.5,
-        ease: "power3.out",
-      }, "-=0.2")
-      .fromTo(
-        ".mobile-nav-link",
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4, stagger: 0.1, ease: "power2.out" },
-        "-=0.3"
-      );
+        .to(
+          menuRef.current,
+          {
+            x: 0,
+            duration: 0.5,
+            ease: "power3.out",
+          },
+          "-=0.2",
+        )
+        .fromTo(
+          ".mobile-nav-link",
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.4, stagger: 0.1, ease: "power2.out" },
+          "-=0.3",
+        );
     } else {
       // Unlock body scroll
       document.body.style.overflow = "";
 
       const tl = gsap.timeline();
-      
+
       tl.to(menuRef.current, {
         x: "100%",
         duration: 0.4,
         ease: "power3.in",
-      })
-      .to(overlayRef.current, {
-        opacity: 0,
-        visibility: "hidden",
-        duration: 0.3,
-        ease: "power2.in",
-      }, "-=0.2");
+      }).to(
+        overlayRef.current,
+        {
+          opacity: 0,
+          visibility: "hidden",
+          duration: 0.3,
+          ease: "power2.in",
+        },
+        "-=0.2",
+      );
     }
 
     return () => {
@@ -85,7 +92,11 @@ export function MobileNav({ isOpen, onClose, navLinks }: MobileNavProps) {
         <div className="flex flex-col h-full p-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-12">
-            <Link href="/" onClick={onClose} className="flex items-center gap-2">
+            <Link
+              href="/"
+              onClick={onClose}
+              className="flex items-center gap-2"
+            >
               <img src="/logo.png" alt="Folkara Icon" className="h-10 w-auto" />
             </Link>
             <button
@@ -100,9 +111,11 @@ export function MobileNav({ isOpen, onClose, navLinks }: MobileNavProps) {
           {/* Links */}
           <nav className="flex flex-col gap-6" ref={linksRef}>
             {navLinks.map((link) => {
-              const isActive = link.href === "/" 
-                ? pathname === "/" 
-                : pathname === link.href || pathname?.startsWith(`${link.href}/`);
+              const isActive =
+                link.href === "/"
+                  ? pathname === "/"
+                  : pathname === link.href ||
+                    pathname?.startsWith(`${link.href}/`);
               return (
                 <Link
                   key={link.name}
@@ -110,7 +123,7 @@ export function MobileNav({ isOpen, onClose, navLinks }: MobileNavProps) {
                   onClick={onClose}
                   className={cn(
                     "mobile-nav-link text-2xl font-serif text-on-surface hover:text-primary transition-colors py-2 border-b border-outline-variant/10",
-                    isActive && "text-primary font-bold"
+                    isActive && "text-primary font-bold",
                   )}
                 >
                   {link.name}
@@ -121,11 +134,11 @@ export function MobileNav({ isOpen, onClose, navLinks }: MobileNavProps) {
 
           {/* Footer / CTA */}
           <div className="mt-auto pt-12 space-y-6 mobile-nav-link">
-            <Button 
-              variant="primary" 
-              size="lg" 
+            <Button
+              variant="primary"
+              size="lg"
               className="w-full rounded-full py-6"
-              href="/login"
+              href="/auth"
               onClick={onClose}
             >
               Join the Circle
