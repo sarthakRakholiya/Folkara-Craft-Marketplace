@@ -1,0 +1,48 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "AI: Full Dev Workflow (/dev)",
+      "type": "shell",
+      "command": "echo 'Type /dev JIRA-123 in your AI assistant chat to start the workflow.'",
+      "group": "none",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "AI: Brainstorm task",
+      "type": "shell",
+      "command": "echo 'Type /brainstorm in your AI assistant chat.'",
+      "group": "none"
+    },
+    {
+      "label": "AI: Write implementation plan",
+      "type": "shell",
+      "command": "echo 'Type /write-plan in your AI assistant chat.'",
+      "group": "none"
+    },
+    {
+      "label": "AI: Execute plan",
+      "type": "shell",
+      "command": "echo 'Type /execute in your AI assistant chat.'",
+      "group": "none"
+    },
+    {
+      "label": "AI: Review implementation",
+      "type": "shell",
+      "command": "echo 'Type /review in your AI assistant chat.'",
+      "group": "none"
+    },
+    {
+      "label": "AI: Check edge cases",
+      "type": "shell",
+      "command": "echo 'Type /check-edge-cases in your AI assistant chat.'",
+      "group": "none"
+    },
+    {
+      "label": "AI: Raise PR",
+      "type": "shell",
+      "command": "echo 'Type /raise-pr in your AI assistant chat.'",
+      "group": "none"
+    }
+  ]
+}

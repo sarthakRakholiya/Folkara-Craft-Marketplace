@@ -1,0 +1,12 @@
+{
+  "skills": {
+    "paths": [".agents/skills"]
+  },
+  "commands": {
+    "paths": [".agents/workflows"]
+  },
+  "agent": {
+    "instructions": "CLAUDE.md",
+    "autoLoadSkills": true
+  }
+}
