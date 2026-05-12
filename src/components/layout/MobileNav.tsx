@@ -7,14 +7,17 @@ import { X } from "lucide-react";
 import { gsap } from "gsap";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface MobileNavProps {
   isOpen: boolean;
   onClose: () => void;
   navLinks: Array<{ name: string; href: string }>;
+  isAuthenticated?: boolean;
+  userRole?: string;
 }
 
-export function MobileNav({ isOpen, onClose, navLinks }: MobileNavProps) {
+export function MobileNav({ isOpen, onClose, navLinks, isAuthenticated = false, userRole }: MobileNavProps) {
   const pathname = usePathname();
   const overlayRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -97,7 +100,7 @@ export function MobileNav({ isOpen, onClose, navLinks }: MobileNavProps) {
               onClick={onClose}
               className="flex items-center gap-2"
             >
-              <img src="/logo.png" alt="Folkara Icon" className="h-10 w-auto" />
+              <Image src="/logo.png" alt="Folkara Icon" width={200} height={200} className="h-10 w-auto object-contain" />
             </Link>
             <button
               onClick={onClose}
@@ -134,15 +137,36 @@ export function MobileNav({ isOpen, onClose, navLinks }: MobileNavProps) {
 
           {/* Footer / CTA */}
           <div className="mt-auto pt-12 space-y-6 mobile-nav-link">
-            <Button
-              variant="primary"
-              size="lg"
-              className="w-full rounded-full py-6"
-              href="/auth"
-              onClick={onClose}
-            >
-              Join the Circle
-            </Button>
+            {isAuthenticated ? (
+              <div className="flex flex-col gap-4">
+                <Link
+                  href={userRole ? `/${userRole}/dashboard` : "/dashboard"}
+                  onClick={onClose}
+                  className="flex items-center gap-3 text-lg font-serif text-on-surface hover:text-primary transition-colors py-3 border-b border-outline-variant/10"
+                >
+                  <span className="material-symbols-outlined text-primary text-[24px]" data-icon="person">person</span>
+                  My Dashboard
+                </Link>
+                <Link
+                  href="/cart"
+                  onClick={onClose}
+                  className="flex items-center gap-3 text-lg font-serif text-on-surface hover:text-primary transition-colors py-3 border-b border-outline-variant/10"
+                >
+                  <span className="material-symbols-outlined text-primary text-[24px]" data-icon="shopping_bag">shopping_bag</span>
+                  Shopping Cart
+                </Link>
+              </div>
+            ) : (
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full rounded-full py-6"
+                href="/auth"
+                onClick={onClose}
+              >
+                Join the Circle
+              </Button>
+            )}
             <div className="text-center">
               <p className="text-xs text-on-surface-variant uppercase tracking-widest font-semibold">
                 © 2026 Folkara

@@ -42,7 +42,11 @@ export function FormSelect<T extends FieldValues, Option = { value: string; labe
             {...props}
             ref={ref}
             instanceId={name}
-            value={props.options?.find((option: any) => option.value === value) || null}
+            value={
+              (props.options as any[])?.find(
+                (option: any) => option.value === value
+              ) || null
+            }
             onChange={(val: any) => onChange(val?.value)}
             onBlur={onBlur}
             placeholder={placeholder}

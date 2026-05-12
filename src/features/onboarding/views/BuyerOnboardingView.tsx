@@ -6,7 +6,12 @@ import { useQueryState, parseAsInteger } from "nuqs";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Image from "next/image";
 import { OnboardingHeader } from "../components/OnboardingHeader";
+import {
+  saveOnboardingStep,
+  finalizeOnboarding,
+} from "../actions/onboarding.action";
 import { Step1BuyerWelcome } from "../components/buyer/Step1BuyerWelcome";
 import { Step2BuyerProfile } from "../components/buyer/Step2BuyerProfile";
 import { Step3BuyerInterests } from "../components/buyer/Step3BuyerInterests";
@@ -20,13 +25,15 @@ export const BuyerOnboardingView = () => {
     "step",
     parseAsInteger.withDefault(1).withOptions({ shallow: false }),
   );
+  const [isSaving, setIsSaving] = useState(false);
   const stepContainerRef = useRef<HTMLDivElement>(null);
 
   const methods = useForm({
     resolver: zodResolver(buyerProfileSchema),
     defaultValues: {
-      fullName: "",
-      username: "",
+      firstName: "",
+      lastName: "",
+      bio: "",
       country: "",
       birthday: "",
       interests: [],
@@ -56,21 +63,35 @@ export const BuyerOnboardingView = () => {
 
     let fieldsToValidate: any[] = [];
     if (currentStep === 2)
-      fieldsToValidate = ["fullName", "username", "country", "birthday"];
+      fieldsToValidate = ["firstName", "lastName", "country", "birthday"];
     if (currentStep === 3) fieldsToValidate = ["interests"];
 
     const isValid = await trigger(fieldsToValidate as any);
 
     if (isValid && currentStep < TOTAL_STEPS) {
-      gsap.to(stepContainerRef.current, {
-        opacity: 0,
-        y: -20,
-        duration: 0.3,
-        ease: "power2.in",
-        onComplete: () => {
-          setCurrentStep(currentStep + 1);
-        },
-      });
+      setIsSaving(true);
+      try {
+        // Save data to DB
+        const result = await saveOnboardingStep(currentStep, methods.getValues());
+        if (!result.success) {
+          console.error("Failed to save onboarding step:", result.error);
+          return; // Stop if save fails
+        }
+
+        gsap.to(stepContainerRef.current, {
+          opacity: 0,
+          y: -20,
+          duration: 0.3,
+          ease: "power2.in",
+          onComplete: () => {
+            setCurrentStep(currentStep + 1);
+          },
+        });
+      } catch (error) {
+        console.error("Onboarding save error:", error);
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -97,12 +118,13 @@ export const BuyerOnboardingView = () => {
           <div ref={stepContainerRef} className="w-full max-w-7xl mx-auto">
             {currentStep === 1 && <Step1BuyerWelcome onContinue={handleNext} />}
             {currentStep === 2 && (
-              <Step2BuyerProfile onContinue={handleNext} onBack={handleBack} />
+              <Step2BuyerProfile onContinue={handleNext} onBack={handleBack} isSaving={isSaving} />
             )}
             {currentStep === 3 && (
               <Step3BuyerInterests
                 onContinue={handleNext}
                 onBack={handleBack}
+                isSaving={isSaving}
               />
             )}
             {currentStep === 4 && <Step4BuyerCompletion />}
@@ -112,10 +134,12 @@ export const BuyerOnboardingView = () => {
         {currentStep < TOTAL_STEPS && (
           <footer className="w-full py-8 px-margin-page flex flex-col items-center text-center bg-surface-container-low mt-10">
             <div className="mb-4">
-              <img
+              <Image
                 src="/logo-name.png"
                 alt="Folkara"
-                className="h-8 md:h-10 object-contain"
+                width={500}
+                height={100}
+                className="h-8 md:h-10 w-auto object-contain"
               />
             </div>
             <p className="font-sans text-xs md:text-sm text-on-surface-variant max-w-md">

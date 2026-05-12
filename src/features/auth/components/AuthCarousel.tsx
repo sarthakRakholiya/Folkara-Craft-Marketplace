@@ -43,14 +43,15 @@ export function AuthCarousel() {
           <Image
             src={carouselImages[index].src}
             alt="Lifestyle"
-            fill
-            className="object-cover"
+            width={1920}
+            height={1080}
+            className="h-full w-full object-cover"
             priority
           />
           {/* Subtle warm overlay */}
           <div className="absolute inset-0 bg-primary/20 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent flex items-end p-16">
-            <motion.div 
+            <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.8 }}
@@ -64,7 +65,7 @@ export function AuthCarousel() {
           </div>
         </motion.div>
       </AnimatePresence>
-      
+
       {/* Progress indicators */}
       <div className="absolute bottom-8 right-8 flex gap-2">
         {carouselImages.map((_, i) => (

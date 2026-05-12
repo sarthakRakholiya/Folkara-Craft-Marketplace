@@ -17,7 +17,7 @@ type AuthMode = "signup" | "login";
 export function AuthForm() {
   const [role, setRole] = useQueryState(
     "role",
-    parseAsStringEnum<AuthRole>(["artisan", "buyer"]).withDefault("artisan"),
+    parseAsStringEnum<AuthRole>(["buyer", "artisan"]).withDefault("buyer"),
   );
 
   const [mode, setMode] = useQueryState(

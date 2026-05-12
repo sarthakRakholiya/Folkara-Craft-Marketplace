@@ -51,7 +51,7 @@ export function Hero() {
                 src="/logo-name.png"
                 alt="Artisan hands"
                 width={500}
-                height={500}
+                height={100}
                 className="w-full h-full object-contain  rounded-2xl grayscale hover:grayscale-0 transition-all duration-700"
               />
             </div>

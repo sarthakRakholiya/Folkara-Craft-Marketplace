@@ -1,11 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { Check, Sparkles } from "lucide-react";
+import { Check, Sparkles, Loader2 } from "lucide-react";
+import { finalizeOnboarding } from "../../actions/onboarding.action";
+import { useRouter } from "next/navigation";
 
 export const Step4BuyerCompletion = () => {
+  const router = useRouter();
+  const [isFinishing, setIsFinishing] = useState(false);
+
+  const handleComplete = async () => {
+    setIsFinishing(true);
+    try {
+      const result = await finalizeOnboarding("BUYER");
+      if (result.success) {
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      console.error("Failed to finalize onboarding:", error);
+    } finally {
+      setIsFinishing(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-3xl mx-auto py-2 md:py-4">
       <div className="text-center space-y-4 md:space-y-6">
@@ -73,17 +92,20 @@ export const Step4BuyerCompletion = () => {
           </div>
         </div>
 
-        {/* Primary CTA */}
         <div className="pt-2 md:pt-4 flex flex-col items-center gap-3">
-          <Link href="/" className="w-full sm:w-auto">
-            <Button
-              size="md"
-              shape="full"
-              className="px-10 md:px-12 py-5 text-xs font-bold uppercase tracking-widest shadow-lg shadow-primary/10 transition-all hover:scale-[1.02] w-full"
-            >
-              Enter Folkara
-            </Button>
-          </Link>
+          <Button
+            size="md"
+            shape="full"
+            onClick={handleComplete}
+            disabled={isFinishing}
+            className="px-10 md:px-12 py-5 text-xs font-bold uppercase tracking-widest shadow-lg shadow-primary/10 transition-all hover:scale-[1.02] w-full sm:w-auto min-w-[200px]"
+          >
+            {isFinishing ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              "Enter Folkara"
+            )}
+          </Button>
           <Link href="/explore">
             <button className="text-[10px] font-bold text-on-surface-variant underline underline-offset-4 decoration-outline-variant/40 hover:decoration-secondary transition-all uppercase tracking-widest">
               Explore Journal

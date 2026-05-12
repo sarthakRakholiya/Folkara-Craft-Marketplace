@@ -1,24 +1,41 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, Lock } from "lucide-react";
+import { Mail, Lock, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { FormInput } from "@/components/form/FormInput";
-import { loginSchema, type LoginSchema } from "@/validations/auth.validation";
+import { login } from "@/features/auth/actions/auth.actions";
+import { loginSchema, type LoginInput } from "@/types/auth";
 
 interface LoginFormProps {
   role: string;
 }
 
-export function LoginForm({ role }: LoginFormProps) {
-  const form = useForm<LoginSchema>({
+export function LoginForm({ role: _role }: LoginFormProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
 
-  const onSubmit = (data: LoginSchema) => {
-    console.log("Login data:", data, "Role:", role);
+  const onSubmit = async (data: LoginInput) => {
+    setIsLoading(true);
+    try {
+      const res = await login(data);
+      if (res?.error) {
+        toast.error(res.error);
+      }
+    } catch (error: any) {
+      if (error.message === 'NEXT_REDIRECT') return;
+      console.error(error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -45,9 +62,17 @@ export function LoginForm({ role }: LoginFormProps) {
         variant="primary"
         size="md"
         type="submit"
+        disabled={isLoading}
         className="w-full rounded-full py-6 mt-2 shadow-lg shadow-primary/10"
       >
-        Login
+        {isLoading ? (
+          <span className="flex items-center gap-2 justify-center">
+            <Loader2 className="animate-spin" size={18} />
+            Signing in...
+          </span>
+        ) : (
+          "Login"
+        )}
       </Button>
     </form>
   );

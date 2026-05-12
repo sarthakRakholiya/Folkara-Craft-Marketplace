@@ -27,6 +27,10 @@ export const metadata: Metadata = {
 import { QueryProvider } from "@/providers/QueryProvider";
 import { AiAssistantSidebar } from "@/features/aiAssistant/components/AiAssistantSidebar";
 
+import { Toaster } from 'sonner';
+
+import { Suspense } from 'react';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -46,10 +50,13 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-sans bg-surface text-on-surface">
         <QueryProvider>
-          <NuqsAdapter>
-            {children}
-            <AiAssistantSidebar />
-          </NuqsAdapter>
+          <Suspense fallback={null}>
+            <NuqsAdapter>
+              {children}
+              <AiAssistantSidebar />
+              <Toaster richColors position="top-center" closeButton />
+            </NuqsAdapter>
+          </Suspense>
         </QueryProvider>
       </body>
     </html>

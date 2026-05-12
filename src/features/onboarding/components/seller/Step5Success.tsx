@@ -8,10 +8,30 @@ import {
   Leaf,
   Edit3,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { finalizeOnboarding } from "../../actions/onboarding.action";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export const Step5Success = () => {
+  const router = useRouter();
+  const [isFinishing, setIsFinishing] = useState(false);
+
+  const handleComplete = async (targetPath: string) => {
+    setIsFinishing(true);
+    try {
+      const result = await finalizeOnboarding("SELLER");
+      if (result.success) {
+        router.push(targetPath);
+      }
+    } catch (error) {
+      console.error("Failed to finalize onboarding:", error);
+    } finally {
+      setIsFinishing(false);
+    }
+  };
   return (
     <div className="w-full max-w-2xl mx-auto flex flex-col items-center text-center gap-6 md:gap-8">
       {/* Content Canvas */}
@@ -95,13 +115,25 @@ export const Step5Success = () => {
           size="lg"
           shape="full"
           variant="primary"
+          disabled={isFinishing}
+          onClick={() => handleComplete("/dashboard/products/new")}
           className="px-10 py-6 w-full sm:w-auto shadow-xl shadow-primary/20 font-sans text-xs font-bold uppercase tracking-widest"
         >
-          Create Listing
+          {isFinishing ? (
+            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+          ) : (
+            "Create Listing"
+          )}
         </Button>
-        <button className="px-8 py-4 font-sans text-[11px] font-bold text-on-surface-variant uppercase tracking-widest hover:text-primary transition-all flex items-center gap-2 group">
-          Go To Dashboard
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        <button
+          disabled={isFinishing}
+          onClick={() => handleComplete("/dashboard")}
+          className="px-8 py-4 font-sans text-[11px] font-bold text-on-surface-variant uppercase tracking-widest hover:text-primary transition-all flex items-center gap-2 group disabled:opacity-50"
+        >
+          {isFinishing ? "Processing..." : "Go To Dashboard"}
+          {!isFinishing && (
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          )}
         </button>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface OnboardingHeaderProps {
   currentStep: number;
@@ -15,9 +16,11 @@ export const OnboardingHeader = ({ currentStep, totalSteps }: OnboardingHeaderPr
         <Link href="/" className="flex items-center gap-2 group">
           <div className="flex items-center gap-3 overflow-hidden">
          
-            <img 
+            <Image 
               src="/logo-name.png" 
               alt="Folkara Name" 
+              width={500}
+              height={100}
               className="hidden sm:block h-5 md:h-8 w-auto object-contain -ml-1" 
             />
           </div>

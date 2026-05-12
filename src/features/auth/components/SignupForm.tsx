@@ -1,24 +1,41 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, Lock } from "lucide-react";
+import { Mail, Lock, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { FormInput } from "@/components/form/FormInput";
-import { signupSchema, type SignupSchema } from "@/validations/auth.validation";
+import { signup } from "@/features/auth/actions/auth.actions";
+import { signupSchema, type SignupInput } from "@/types/auth";
 
 interface SignupFormProps {
   role: string;
 }
 
 export function SignupForm({ role }: SignupFormProps) {
-  const form = useForm<SignupSchema>({
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<SignupInput>({
     resolver: zodResolver(signupSchema),
     defaultValues: { email: "", password: "", confirmPassword: "" },
   });
 
-  const onSubmit = (data: SignupSchema) => {
-    console.log("Signup data:", data, "Role:", role);
+  const onSubmit = async (data: SignupInput) => {
+    setIsLoading(true);
+    try {
+      const res = await signup(data);
+      if (res?.error) {
+        toast.error(res.error);
+      }
+    } catch (error: any) {
+      if (error.message === 'NEXT_REDIRECT') return;
+      console.error(error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const isArtisan = role === "artisan";
@@ -50,14 +67,24 @@ export function SignupForm({ role }: SignupFormProps) {
           startIcon={<Lock size={16} />}
         />
       </div>
-      
+
       <Button
         variant="primary"
         size="md"
         type="submit"
+        disabled={isLoading}
         className="w-full rounded-full py-6 mt-2 shadow-lg shadow-primary/10"
       >
-        {isArtisan ? "Start Selling" : "Start Exploring"}
+        {isLoading ? (
+          <span className="flex items-center gap-2 justify-center">
+            <Loader2 className="animate-spin" size={18} />
+            Creating account...
+          </span>
+        ) : isArtisan ? (
+          "Start Selling"
+        ) : (
+          "Start Exploring"
+        )}
       </Button>
     </form>
   );

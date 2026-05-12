@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export function Footer() {
   return (
@@ -6,14 +7,18 @@ export function Footer() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-section-gap px-margin-page py-section-gap max-w-container-max mx-auto">
         <div>
           <div className="flex items-center gap-3 mb-8 overflow-hidden">
-            <img 
+            <Image 
               src="/logo.png" 
               alt="Folkara Icon" 
+              width={200}
+              height={200}
               className="h-12 w-auto object-contain opacity-80 grayscale" 
             />
-            <img 
+            <Image 
               src="/logo-name.png" 
               alt="Folkara Name" 
+              width={500}
+              height={100}
               className="h-8 w-auto object-contain -ml-2 opacity-80 grayscale" 
             />
           </div>

@@ -19,12 +19,12 @@ export function AuthTabs({ mode, setMode, role, setRole }: AuthTabsProps) {
     // Animate Role Indicator
     if (roleIndicatorRef.current) {
       gsap.to(roleIndicatorRef.current, {
-        x: role === "artisan" ? "0%" : "100%",
+        x: role === "buyer" ? "0%" : "100%",
         duration: 0.4,
         ease: "power2.out",
       });
     }
-  }, [role]);
+  }, [role, mode]);
 
   useEffect(() => {
     // Animate Mode Indicator
@@ -39,38 +39,6 @@ export function AuthTabs({ mode, setMode, role, setRole }: AuthTabsProps) {
 
   return (
     <div className="space-y-8 mb-8">
-      {/* Role Toggle */}
-      <div className="flex justify-center">
-        <div className="relative inline-flex p-1 bg-surface-container-high rounded-full w-64 overflow-hidden">
-          <div
-            ref={roleIndicatorRef}
-            className="absolute top-1 left-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-full shadow-sm"
-          />
-          <button
-            onClick={() => setRole("artisan")}
-            className={cn(
-              "relative flex-1 px-6 py-2 rounded-full text-[10px] tracking-widest font-semibold uppercase transition-colors duration-300 cursor-pointer",
-              role === "artisan"
-                ? "text-primary"
-                : "text-on-surface-variant hover:text-on-surface",
-            )}
-          >
-            Artisan
-          </button>
-          <button
-            onClick={() => setRole("buyer")}
-            className={cn(
-              "relative flex-1 px-6 py-2 rounded-full text-[10px] tracking-widest font-semibold uppercase transition-colors duration-300 cursor-pointer",
-              role === "buyer"
-                ? "text-primary"
-                : "text-on-surface-variant hover:text-on-surface",
-            )}
-          >
-            Buyer
-          </button>
-        </div>
-      </div>
-
       {/* Mode Tabs */}
       <div className="relative border-b border-surface-container-highest/50 flex">
         <div
@@ -100,6 +68,40 @@ export function AuthTabs({ mode, setMode, role, setRole }: AuthTabsProps) {
           Sign Up
         </button>
       </div>
+
+      {/* Role Toggle */}
+      {mode === "signup" && (
+        <div className="flex w-full justify-center">
+          <div className="relative inline-flex p-1 bg-surface-container-high rounded-full w-full overflow-hidden">
+            <div
+              ref={roleIndicatorRef}
+              className="absolute top-1 left-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-full shadow-sm"
+            />
+            <button
+              onClick={() => setRole("buyer")}
+              className={cn(
+                "relative flex-1 px-6 py-2 rounded-full text-[10px] tracking-widest font-semibold uppercase transition-colors duration-300 cursor-pointer",
+                role === "buyer"
+                  ? "text-primary"
+                  : "text-on-surface-variant hover:text-on-surface",
+              )}
+            >
+              Buyer
+            </button>
+            <button
+              onClick={() => setRole("artisan")}
+              className={cn(
+                "relative flex-1 px-6 py-2 rounded-full text-[10px] tracking-widest font-semibold uppercase transition-colors duration-300 cursor-pointer",
+                role === "artisan"
+                  ? "text-primary"
+                  : "text-on-surface-variant hover:text-on-surface",
+              )}
+            >
+              Artisan
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -11,11 +11,13 @@ import { Check } from "lucide-react";
 interface Step3BuyerInterestsProps {
   onContinue: () => void;
   onBack: () => void;
+  isSaving?: boolean;
 }
 
 export const Step3BuyerInterests = ({
   onContinue,
   onBack,
+  isSaving,
 }: Step3BuyerInterestsProps) => {
   const {
     watch,
@@ -121,9 +123,17 @@ export const Step3BuyerInterests = ({
             onClick={onContinue}
             size="lg"
             shape="rounded"
+            disabled={isSaving}
             className="flex-1 sm:flex-none shadow-lg shadow-primary/10"
           >
-            Continue to Final Step
+            {isSaving ? (
+              <span className="flex items-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Saving...
+              </span>
+            ) : (
+              "Continue to Final Step"
+            )}
           </Button>
         </div>
       </footer>
