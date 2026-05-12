@@ -1,47 +1,17 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ShopNameSchema } from '../../types/onboarding.types';
-import { cn } from '@/lib/utils';
-import { Sparkles, X } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
 import { FormInput } from '@/components/form/FormInput';
+import { ImageUpload } from '@/components/ui/ImageUpload';
+import { toast } from 'sonner';
 
 export const Step2ShopName = () => {
-  const { control, watch, setValue, formState: { errors } } = useFormContext<ShopNameSchema>();
-  const [isDragging, setIsDragging] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-  
+  const { control, watch, setValue } = useFormContext<ShopNameSchema>();
   const shopName = watch('shopName') || '';
-
-  const handleFileChange = (file: File) => {
-    if (file && file.type.startsWith('image/')) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      setValue('logoUrl', url); // In a real app, you'd upload this to a server
-    }
-  };
-
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) handleFileChange(file);
-  };
-
-  const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleFileChange(file);
-  };
-
-  const removeLogo = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setPreviewUrl(null);
-    setValue('logoUrl', '');
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
+  const previewUrl = watch('logoUrl') || null;
+  const [hasNewUpload, setHasNewUpload] = React.useState(false);
 
   return (
     <div className="w-full max-w-container-max mx-auto flex flex-col lg:grid lg:grid-cols-[1fr_360px] gap-8 lg:gap-16 items-start pb-4">
@@ -73,52 +43,25 @@ export const Step2ShopName = () => {
             <label className="block font-sans text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em]">
               Shop Logo
             </label>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={onFileSelect} 
-              accept="image/*" 
-              className="hidden" 
+            <ImageUpload
+              folder="shops/logos"
+              onUploadComplete={(image) => {
+                setValue('logoUrl', image.url, { shouldValidate: true, shouldDirty: true });
+                setValue('logoPublicId', image.publicId, { shouldValidate: true, shouldDirty: true });
+                setHasNewUpload(true);
+              }}
+              onUploadError={(err) => toast.error(err)}
+              currentImageUrl={previewUrl || undefined}
+              currentPublicId={watch('logoPublicId') || undefined}
+              isUnsaved={hasNewUpload}
+              hint="JPG, PNG or WebP · max 5 MB"
+              shape="rectangle"
+              aspectRatio="auto"
+              width="100%"
+              height="100%"
+              maxWidth="100%"
+              maxHeight={400}
             />
-            <div 
-              onClick={() => fileInputRef.current?.click()}
-              onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={onDrop}
-              className={cn(
-                "relative border-2 border-dashed rounded-2xl p-6 md:p-10 flex flex-col items-center justify-center gap-4 transition-all cursor-pointer group/upload bg-surface-container-low/30 overflow-hidden min-h-[220px]",
-                isDragging ? "border-primary bg-primary/5 scale-[1.01]" : "border-outline-variant hover:border-primary/50 hover:bg-white",
-                previewUrl && "border-solid border-primary/30"
-              )}
-            >
-              {previewUrl ? (
-                <div className="relative w-28 h-28 md:w-36 md:h-36">
-                  <img src={previewUrl} alt="Logo preview" className="w-full h-full object-cover rounded-xl shadow-lg" />
-                  <button 
-                    onClick={removeLogo}
-                    className="absolute -top-2 -right-2 bg-error text-white p-1.5 rounded-full shadow-md hover:scale-110 transition-transform"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-outline group-hover/upload:text-primary transition-colors shadow-sm">
-                    <span className="material-symbols-outlined text-[32px]" style={{ fontVariationSettings: "'FILL' 0" }}>
-                      upload_file
-                    </span>
-                  </div>
-                  <div className="text-center">
-                    <p className="font-serif text-base text-on-surface">
-                      Drag and drop your logo, or <span className="text-primary font-bold underline decoration-primary/30">browse files</span>
-                    </p>
-                    <p className="font-sans text-[10px] font-bold text-outline mt-1 uppercase tracking-widest">
-                      PNG, JPG up to 5MB
-                    </p>
-                  </div>
-                </>
-              )}
-            </div>
           </div>
         </div>
       </div>

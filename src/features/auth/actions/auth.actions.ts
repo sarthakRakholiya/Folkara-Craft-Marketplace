@@ -36,6 +36,7 @@ export async function signup(data: SignupInput): Promise<ActionResult> {
       id: createId(),           
       email: parsed.data.email,
       password: hashedPassword,
+      role: parsed.data.role,
     })
     .returning({ id: users.id, role: users.role });
 
@@ -51,7 +52,8 @@ export async function signup(data: SignupInput): Promise<ActionResult> {
   cookieStore.set('session', session, sessionCookieOptions(expires));
 
   // 6. Redirect 
-  redirect('/buyer/onboarding?step=1');
+  const onboardingRoute = parsed.data.role === 'SELLER' ? '/seller/onboarding' : '/buyer/onboarding';
+  redirect(`${onboardingRoute}?step=1`);
 }
 
 export async function login(data: LoginInput): Promise<ActionResult> {

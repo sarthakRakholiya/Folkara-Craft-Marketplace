@@ -23,10 +23,11 @@ const onboardingStepSchema = z.object({
   customCraft: z.string().optional(),
   shopName: z.string().optional(),
   logoUrl: z.string().optional(),
-  makerPortrait: z.string().optional(),
+  avatarUrl: z.string().optional(),
+  avatarPublicId: z.string().optional(),
   makerQuote: z.string().optional(),
-  story: z.string().optional(),
   showLocation: z.boolean().optional(),
+  shopId: z.string().optional(),
 });
 
 export type OnboardingStepData = z.infer<typeof onboardingStepSchema>;
@@ -113,5 +114,39 @@ export async function finalizeOnboarding(role: Role): Promise<ActionResult> {
   } catch (error) {
     console.error('finalizeOnboarding error:', error);
     return { success: false, error: 'Failed to complete onboarding. Please try again.' };
+  }
+}
+
+export async function getOnboardingData(): Promise<OnboardingStepData | null> {
+  const session = await getSession();
+  if (!session) return null;
+
+  try {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, session.userId),
+      columns: { 
+        onboardingData: true,
+        firstName: true,
+        lastName: true,
+        bio: true,
+        avatarUrl: true,
+        avatarPublicId: true,
+      },
+    });
+
+    if (!user) return null;
+
+    // Merge core profile fields with the temporary onboarding data
+    return {
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      bio: user.bio || '',
+      avatarUrl: user.avatarUrl || '',
+      avatarPublicId: user.avatarPublicId || '',
+      ...(user.onboardingData as object ?? {}),
+    } as OnboardingStepData;
+  } catch (error) {
+    console.error('getOnboardingData error:', error);
+    return null;
   }
 }

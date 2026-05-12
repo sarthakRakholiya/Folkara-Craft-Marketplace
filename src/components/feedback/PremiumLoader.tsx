@@ -48,29 +48,47 @@ export function PremiumLoader() {
           />
         </motion.div>
 
-        {/* Progress Container */}
-        <div className="flex flex-col items-center gap-4 w-full">
-          <div className="w-full h-[2px] bg-outline-variant/30 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-primary"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ ease: "easeOut", duration: 0.5 }}
-            />
+        {/* Circular Progress Container */}
+        <div className="flex flex-col items-center gap-6 mt-4">
+          <div className="relative w-16 h-16">
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+              <circle
+                cx="50"
+                cy="50"
+                r="45"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="4"
+                className="text-outline-variant/30"
+              />
+              <motion.circle
+                cx="50"
+                cy="50"
+                r="45"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeLinecap="round"
+                className="text-primary"
+                initial={{ strokeDasharray: "283", strokeDashoffset: "283" }}
+                animate={{ strokeDashoffset: 283 - (283 * progress) / 100 }}
+                transition={{ ease: "easeOut", duration: 0.5 }}
+              />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-[10px] font-bold tabular-nums text-primary/80">
+                {Math.round(progress)}%
+              </span>
+            </div>
           </div>
           
-          <div className="flex justify-between w-full">
-            <motion.span 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-[10px] font-medium tracking-[0.2em] uppercase text-on-surface-variant/60"
-            >
-              Curating Objects
-            </motion.span>
-            <span className="text-[10px] font-bold tabular-nums text-primary/80">
-              {Math.round(progress)}%
-            </span>
-          </div>
+          <motion.span 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-[10px] font-medium tracking-[0.2em] uppercase text-on-surface-variant/60"
+          >
+            Curating Objects
+          </motion.span>
         </div>
       </div>
 

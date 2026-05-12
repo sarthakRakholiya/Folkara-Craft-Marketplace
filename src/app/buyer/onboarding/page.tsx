@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description: "Start your journey and discover intentional objects for a slower life.",
 };
 
-export default function BuyerOnboardingPage() {
-  return <BuyerOnboardingView />;
+import { getOnboardingData } from "@/features/onboarding/actions/onboarding.action";
+
+export default async function BuyerOnboardingPage() {
+  const initialData = await getOnboardingData();
+  return <BuyerOnboardingView initialData={initialData || undefined} />;
 }

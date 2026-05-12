@@ -24,10 +24,13 @@ import {
   saveOnboardingStep,
   finalizeOnboarding,
 } from "../actions/onboarding.action";
+import { createShop, updateShopLogo } from "@/features/shop/actions/shop.actions";
+import { updateProfilePicture } from "@/features/auth/actions/profile.actions";
+import { toast } from "sonner";
 
 const TOTAL_STEPS = 5;
 
-export const OnboardingView = () => {
+export const OnboardingView = ({ initialData }: { initialData?: any }) => {
   const [currentStep, setCurrentStep] = useQueryState(
     "step",
     parseAsInteger.withDefault(1).withOptions({ shallow: false }),
@@ -45,18 +48,20 @@ export const OnboardingView = () => {
   const methods = useForm({
     resolver: zodResolver(combinedSchema),
     defaultValues: {
-      craftIds: [],
-      customCraft: "",
-      shopName: "",
-      logoUrl: "",
-      country: "",
-      city: "",
-      showLocation: true,
-      firstName: "",
-      lastName: "",
-      makerPortrait: "",
-      makerQuote: "",
-      story: "",
+      craftIds: initialData?.craftIds || [],
+      customCraft: initialData?.customCraft || "",
+      shopName: initialData?.shopName || "",
+      logoUrl: initialData?.logoUrl || "",
+      country: initialData?.country || "",
+      city: initialData?.city || "",
+      showLocation: initialData?.showLocation ?? true,
+      firstName: initialData?.firstName || "",
+      lastName: initialData?.lastName || "",
+      avatarUrl: initialData?.avatarUrl || "",
+      avatarPublicId: initialData?.avatarPublicId || "",
+      makerQuote: initialData?.makerQuote || "",
+      bio: initialData?.bio || "",
+      logoPublicId: initialData?.logoPublicId || "",
     },
     mode: "onChange",
   });
@@ -70,19 +75,67 @@ export const OnboardingView = () => {
   const handleNext = async () => {
     // Validate only current step fields
     let fieldsToValidate: any[] = [];
-    if (currentStep === 1) fieldsToValidate = ["craftIds"];
-    if (currentStep === 2) fieldsToValidate = ["shopName"];
-    if (currentStep === 3) fieldsToValidate = ["country"];
+    if (currentStep === 1) fieldsToValidate = ["craftIds", "customCraft"];
+    if (currentStep === 2) fieldsToValidate = ["shopName", "logoUrl", "logoPublicId"];
+    if (currentStep === 3) fieldsToValidate = ["country", "city", "showLocation"];
     if (currentStep === 4)
-      fieldsToValidate = ["firstName", "lastName", "story"];
+      fieldsToValidate = ["firstName", "lastName", "bio", "makerQuote", "avatarUrl", "avatarPublicId"];
     if (currentStep === 5) return; // Already on success page
 
     const isValid = await trigger(fieldsToValidate as any);
 
     if (isValid && currentStep < TOTAL_STEPS) {
+      // If fields exist for this step, check if any were modified.
+      // If none were modified, we skip the API call and just go next.
+      const isStepDirty = fieldsToValidate.length === 0 || fieldsToValidate.some(
+        (field) => methods.formState.dirtyFields[field as keyof typeof methods.formState.dirtyFields]
+      );
+
+      if (!isStepDirty) {
+        gsap.to(stepContainerRef.current, {
+          opacity: 0,
+          x: -20,
+          duration: 0.3,
+          ease: "power2.in",
+          onComplete: () => {
+            setCurrentStep(currentStep + 1);
+          },
+        });
+        return;
+      }
+
       setIsSaving(true);
       try {
-        const result = await saveOnboardingStep(currentStep, methods.getValues());
+        const stepData = methods.getValues() as Record<string, any>;
+
+        if (currentStep === 2) {
+          const shopResult = await createShop(stepData.shopName);
+          if ('error' in shopResult) {
+            toast.error(shopResult.error);
+            setIsSaving(false);
+            return;
+          }
+          
+          stepData.shopId = shopResult.shopId;
+
+          if (stepData.logoUrl && stepData.logoPublicId) {
+            await updateShopLogo(shopResult.shopId, { 
+              url: stepData.logoUrl, 
+              publicId: stepData.logoPublicId 
+            });
+          }
+        }
+
+        if (currentStep === 4) {
+          if (stepData.avatarUrl && stepData.avatarPublicId) {
+            await updateProfilePicture({
+              url: stepData.avatarUrl,
+              publicId: stepData.avatarPublicId,
+            });
+          }
+        }
+
+        const result = await saveOnboardingStep(currentStep, stepData);
         if (!result.success) {
           console.error("Failed to save onboarding step:", result.error);
           return; // Stop if save fails
@@ -95,6 +148,8 @@ export const OnboardingView = () => {
           duration: 0.3,
           ease: "power2.in",
           onComplete: () => {
+            // Reset defaultValues to current values so dirtyFields is cleared
+            methods.reset(methods.getValues());
             setCurrentStep(currentStep + 1);
           },
         });

@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description: "Start your journey as a Folkara artisan.",
 };
 
-export default function OnboardingPage() {
-  return <OnboardingView />;
+import { getOnboardingData } from "@/features/onboarding/actions/onboarding.action";
+
+export default async function OnboardingPage() {
+  const initialData = await getOnboardingData();
+  return <OnboardingView initialData={initialData || undefined} />;
 }

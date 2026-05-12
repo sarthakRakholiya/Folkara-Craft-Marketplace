@@ -5,7 +5,7 @@ import { Control, Controller, FieldValues, Path } from "react-hook-form";
 import { cn } from "@/lib/utils";
 
 interface FormSwitchProps<T extends FieldValues> {
-  control: Control<T>;
+  control: any;
   name: Path<T>;
   label?: string;
   description?: string;

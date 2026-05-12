@@ -1,5 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { decrypt } from '@/lib/session';
+import { db } from '@/lib/db';
+import { users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 /**
  * Route categories:
@@ -60,13 +63,41 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  const role = session.role.toLowerCase();
+  // Verify that the user still exists and get latest onboarding status
+  let dbUser;
+  try {
+    const [user] = await db
+      .select({ 
+        id: users.id,
+        role: users.role,
+        isOnboardingComplete: users.isOnboardingComplete,
+        currentStep: users.currentStep
+      })
+      .from(users)
+      .where(eq(users.id, session.userId))
+      .limit(1);
+    
+    dbUser = user;
+
+    if (!dbUser) {
+      const response = NextResponse.redirect(new URL('/auth', request.url));
+      response.cookies.delete('session');
+      return response;
+    }
+  } catch (error) {
+    console.error('Middleware DB user check failed:', error);
+  }
+
+  // Use DB values for most up-to-date status
+  const role = dbUser?.role?.toLowerCase() || session.role.toLowerCase();
+  const isOnboardingComplete = dbUser ? dbUser.isOnboardingComplete : session.onboardingComplete;
+  const currentStep = dbUser ? dbUser.currentStep : session.currentStep;
 
   // Logged-in user hitting /login or /signup
   if (isAuthRoute(pathname)) {
-    if (!session.onboardingComplete) {
+    if (!isOnboardingComplete) {
       return NextResponse.redirect(
-        new URL(`/${role}/onboarding?step=${session.currentStep}`, request.url)
+        new URL(`/${role}/onboarding?step=${currentStep}`, request.url)
       );
     }
     return NextResponse.redirect(new URL('/dashboard', request.url));
@@ -74,23 +105,23 @@ export async function middleware(request: NextRequest) {
 
   // Onboarding routes
   if (isOnboardingRoute(pathname)) {
-    if (session.onboardingComplete) {
+    if (isOnboardingComplete) {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
     // Correct the path if the role in the URL doesn't match the session
     const expectedPath = `/${role}/onboarding`;
     if (!pathname.startsWith(expectedPath)) {
       return NextResponse.redirect(
-        new URL(`${expectedPath}?step=${session.currentStep}`, request.url)
+        new URL(`${expectedPath}?step=${currentStep}`, request.url)
       );
     }
     return NextResponse.next();
   }
 
   // All other protected routes — require completed onboarding
-  if (!session.onboardingComplete) {
+  if (!isOnboardingComplete) {
     return NextResponse.redirect(
-      new URL(`/${role}/onboarding?step=${session.currentStep}`, request.url)
+      new URL(`/${role}/onboarding?step=${currentStep}`, request.url)
     );
   }
 

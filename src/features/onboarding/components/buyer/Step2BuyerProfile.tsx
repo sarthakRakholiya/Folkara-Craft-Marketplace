@@ -8,6 +8,11 @@ import { FormTextarea } from "@/components/form/FormTextarea";
 import { Button } from "@/components/ui/Button";
 import { BuyerProfileSchema } from "../../schemas/buyer.schema";
 import { AtSign, ChevronDown } from "lucide-react";
+import { ImageUpload, type UploadedImage } from "@/components/ui/ImageUpload";
+import { updateProfilePicture } from "@/features/auth/actions/profile.actions";
+import { toast } from "sonner";
+import { useState } from "react";
+import { COUNTRY_OPTIONS } from "../../constants/onboarding.constants";
 
 interface Step2BuyerProfileProps {
   onContinue: () => void;
@@ -20,15 +25,10 @@ export const Step2BuyerProfile = ({
   onBack,
   isSaving,
 }: Step2BuyerProfileProps) => {
-  const { control, handleSubmit } = useFormContext<BuyerProfileSchema>();
-
-  const countryOptions = [
-    { value: "uk", label: "United Kingdom" },
-    { value: "fr", label: "France" },
-    { value: "it", label: "Italy" },
-    { value: "jp", label: "Japan" },
-    { value: "us", label: "United States" },
-  ];
+  const { control, setValue, watch, formState: { dirtyFields } } = useFormContext<BuyerProfileSchema>();
+  const [isUploadingProfile, setIsUploadingProfile] = useState(false);
+  const avatarUrl = watch('avatarUrl');
+  const avatarPublicId = watch('avatarPublicId');
 
   return (
     <div className="w-full flex justify-center py-2 md:py-4">
@@ -54,9 +54,39 @@ export const Step2BuyerProfile = ({
             </p>
           </div>
 
+          <div className="mb-8 flex justify-center">
+            <ImageUpload
+              folder="profiles"
+              currentImageUrl={avatarUrl}
+              currentPublicId={avatarPublicId}
+              onUploadComplete={(image) => {
+                setValue('avatarUrl', image.url, { shouldDirty: true, shouldValidate: true });
+                setValue('avatarPublicId', image.publicId, { shouldDirty: true, shouldValidate: true });
+              }}
+              onUploadError={(err) => toast.error(err)}
+              isUnsaved={!!dirtyFields.avatarUrl}
+              label="Profile Picture"
+              hint="JPG, PNG or WebP · max 5 MB · Recommended: 400×400px"
+              shape="circle"
+              aspectRatio="1/1"
+              maxWidth={160}
+            />
+          </div>
+
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
+              
+              if (dirtyFields.avatarUrl && avatarUrl && avatarPublicId) {
+                setIsUploadingProfile(true);
+                const result = await updateProfilePicture({ url: avatarUrl, publicId: avatarPublicId });
+                setIsUploadingProfile(false);
+                if ('error' in result) {
+                  toast.error(result.error);
+                  return;
+                }
+              }
+              
               onContinue();
             }}
             className="space-y-4"
@@ -93,7 +123,7 @@ export const Step2BuyerProfile = ({
               name="country"
               label="Country"
               placeholder="Select your location"
-              options={countryOptions}
+              options={COUNTRY_OPTIONS}
             />
 
             {/* Birthday with curating info */}
@@ -127,10 +157,10 @@ export const Step2BuyerProfile = ({
                 type="submit"
                 size="lg"
                 shape="rounded"
-                disabled={isSaving}
+                disabled={isSaving || isUploadingProfile}
                 className="w-full h-12 shadow-lg shadow-primary/10"
               >
-                {isSaving ? (
+                {isSaving || isUploadingProfile ? (
                   <span className="flex items-center gap-2">
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Saving...

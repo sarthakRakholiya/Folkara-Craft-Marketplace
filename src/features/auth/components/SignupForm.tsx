@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, Lock, Loader2 } from "lucide-react";
@@ -18,9 +18,18 @@ export function SignupForm({ role }: SignupFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<SignupInput>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: { email: "", password: "", confirmPassword: "" },
+    resolver: zodResolver(signupSchema) as any,
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+      role: role === "artisan" ? "SELLER" : "BUYER",
+    },
   });
+
+  useEffect(() => {
+    form.setValue("role", role === "artisan" ? "SELLER" : "BUYER");
+  }, [role, form]);
 
   const onSubmit = async (data: SignupInput) => {
     setIsLoading(true);
@@ -30,7 +39,7 @@ export function SignupForm({ role }: SignupFormProps) {
         toast.error(res.error);
       }
     } catch (error: any) {
-      if (error.message === 'NEXT_REDIRECT') return;
+      if (error.message === "NEXT_REDIRECT") return;
       console.error(error);
       toast.error("Something went wrong. Please try again.");
     } finally {
@@ -41,7 +50,7 @@ export function SignupForm({ role }: SignupFormProps) {
   const isArtisan = role === "artisan";
 
   return (
-    <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
+    <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit as any)}>
       <div className="space-y-4">
         <FormInput
           control={form.control}

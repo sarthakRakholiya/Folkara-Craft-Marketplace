@@ -7,6 +7,8 @@ export const buyerProfileSchema = z.object({
   country: z.string().min(1, 'Please select your country'),
   birthday: z.string().min(1, 'Birthday is required'),
   interests: z.array(z.string()).min(1, 'Please select at least one interest'),
+  avatarUrl: z.string().optional(),
+  avatarPublicId: z.string().optional(),
 });
 
 export type BuyerProfileSchema = z.infer<typeof buyerProfileSchema>;

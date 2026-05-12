@@ -32,34 +32,15 @@ export const Step3BuyerInterests = ({
       setValue(
         "interests",
         selectedInterests.filter((item) => item !== id),
-        { shouldValidate: true },
+        { shouldValidate: true, shouldDirty: true },
       );
     } else {
       setValue("interests", [...selectedInterests, id], {
         shouldValidate: true,
+        shouldDirty: true,
       });
     }
   };
-
-  // Mock inspirations based on selection (as shown in design)
-  const inspirations = [
-    {
-      alt: "Handmade gifts selection",
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuDPSH1CJi9XN6Op3CXmWAWpPgt6n1jd3vusq7Z3ZtYhxF6KAMiisiKVH8Fxzw1KNIB-fNXVGelZoeoPZqfj1wtAQvTnpMEsvBSM7SJuapFxwL0oWjvM6Yjp5bfh9dmFeA2AfpIMuUxvIK1XSClod3Ps7NNLaxB77_vkc451WdELaB0ydjH5T4UczMNTm15JrI5O-LI4A4Sg_-lQpNO5KstJjODIdpH0eLdweOL4Rcg7-quqs9N7evXBE0HYicc2m-L4zwMkt62QcNo",
-    },
-    {
-      alt: "Art pieces context",
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuCQnB9y2-AwTkUL1ESkJe0NDPAOnA9UYBI-NJM-lZmlHtW5lfWk6jJsOw63ZKr-5PCtnoxSioU1FhtbCOY7y5_l8sf1uDNw8buOkvb0EJKvdsrVrzrDCrJL8erPYmvRSv5TwY3lPJxebYcAtOTIIWr_ma-6NpH8nphVeLNKvV_zuMuUu3jv3Y6jf9J_Ltsx-9L1Z2H_rPGaL5qQBliAelU73yFOEU_uZ3u4_PQhrMik1u8yHTcSpTZZuSz58Bf-7PoDuRiuG0209X8",
-    },
-    {
-      alt: "Ceramics teaser",
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuCGdaTT6LcXg8m4UBYKIS8jGTKENXOtxFXDI2G9xeZWMMnzB-DD8dOzmLtqQ48ggyzjT5P3Wd_3LtPxdBUBTafYNuUeXgue1Cu1hy7nGp7UliFdbOU8lW0kal3sWDvQDC5EcBnarkiM4QxUXLsRC_y_lzFgViV3KmBR69XqYGmfZ-UDpznLhAhJNqZDHkC-CPT1UY181TOUdlkEGT6XmZ3xeuKw8RSwvvxG_S2OoBS058nhmXzzIgq-lwJKqn2hTMl0Y-Lorl7Ow6Q",
-    },
-    {
-      alt: "Home decor inspiration",
-      src: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8V8Uqt1UpIuOmZMpJlPx8BUZzGr8_MMNs180ZTMmmhTd9UUWHj9VUX452Ygm5qK7bVylMLAeYMUrz2Feb8HRYpoOgT9eki50BTmdFERmHO4wAoa8KWFK7gRmdDqDiLJDSaqq0Q8U8i2mfg-uZe0A6XGVJCSHVWhUvtvsFIO78kKASC83_lGVJAucLVERItsED-zyh4JXITkvis25WRZuKsTTLPeCNOMCKhDe3DMvOmQWyFnbnjMWZHia8NQn3-5eUIM0Ec9YHOUM",
-    },
-  ];
 
   return (
     <div className="w-full max-w-4xl mx-auto py-8">

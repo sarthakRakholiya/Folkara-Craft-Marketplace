@@ -22,6 +22,7 @@ export const users = pgTable('users', {
   lastName: varchar('last_name', { length: 100 }),
   bio: text('bio'),
   avatarUrl: text('avatar_url'),
+  avatarPublicId: text('avatar_public_id'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()

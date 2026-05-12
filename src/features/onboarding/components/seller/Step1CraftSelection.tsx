@@ -13,33 +13,22 @@ export const Step1CraftSelection = () => {
   
   const selectedCraftIds = watch('craftIds') || [];
 
-  const mainCrafts = useMemo(() => {
+  const filteredCrafts = useMemo(() => {
     return CRAFT_OPTIONS.filter(craft => 
-      craft.id !== 'other' && (
-        craft.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        craft.category.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      craft.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      craft.category.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery]);
-
-  const otherCraft = useMemo(() => {
-    const other = CRAFT_OPTIONS.find(c => c.id === 'other');
-    if (!other) return null;
-    if (searchQuery === '' || other.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return other;
-    }
-    return null;
   }, [searchQuery]);
 
   const toggleCraft = (id: string) => {
     if (selectedCraftIds.includes(id)) {
-      setValue('craftIds', selectedCraftIds.filter(item => item !== id), { shouldValidate: true });
+      setValue('craftIds', selectedCraftIds.filter(item => item !== id), { shouldValidate: true, shouldDirty: true });
     } else {
-      setValue('craftIds', [...selectedCraftIds, id], { shouldValidate: true });
+      setValue('craftIds', [...selectedCraftIds, id], { shouldValidate: true, shouldDirty: true });
     }
   };
 
-  const renderCraftCard = (craft: typeof CRAFT_OPTIONS[0], isCentered = false) => {
+  const renderCraftCard = (craft: typeof CRAFT_OPTIONS[0]) => {
     const isSelected = selectedCraftIds.includes(craft.id);
     return (
       <div 
@@ -47,7 +36,6 @@ export const Step1CraftSelection = () => {
         onClick={() => toggleCraft(craft.id)}
         className={cn(
           "group relative bg-surface-container-low rounded-xl p-4 md:p-6 cursor-pointer border-2 transition-all duration-300 flex flex-col items-center justify-center text-center h-full min-h-[120px] md:min-h-[140px]",
-          isCentered ? "max-w-xs w-full mx-auto" : "",
           isSelected 
             ? "border-primary bg-white shadow-xl shadow-primary/5 ring-1 ring-primary" 
             : "border-transparent hover:border-outline-variant hover:bg-white"
@@ -71,21 +59,6 @@ export const Step1CraftSelection = () => {
         </span>
         <h3 className="font-serif text-sm md:text-base text-on-surface mb-0.5">{craft.name}</h3>
         <p className="font-sans text-[9px] md:text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">{craft.category}</p>
-
-        {craft.id === 'other' && isSelected && (
-          <div className="w-full mt-6 text-left animate-in fade-in slide-in-from-top-2 duration-300">
-            <label className="block font-sans text-[9px] font-bold text-on-surface-variant mb-2 uppercase tracking-widest">
-              Describe your craft
-            </label>
-            <input 
-              {...register('customCraft')}
-              className="w-full bg-surface border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-2 px-3 text-on-surface font-sans text-xs md:text-sm transition-all" 
-              placeholder="e.g. Glassblowing" 
-              type="text"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-        )}
       </div>
     );
   };
@@ -120,16 +93,10 @@ export const Step1CraftSelection = () => {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-fr gap-4 md:gap-gutter w-full">
-        {mainCrafts.map((craft) => renderCraftCard(craft))}
+        {filteredCrafts.map((craft) => renderCraftCard(craft))}
       </div>
 
-      {otherCraft && (
-        <div className="mt-8 md:mt-gutter w-full flex justify-center">
-          {renderCraftCard(otherCraft, true)}
-        </div>
-      )}
-
-      {mainCrafts.length === 0 && !otherCraft && (
+      {filteredCrafts.length === 0 && (
         <div className="py-20 text-center flex flex-col items-center gap-4">
           <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center text-outline">
             <Search className="w-8 h-8" />

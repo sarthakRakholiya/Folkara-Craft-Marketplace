@@ -3,9 +3,10 @@
 import React from "react";
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
 import { cn } from "@/lib/utils";
+import TextareaAutosize from "react-textarea-autosize";
 
 interface FormTextareaProps<T extends FieldValues> {
-  control: Control<T>;
+  control: any;
   name: Path<T>;
   label?: string;
   placeholder?: string;
@@ -14,6 +15,7 @@ interface FormTextareaProps<T extends FieldValues> {
   rows?: number;
   disabled?: boolean;
   variant?: "default" | "underlined";
+  autosize?: boolean;
 }
 
 export function FormTextarea<T extends FieldValues>({
@@ -26,7 +28,15 @@ export function FormTextarea<T extends FieldValues>({
   rows = 4,
   disabled,
   variant = "default",
+  autosize = false,
 }: FormTextareaProps<T>) {
+  const commonClasses = cn(
+    "w-full transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-on-surface-variant/40 resize-none",
+    variant === "default" && "bg-surface-container-low border rounded-xl py-4 px-4 text-sm focus:ring-2",
+    variant === "underlined" && "bg-transparent border-b-2 rounded-none py-4 px-0",
+    textareaClassName
+  );
+
   return (
     <Controller
       control={control}
@@ -43,22 +53,35 @@ export function FormTextarea<T extends FieldValues>({
           )}
           
           <div className="relative">
-            <textarea
-              {...field}
-              id={name}
-              placeholder={placeholder}
-              disabled={disabled}
-              rows={rows}
-              className={cn(
-                "w-full transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-on-surface-variant/40 resize-none",
-                variant === "default" && "bg-surface-container-low border rounded-xl py-4 px-4 text-sm focus:ring-2",
-                variant === "underlined" && "bg-transparent border-b-2 rounded-none py-4 px-0",
-                error 
-                  ? "border-error focus:ring-error/10 focus:border-error" 
-                  : (variant === "default" ? "border-surface-container-highest/50 focus:ring-primary/10 focus:border-primary" : "border-outline-variant focus:border-primary"),
-                textareaClassName
-              )}
-            />
+            {autosize ? (
+              <TextareaAutosize
+                {...field}
+                id={name}
+                placeholder={placeholder}
+                disabled={disabled}
+                minRows={rows}
+                className={cn(
+                  commonClasses,
+                  error 
+                    ? "border-error focus:ring-error/10 focus:border-error" 
+                    : (variant === "default" ? "border-surface-container-highest/50 focus:ring-primary/10 focus:border-primary" : "border-outline-variant focus:border-primary")
+                )}
+              />
+            ) : (
+              <textarea
+                {...field}
+                id={name}
+                placeholder={placeholder}
+                disabled={disabled}
+                rows={rows}
+                className={cn(
+                  commonClasses,
+                  error 
+                    ? "border-error focus:ring-error/10 focus:border-error" 
+                    : (variant === "default" ? "border-surface-container-highest/50 focus:ring-primary/10 focus:border-primary" : "border-outline-variant focus:border-primary")
+                )}
+              />
+            )}
           </div>
 
           {error && (

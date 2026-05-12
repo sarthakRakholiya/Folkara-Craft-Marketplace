@@ -6,7 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FormInputProps<T extends FieldValues> {
-  control: Control<T>;
+  control: any;
   name: Path<T>;
   label?: string;
   placeholder?: string;

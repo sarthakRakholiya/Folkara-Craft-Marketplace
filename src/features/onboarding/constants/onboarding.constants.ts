@@ -20,5 +20,16 @@ export const CRAFT_OPTIONS: CraftOption[] = [
   { id: 'printmaking', name: 'Printmaking', category: 'Ink & Impression', icon: 'layers' },
   { id: 'culinary', name: 'Culinary Arts', category: 'Taste & Tradition', icon: 'restaurant_menu' },
   { id: 'musical', name: 'Musical Instruments', category: 'Sound & Craft', icon: 'music_note' },
-  { id: 'other', name: 'Other', category: 'Unique Mediums', icon: 'more_horiz' },
+];
+
+export const COUNTRY_OPTIONS = [
+  { value: "IN", label: "India" },
+  { value: "US", label: "United States" },
+  { value: "UK", label: "United Kingdom" },
+  { value: "JP", label: "Japan" },
+  { value: "FR", label: "France" },
+  { value: "IT", label: "Italy" },
+  { value: "DE", label: "Germany" },
+  { value: "CA", label: "Canada" },
+  { value: "AU", label: "Australia" },
 ];

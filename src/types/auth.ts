@@ -12,6 +12,7 @@ export const signupSchema = z
       .regex(/[A-Z]/, 'Must contain an uppercase letter')
       .regex(/[0-9]/, 'Must contain a number'),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
+    role: z.enum(['BUYER', 'SELLER']).default('BUYER'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",

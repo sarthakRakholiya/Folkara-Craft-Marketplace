@@ -20,7 +20,7 @@ import { buyerProfileSchema } from "../schemas/buyer.schema";
 
 const TOTAL_STEPS = 4;
 
-export const BuyerOnboardingView = () => {
+export const BuyerOnboardingView = ({ initialData }: { initialData?: any }) => {
   const [currentStep, setCurrentStep] = useQueryState(
     "step",
     parseAsInteger.withDefault(1).withOptions({ shallow: false }),
@@ -31,12 +31,14 @@ export const BuyerOnboardingView = () => {
   const methods = useForm({
     resolver: zodResolver(buyerProfileSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      bio: "",
-      country: "",
-      birthday: "",
-      interests: [],
+      firstName: initialData?.firstName || "",
+      lastName: initialData?.lastName || "",
+      bio: initialData?.bio || "",
+      country: initialData?.country || "",
+      birthday: initialData?.birthday || "",
+      interests: initialData?.interests || [],
+      avatarUrl: initialData?.avatarUrl || "",
+      avatarPublicId: initialData?.avatarPublicId || "",
     },
     mode: "onChange",
   });
@@ -63,7 +65,7 @@ export const BuyerOnboardingView = () => {
 
     let fieldsToValidate: any[] = [];
     if (currentStep === 2)
-      fieldsToValidate = ["firstName", "lastName", "country", "birthday"];
+      fieldsToValidate = ["firstName", "lastName", "country", "birthday", "bio"];
     if (currentStep === 3) fieldsToValidate = ["interests"];
 
     const isValid = await trigger(fieldsToValidate as any);
@@ -75,6 +77,7 @@ export const BuyerOnboardingView = () => {
         const result = await saveOnboardingStep(currentStep, methods.getValues());
         if (!result.success) {
           console.error("Failed to save onboarding step:", result.error);
+          setIsSaving(false);
           return; // Stop if save fails
         }
 
@@ -84,6 +87,8 @@ export const BuyerOnboardingView = () => {
           duration: 0.3,
           ease: "power2.in",
           onComplete: () => {
+            // Reset defaultValues to current values so dirtyFields is cleared
+            methods.reset(methods.getValues());
             setCurrentStep(currentStep + 1);
           },
         });
