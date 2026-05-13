@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { users } from '@/db/schema';
+import { users, shops } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { createId } from '@paralleldrive/cuid2';
@@ -73,6 +73,10 @@ export async function login(data: LoginInput): Promise<ActionResult> {
   const isPasswordValid = await bcrypt.compare(parsed.data.password, user.password);
   if (!isPasswordValid) return { error: 'Invalid email or password' };
 
+  const shop = user.role === 'SELLER' 
+    ? await db.query.shops.findFirst({ where: eq(shops.userId, user.id) })
+    : null;
+
   const expires = new Date(Date.now() + SESSION_DURATION_MS);
   const session = await encrypt({
     userId: user.id,
@@ -82,6 +86,7 @@ export async function login(data: LoginInput): Promise<ActionResult> {
     firstName: user.firstName,
     lastName: user.lastName,
     avatarUrl: user.avatarUrl,
+    shopName: shop?.name,
   });
   const cookieStore = await cookies();
   cookieStore.set('session', session, sessionCookieOptions(expires));
@@ -89,7 +94,7 @@ export async function login(data: LoginInput): Promise<ActionResult> {
   if (!user.isOnboardingComplete) {
     redirect(`/${user.role.toLowerCase()}/onboarding?step=${user.currentStep}`);
   }
-  redirect('/dashboard');
+  redirect(`/${user.role.toLowerCase()}/overview`);
 }
 
 export async function logout(): Promise<void> {

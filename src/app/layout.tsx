@@ -25,11 +25,10 @@ export const metadata: Metadata = {
 };
 
 import { QueryProvider } from "@/providers/QueryProvider";
+import { NavigationProgress } from "@/components/NavigationProgress";
 import { AiAssistantSidebar } from "@/features/aiAssistant/components/AiAssistantSidebar";
-
-import { Toaster } from 'sonner';
-
-import { Suspense } from 'react';
+import { Toaster } from "sonner";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -52,6 +51,7 @@ export default function RootLayout({
         <QueryProvider>
           <Suspense fallback={null}>
             <NuqsAdapter>
+              <NavigationProgress />
               {children}
               <AiAssistantSidebar />
               <Toaster richColors position="top-center" closeButton />

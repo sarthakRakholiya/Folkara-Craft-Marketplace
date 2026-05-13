@@ -140,7 +140,7 @@ export function MobileNav({ isOpen, onClose, navLinks, isAuthenticated = false, 
             {isAuthenticated ? (
               <div className="flex flex-col gap-4">
                 <Link
-                  href={userRole ? `/${userRole}/dashboard` : "/dashboard"}
+                  href={`/${userRole?.toLowerCase()}/overview`}
                   onClick={onClose}
                   className="flex items-center gap-3 text-lg font-serif text-on-surface hover:text-primary transition-colors py-3 border-b border-outline-variant/10"
                 >

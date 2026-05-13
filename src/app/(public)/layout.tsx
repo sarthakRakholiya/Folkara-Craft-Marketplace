@@ -10,12 +10,19 @@ export default async function PublicLayout({
   children: React.ReactNode;
 }) {
   const session = await getSession();
+  const user = session ? {
+    firstName: session.firstName,
+    lastName: session.lastName,
+    avatarUrl: session.avatarUrl,
+    shopName: session.shopName,
+  } : undefined;
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header 
         isAuthenticated={!!session} 
-        userRole={session?.role?.toLowerCase()} 
+        user={user}
+        userRole={session?.role} 
       />
       <main className="flex-grow">
         {children}

@@ -11,6 +11,7 @@ export interface SessionPayload {
   firstName?: string | null;
   lastName?: string | null;
   avatarUrl?: string | null;
+  shopName?: string | null;
 }
 
 // ── Key setup ────────────────────────────────────────────────────────────────

@@ -16,7 +16,7 @@ export const Step4BuyerCompletion = () => {
     try {
       const result = await finalizeOnboarding("BUYER");
       if (result.success) {
-        router.push("/buyer/dashboard");
+        router.push("/buyer/overview");
       }
     } catch (error) {
       console.error("Failed to finalize onboarding:", error);

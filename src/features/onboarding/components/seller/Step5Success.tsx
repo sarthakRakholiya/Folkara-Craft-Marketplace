@@ -116,7 +116,7 @@ export const Step5Success = () => {
           shape="full"
           variant="primary"
           disabled={isFinishing}
-          onClick={() => handleComplete("/seller/dashboard/products/new")}
+          onClick={() => handleComplete("/seller/listings/new")}
           className="px-10 py-6 w-full sm:w-auto shadow-xl shadow-primary/20 font-sans text-xs font-bold uppercase tracking-widest"
         >
           {isFinishing ? (
@@ -127,7 +127,7 @@ export const Step5Success = () => {
         </Button>
         <button
           disabled={isFinishing}
-          onClick={() => handleComplete("/seller/dashboard")}
+          onClick={() => handleComplete("/seller/overview")}
           className="px-8 py-4 font-sans text-[11px] font-bold text-on-surface-variant uppercase tracking-widest hover:text-primary transition-all flex items-center gap-2 group disabled:opacity-50"
         >
           {isFinishing ? "Processing..." : "Go To Dashboard"}

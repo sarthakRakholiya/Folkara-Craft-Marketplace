@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
@@ -8,31 +8,22 @@ import { Button } from "@/components/ui/Button";
 import { MobileNav } from "./MobileNav";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { logout } from "@/features/auth/actions/auth.actions";
+import { UserMenu } from "./user-menu";
 
 interface HeaderProps {
   isAuthenticated?: boolean;
   userRole?: string;
+  user?: {
+    firstName?: string | null;
+    lastName?: string | null;
+    avatarUrl?: string | null;
+    shopName?: string | null;
+  };
 }
 
-export function Header({ isAuthenticated = false, userRole }: HeaderProps) {
+export function Header({ isAuthenticated = false, userRole, user }: HeaderProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const userMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        userMenuRef.current &&
-        !userMenuRef.current.contains(event.target as Node)
-      ) {
-        setIsUserMenuOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const navLinks = [
     { name: "Explore crafts", href: "/explore" },
@@ -96,7 +87,7 @@ export function Header({ isAuthenticated = false, userRole }: HeaderProps) {
           </nav>
 
           <div className="flex items-center justify-end gap-2">
-            {isAuthenticated ? (
+            {isAuthenticated && user ? (
               <div className="hidden lg:flex items-center gap-4 mr-2">
                 <Link href="/cart" aria-label="Cart">
                   <span
@@ -106,58 +97,7 @@ export function Header({ isAuthenticated = false, userRole }: HeaderProps) {
                     shopping_bag
                   </span>
                 </Link>
-                <div className="relative" ref={userMenuRef}>
-                  <button
-                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center"
-                    aria-label="User menu"
-                  >
-                    <span
-                      className={cn(
-                        "material-symbols-outlined cursor-pointer transition-colors text-[20px]",
-                        isUserMenuOpen
-                          ? "text-secondary"
-                          : "text-primary hover:text-secondary",
-                      )}
-                      data-icon="person"
-                    >
-                      person
-                    </span>
-                  </button>
-
-                  {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-4 w-48 bg-surface rounded-xl shadow-xl border border-outline-variant/20 py-2 z-50 animate-in fade-in slide-in-from-top-2">
-                      <Link
-                        href={userRole ? `/${userRole}/dashboard` : "/dashboard"}
-                        onClick={() => setIsUserMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-sans text-on-surface hover:bg-surface-container-high transition-colors"
-                      >
-                        <span
-                          className="material-symbols-outlined text-[18px] text-primary"
-                          data-icon="manage_accounts"
-                        >
-                          manage_accounts
-                        </span>
-                        Go to account
-                      </Link>
-                      <button
-                        onClick={() => {
-                          setIsUserMenuOpen(false);
-                          logout();
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-sans text-error hover:bg-error-container/10 transition-colors"
-                      >
-                        <span
-                          className="material-symbols-outlined text-[18px] text-error"
-                          data-icon="logout"
-                        >
-                          logout
-                        </span>
-                        Sign out
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <UserMenu user={user} role={userRole} position="bottom" />
               </div>
             ) : (
               <Button

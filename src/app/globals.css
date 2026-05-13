@@ -246,3 +246,30 @@ h1, h2, h3, h4, h5, h6, .font-serif {
 @utility gap-gutter {
   gap: var(--spacing-gutter);
 }
+
+/* ─── NProgress (route change indicator) ────────────────── */
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: var(--primary);
+  position: fixed;
+  z-index: 99999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  box-shadow: 0 0 12px var(--primary), 0 0 6px var(--primary);
+}
+
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0;
+  width: 120px;
+  height: 100%;
+  box-shadow: 0 0 20px var(--primary), 0 0 10px var(--primary), 0 0 4px var(--primary);
+  opacity: 1;
+  transform: rotate(3deg) translate(0px, -4px);
+}

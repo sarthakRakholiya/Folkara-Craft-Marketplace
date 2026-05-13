@@ -100,13 +100,13 @@ export async function middleware(request: NextRequest) {
         new URL(`/${role}/onboarding?step=${currentStep}`, request.url)
       );
     }
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    return NextResponse.redirect(new URL(`/${role}/overview`, request.url));
   }
 
   // Onboarding routes
   if (isOnboardingRoute(pathname)) {
     if (isOnboardingComplete) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      return NextResponse.redirect(new URL(`/${role}/overview`, request.url));
     }
     // Correct the path if the role in the URL doesn't match the session
     const expectedPath = `/${role}/onboarding`;
