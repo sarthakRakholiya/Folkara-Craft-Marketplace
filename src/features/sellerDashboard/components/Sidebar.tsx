@@ -6,21 +6,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { SELLER_NAV_ITEMS } from "../constants/dashboardNav.constants";
-import { UserMenu } from "@/components/layout/user-menu";
+import { UserMenu } from "@/components/layout/UserMenu";
 import { X } from "lucide-react";
 
 interface SidebarProps {
-  user: {
-    firstName?: string | null;
-    lastName?: string | null;
-    avatarUrl?: string | null;
-    shopName?: string | null;
-  };
   isMobileOpen?: boolean;
   onMobileClose?: () => void;
 }
 
-export function Sidebar({ user, isMobileOpen, onMobileClose }: SidebarProps) {
+export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
 
   // Close mobile menu when pathname changes
@@ -109,7 +103,7 @@ export function Sidebar({ user, isMobileOpen, onMobileClose }: SidebarProps) {
         {/* User Profile Section */}
         <div className="p-4 mt-auto">
           <div className="bg-white rounded-2xl p-2 shadow-sm border border-outline-variant/10">
-            <UserMenu user={user} position="top" showDetails={true} />
+            <UserMenu position="top" showDetails={true} />
           </div>
         </div>
       </aside>

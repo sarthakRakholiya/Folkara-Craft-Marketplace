@@ -5,10 +5,14 @@ import { users, shops } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { createId } from '@paralleldrive/cuid2';
-import { encrypt, sessionCookieOptions, SESSION_DURATION_MS } from '@/lib/session';
+import { encrypt, sessionCookieOptions, SESSION_DURATION_MS, getSession } from '@/lib/session';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { signupSchema, loginSchema, type SignupInput, type LoginInput } from '@/types/auth';
+
+export async function getSessionData() {
+  return await getSession();
+}
 
 type ActionResult = { error: string } | undefined;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { UserMenu } from "@/components/layout/user-menu";
+import { UserMenu } from "@/components/layout/UserMenu";
 import { getTimeBasedGreeting } from "../utils";
 import { usePathname } from "next/navigation";
 import { Bell, Menu } from "lucide-react";
@@ -8,9 +8,6 @@ import { Bell, Menu } from "lucide-react";
 interface HeaderProps {
   user: {
     firstName?: string | null;
-    lastName?: string | null;
-    avatarUrl?: string | null;
-    shopName?: string | null;
   };
   onMenuClick?: () => void;
 }
@@ -61,7 +58,7 @@ export function Header({ user, onMenuClick }: HeaderProps) {
             <Bell size={20} className="text-on-surface-variant" />
           </button>
 
-          <UserMenu user={user} position="bottom" />
+          <UserMenu position="bottom" />
         </div>
       </div>
     </header>

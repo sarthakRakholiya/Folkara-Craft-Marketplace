@@ -8,20 +8,13 @@ import { Button } from "@/components/ui/Button";
 import { MobileNav } from "./MobileNav";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { UserMenu } from "./user-menu";
+import { UserMenu } from "./UserMenu";
 
-interface HeaderProps {
-  isAuthenticated?: boolean;
-  userRole?: string;
-  user?: {
-    firstName?: string | null;
-    lastName?: string | null;
-    avatarUrl?: string | null;
-    shopName?: string | null;
-  };
-}
+import { useSession } from "@/hooks/useSession";
 
-export function Header({ isAuthenticated = false, userRole, user }: HeaderProps) {
+export function Header() {
+  const { data: session } = useSession();
+  const isAuthenticated = !!session;
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -87,7 +80,7 @@ export function Header({ isAuthenticated = false, userRole, user }: HeaderProps)
           </nav>
 
           <div className="flex items-center justify-end gap-2">
-            {isAuthenticated && user ? (
+            {isAuthenticated ? (
               <div className="hidden lg:flex items-center gap-4 mr-2">
                 <Link href="/cart" aria-label="Cart">
                   <span
@@ -97,7 +90,7 @@ export function Header({ isAuthenticated = false, userRole, user }: HeaderProps)
                     shopping_bag
                   </span>
                 </Link>
-                <UserMenu user={user} role={userRole} position="bottom" />
+                <UserMenu position="bottom" />
               </div>
             ) : (
               <Button
@@ -126,8 +119,6 @@ export function Header({ isAuthenticated = false, userRole, user }: HeaderProps)
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         navLinks={navLinks}
-        isAuthenticated={isAuthenticated}
-        userRole={userRole}
       />
     </>
   );

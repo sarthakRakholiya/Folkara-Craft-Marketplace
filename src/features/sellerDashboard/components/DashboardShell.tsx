@@ -21,7 +21,6 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
     <div className="flex min-h-screen bg-background text-on-surface font-body-md">
       {/* Sidebar - Desktop and Mobile Drawer */}
       <Sidebar 
-        user={user} 
         isMobileOpen={isMobileMenuOpen} 
         onMobileClose={() => setIsMobileMenuOpen(false)} 
       />

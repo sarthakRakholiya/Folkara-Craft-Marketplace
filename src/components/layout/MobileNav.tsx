@@ -8,16 +8,17 @@ import { gsap } from "gsap";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useSession } from "@/hooks/useSession";
 
 interface MobileNavProps {
   isOpen: boolean;
   onClose: () => void;
   navLinks: Array<{ name: string; href: string }>;
-  isAuthenticated?: boolean;
-  userRole?: string;
 }
 
-export function MobileNav({ isOpen, onClose, navLinks, isAuthenticated = false, userRole }: MobileNavProps) {
+export function MobileNav({ isOpen, onClose, navLinks }: MobileNavProps) {
+  const { data: session } = useSession();
+  const isAuthenticated = !!session;
   const pathname = usePathname();
   const overlayRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -140,7 +141,7 @@ export function MobileNav({ isOpen, onClose, navLinks, isAuthenticated = false, 
             {isAuthenticated ? (
               <div className="flex flex-col gap-4">
                 <Link
-                  href={`/${userRole?.toLowerCase()}/overview`}
+                  href={`/${session?.role?.toLowerCase()}/overview`}
                   onClick={onClose}
                   className="flex items-center gap-3 text-lg font-serif text-on-surface hover:text-primary transition-colors py-3 border-b border-outline-variant/10"
                 >
