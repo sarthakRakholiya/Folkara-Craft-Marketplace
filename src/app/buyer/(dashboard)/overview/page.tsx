@@ -1,19 +1,11 @@
-import { BuyerView } from "@/features/buyerDashboard/views/BuyerView";
-import { getSession } from "@/lib/session";
-import { redirect } from "next/navigation";
+import { BuyerDashboardView } from "@/features/buyerDashboard/views/BuyerDashboardView";
+import { Metadata } from "next";
 
-export default async function BuyerOverviewPage() {
-  const session = await getSession();
+export const metadata: Metadata = {
+  title: "Buyer Overview | Folkara",
+  description: "Your collection and artisan stories.",
+};
 
-  if (!session) {
-    redirect("/auth");
-  }
-
-  const user = {
-    firstName: session.firstName,
-    lastName: session.lastName,
-    avatarUrl: session.avatarUrl,
-  };
-
-  return <BuyerView user={user} />;
+export default function BuyerOverviewPage() {
+  return <BuyerDashboardView />;
 }

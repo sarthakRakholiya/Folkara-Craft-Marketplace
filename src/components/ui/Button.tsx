@@ -3,7 +3,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "fixed" | "accent";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "fixed" | "accent" | "destructive";
   size?: "sm" | "md" | "lg" | "icon";
   shape?: "square" | "rounded" | "full";
   href?: string;
@@ -12,12 +12,13 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", shape = "square", href, ...props }, ref) => {
     const variants = {
-      primary: "bg-primary text-primary-foreground hover:bg-secondary hover:text-secondary-foreground shadow-sm",
+      primary: "bg-primary text-white hover:bg-secondary hover:text-white shadow-sm",
       secondary: "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground shadow-sm",
       outline: "border border-primary text-primary hover:bg-primary hover:text-primary-foreground",
       ghost: "text-primary hover:bg-primary/10",
       accent: "bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground",
       fixed: "bg-primary-fixed text-primary hover:bg-white hover:text-primary",
+      destructive: "border border-error text-error hover:bg-error hover:text-white",
     };
 
     const sizes = {

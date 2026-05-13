@@ -7,6 +7,8 @@ import { gsap } from "gsap";
 import { logout } from "@/features/auth/actions/auth.actions";
 import { getInitials, cn } from "@/lib/utils";
 import { useSession } from "@/hooks/useSession";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
+import { LogOut } from "lucide-react";
 
 interface UserMenuProps {
   position?: "top" | "bottom";
@@ -19,7 +21,18 @@ export function UserMenu({
 }: UserMenuProps) {
   const { data: session, isLoading } = useSession();
   const [isOpen, setIsOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   useEffect(() => {
     if (isOpen && dropdownRef.current) {
@@ -158,7 +171,10 @@ export function UserMenu({
           </div>
           <div className="p-2 border-t border-outline-variant/10">
             <button
-              onClick={() => logout()}
+              onClick={() => {
+                setIsOpen(false);
+                setShowLogoutModal(true);
+              }}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-error hover:bg-error/10 transition-all duration-200 group cursor-pointer"
             >
               <span className="material-symbols-outlined text-lg transition-transform group-hover:translate-x-1">
@@ -169,6 +185,19 @@ export function UserMenu({
           </div>
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
+        title="Sign Out"
+        message="Are you sure you want to sign out? We'll be here when you're ready to continue your craft journey."
+        confirmText="Sign Out"
+        cancelText="Keep Creating"
+        variant="destructive"
+        icon={LogOut}
+        isLoading={isLoggingOut}
+      />
     </div>
   );
 }

@@ -95,6 +95,8 @@ export async function finalizeOnboarding(role: Role): Promise<ActionResult> {
         firstName: data.firstName ?? null,
         lastName: data.lastName ?? null,
         bio: data.bio ?? null,
+        avatarUrl: data.avatarUrl ?? null,
+        avatarPublicId: data.avatarPublicId ?? null,
       })
       .where(eq(users.id, session.userId));
 
@@ -106,6 +108,7 @@ export async function finalizeOnboarding(role: Role): Promise<ActionResult> {
       role,
       firstName: data.firstName ?? null,
       lastName: data.lastName ?? null,
+      avatarUrl: data.avatarUrl ?? null,
     });
     const cookieStore = await cookies();
     cookieStore.set('session', newSession, sessionCookieOptions(expires));

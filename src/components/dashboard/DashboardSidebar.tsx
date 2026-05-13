@@ -5,16 +5,44 @@ import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { SELLER_NAV_ITEMS } from "../constants/dashboardNav.constants";
+import { 
+  LayoutDashboard, 
+  List, 
+  ShoppingBag, 
+  MessageSquare, 
+  BarChart3, 
+  Wallet,
+  Library,
+  History,
+  Sparkles,
+  Settings,
+  X 
+} from "lucide-react";
+import { LucideIcon } from "lucide-react";
+import { NavItem } from "@/types/navigation";
 import { UserMenu } from "@/components/layout/UserMenu";
-import { X } from "lucide-react";
 
 interface SidebarProps {
+  navItems: NavItem[];
+  rootHref: string;
   isMobileOpen?: boolean;
   onMobileClose?: () => void;
 }
 
-export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
+const iconMap: Record<string, LucideIcon> = {
+  LayoutDashboard,
+  List,
+  ShoppingBag,
+  MessageSquare,
+  BarChart3,
+  Wallet,
+  Library,
+  History,
+  Sparkles,
+  Settings,
+};
+
+export function DashboardSidebar({ navItems, rootHref, isMobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
 
   // Close mobile menu when pathname changes
@@ -35,7 +63,7 @@ export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
         {/* Logo Section */}
         <div className="h-24 flex items-center justify-between px-8 shrink-0">
           <Link
-            href="/seller/overview"
+            href={rootHref}
             className="flex items-center gap-3 group"
           >
             <div className="w-12 h-12 relative">
@@ -71,8 +99,9 @@ export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
           <p className="px-4 text-[10px] font-label-caps text-on-surface-variant/50 tracking-widest mb-4">
             MAIN MENU
           </p>
-          {SELLER_NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const isActive = pathname === item.href;
+            const Icon = iconMap[item.icon] || LayoutDashboard;
             return (
               <Link
                 key={item.href}
@@ -84,7 +113,7 @@ export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
                     : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface",
                 )}
               >
-                <item.icon
+                <Icon
                   className={cn(
                     "w-5 h-5 transition-transform group-hover:scale-110 shrink-0",
                     isActive

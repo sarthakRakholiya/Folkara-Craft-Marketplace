@@ -89,6 +89,7 @@
   --color-primary-fixed: var(--primary-fixed);
   --color-primary-fixed-dim: var(--primary-fixed-dim);
   --color-primary-container: var(--primary-container);
+  --color-on-primary: var(--primary-foreground);
   --color-on-primary-container: var(--on-primary-container);
   
   --color-tertiary-fixed: var(--tertiary-fixed);
@@ -122,6 +123,24 @@ body {
 
 h1, h2, h3, h4, h5, h6, .font-serif {
   font-family: var(--font-noto-serif), serif;
+}
+
+/* Ensure all interactive elements have cursor-pointer */
+button, 
+[role="button"],
+a,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+select,
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled,
+[role="button"][aria-disabled="true"],
+input:disabled {
+  cursor: not-allowed;
 }
 
 /* Organic Shapes from Untitled-1 */
@@ -260,7 +279,7 @@ h1, h2, h3, h4, h5, h6, .font-serif {
   left: 0;
   width: 100%;
   height: 4px;
-  box-shadow: 0 0 12px var(--primary), 0 0 6px var(--primary);
+  /* box-shadow: 0 0 12px var(--primary), 0 0 6px var(--primary); */
 }
 
 #nprogress .peg {
@@ -269,7 +288,7 @@ h1, h2, h3, h4, h5, h6, .font-serif {
   right: 0;
   width: 120px;
   height: 100%;
-  box-shadow: 0 0 20px var(--primary), 0 0 10px var(--primary), 0 0 4px var(--primary);
+  /* box-shadow: 0 0 20px var(--primary), 0 0 10px var(--primary), 0 0 4px var(--primary); */
   opacity: 1;
   transform: rotate(3deg) translate(0px, -4px);
 }

@@ -57,6 +57,13 @@ export async function getSession(): Promise<SessionPayload | null> {
   return decrypt(token);
 }
 
+export async function setSession(payload: SessionPayload) {
+  const cookieStore = await cookies();
+  const expires = new Date(Date.now() + SESSION_DURATION_MS);
+  const token = await encrypt(payload);
+  cookieStore.set('session', token, sessionCookieOptions(expires));
+}
+
 // ── sessionCookieOptions() ───────────────────────────────────────────────────
 // Shared cookie options — avoids copy-paste drift across multiple set() calls.
 export function sessionCookieOptions(expires: Date) {

@@ -1,34 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { Sidebar } from "./Sidebar";
-import { Header } from "./Header";
+import { DashboardSidebar } from "./DashboardSidebar";
+import { DashboardHeader } from "./DashboardHeader";
+import { NavItem } from "@/types/navigation";
 
 interface DashboardShellProps {
   children: React.ReactNode;
-  user: {
-    firstName?: string | null;
-    lastName?: string | null;
-    avatarUrl?: string | null;
-    shopName?: string | null;
-  };
+  navItems: NavItem[];
+  rootHref: string;
 }
 
-export function DashboardShell({ children, user }: DashboardShellProps) {
+export function DashboardShell({ children, navItems, rootHref }: DashboardShellProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-background text-on-surface font-body-md">
       {/* Sidebar - Desktop and Mobile Drawer */}
-      <Sidebar 
+      <DashboardSidebar 
+        navItems={navItems}
+        rootHref={rootHref}
         isMobileOpen={isMobileMenuOpen} 
         onMobileClose={() => setIsMobileMenuOpen(false)} 
       />
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0">
-        <Header 
-          user={user} 
+        <DashboardHeader 
           onMenuClick={() => setIsMobileMenuOpen(true)} 
         />
         <div className="flex-1 overflow-y-auto custom-scrollbar pb-6 lg:pb-0">

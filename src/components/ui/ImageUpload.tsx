@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import { Upload, X, Loader2, ImageIcon } from "lucide-react";
 import type { UploadFolder } from "@/lib/cloudinary";
 import axios from "axios";
+import type { AxiosError } from "axios";
 import { useUnsavedImage } from "@/hooks/useUnsavedImage";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,8 @@ interface ImageUploadProps {
   minHeight?: number | string;
   width?: number | string;
   height?: number | string;
+  trigger?: React.ReactNode;
+  hideLabel?: boolean;
 }
 
 export function ImageUpload({
@@ -46,6 +49,8 @@ export function ImageUpload({
   minHeight,
   width = "100%",
   height,
+  trigger,
+  hideLabel = false,
 }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(
     currentImageUrl ?? null,
@@ -97,10 +102,11 @@ export function ImageUpload({
         setPreview(data.url);
         setActivePublicId(data.publicId);
         onUploadComplete({ url: data.url, publicId: data.publicId });
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const axiosError = err as AxiosError<{ error?: string }>;
         const msg =
-          err.response?.data?.error ||
-          err.message ||
+          axiosError.response?.data?.error ||
+          axiosError.message ||
           "Upload failed. Please try again.";
         setError(msg);
         onUploadError?.(msg);
@@ -132,6 +138,7 @@ export function ImageUpload({
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();
     setPreview(null);
+    setActivePublicId(null);
     setError(null);
     if (inputRef.current) inputRef.current.value = "";
   };
@@ -140,10 +147,10 @@ export function ImageUpload({
 
   return (
     <div
-      className="flex flex-col gap-2 mx-auto"
+      className="flex flex-col gap-2 mx-auto relative group/upload-root"
       style={{ maxWidth, width, height }}
     >
-      {label && (
+      {label && !hideLabel && (
         <span className="text-sm font-medium text-on-surface text-center">
           {label}
         </span>
@@ -155,12 +162,12 @@ export function ImageUpload({
         onDragOver={handleDragOver}
         onDragLeave={() => setIsDragging(false)}
         className={`
-          relative cursor-pointer border-2 transition-all mx-auto group/upload
+          relative cursor-pointer transition-all mx-auto group/upload
           ${shapeClass}
           ${
-            isDragging
-              ? "border-primary bg-primary/5"
-              : "border-dashed border-outline-variant hover:border-primary/50 hover:bg-surface-container-highest"
+            !trigger && (isDragging
+              ? "border-2 border-primary bg-primary/5"
+              : "border-2 border-dashed border-outline-variant hover:border-primary/50 hover:bg-surface-container-highest")
           }
           ${isUploading ? "pointer-events-none opacity-70" : ""}
         `}
@@ -181,7 +188,7 @@ export function ImageUpload({
               <img
                 src={preview}
                 alt="Preview"
-                className="w-full h-full object-contain"
+                className={`w-full h-full ${shape === "circle" ? "object-cover" : "object-contain"}`}
               />
               {/* Hover overlay */}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
@@ -191,10 +198,16 @@ export function ImageUpload({
               </div>
             </>
           ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center">
-              <div className="rounded-full bg-surface-container-high p-3">
-                <ImageIcon size={24} className="text-outline" />
-              </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+              {trigger ? (
+                <div className="flex items-center justify-center">
+                  {trigger}
+                </div>
+              ) : (
+                <div className="rounded-full bg-surface-container-high p-3">
+                  <ImageIcon size={24} className="text-outline" />
+                </div>
+              )}
               <div>
                 <p className="text-sm font-medium text-on-surface">
                   Click to upload
@@ -205,14 +218,21 @@ export function ImageUpload({
           )}
         </div>
 
-        {/* Remove button (Outside the clipped wrapper but inside relative parent) */}
+        {/* Trigger (if provided and image exists) */}
+        {trigger && preview && (
+          <div className="absolute -bottom-2 -right-2 z-20">
+            {trigger}
+          </div>
+        )}
+
+        {/* Remove button */}
         {preview && !isUploading && (
           <button
             type="button"
             onClick={handleRemove}
             className={cn(
-              "absolute z-20 bg-error hover:bg-error/80 text-white rounded-full p-1.5 shadow-lg transition-all",
-              shape === "circle" ? "top-1 right-1" : "-top-2 -right-2"
+              "absolute z-30 bg-error hover:bg-error/80 text-white rounded-full p-1.5 shadow-lg transition-all",
+              shape === "circle" ? "top-1 right-1" : "-top-2 -right-2",
             )}
             aria-label="Remove image"
           >
@@ -222,7 +242,12 @@ export function ImageUpload({
 
         {/* Loading overlay (Inside parent to cover everything) */}
         {isUploading && (
-          <div className={cn("absolute inset-0 bg-white/80 flex items-center justify-center z-30", shapeClass)}>
+          <div
+            className={cn(
+              "absolute inset-0 bg-white/80 flex items-center justify-center z-30",
+              shapeClass,
+            )}
+          >
             <div className="flex flex-col items-center gap-2">
               <Loader2 size={24} className="animate-spin text-primary" />
               <span className="text-xs text-on-surface-variant">

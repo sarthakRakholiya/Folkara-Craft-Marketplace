@@ -1,4 +1,4 @@
-import { DashboardView } from '@/features/sellerDashboard/views/dashboardView';
+import { DashboardView } from '@/features/sellerDashboard/views/DashboardView';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

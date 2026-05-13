@@ -1,4 +1,4 @@
-import { ComingSoonView } from "@/features/sellerDashboard/components/ComingSoonView";
+import { ComingSoonView } from "@/components/dashboard/ComingSoonView";
 import { BarChart3 } from "lucide-react";
 
 export default function AnalyticsPage() {

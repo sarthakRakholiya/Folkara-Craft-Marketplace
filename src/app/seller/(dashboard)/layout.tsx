@@ -1,28 +1,16 @@
-import { getSession } from "@/lib/session";
-import { redirect } from "next/navigation";
-import { DashboardShell } from "@/features/sellerDashboard/components/DashboardShell";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
+import { SELLER_NAV_ITEMS } from "@/constants/navigation";
 
-export default async function SellerDashboardLayout({
+export default function SellerDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSession();
-
-  // Basic check - middleware should handle this but layout adds extra layer
-  if (!session || session.role !== "SELLER") {
-    redirect("/auth");
-  }
-
-  const user = {
-    firstName: session.firstName,
-    lastName: session.lastName,
-    avatarUrl: session.avatarUrl,
-    shopName: session.shopName,
-  };
-
   return (
-    <DashboardShell user={user}>
+    <DashboardShell 
+      navItems={SELLER_NAV_ITEMS} 
+      rootHref="/seller/overview"
+    >
       {children}
     </DashboardShell>
   );
