@@ -205,7 +205,7 @@ export function ImageUpload({
                 </div>
               ) : (
                 <div className="rounded-full bg-surface-container-high p-3">
-                  <ImageIcon size={24} className="text-outline" />
+                  <ImageIcon size={20} className="text-outline" />
                 </div>
               )}
               <div>

@@ -77,7 +77,7 @@ BLOCKING step — no PR raised until this passes and human approves.
 
 #### G. Conventions & Architecture
 
-- **Naming**: Components `PascalCase`, Functions `camelCase`, Files `kebab-case`.
+- **Naming**: Components `PascalCase`, Functions `camelCase`, Files `camelCase`.
 - **Structure**: Feature modules in `features/`, thin routes in `app/`.
 - **Data Fetching**: Use **Axios** and **TanStack Query**.
 - **Database**: Use **Drizzle**.

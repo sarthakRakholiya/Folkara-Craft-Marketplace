@@ -45,7 +45,7 @@ export function OrderCard({ order }: OrderCardProps) {
               {order.title}
             </h4>
             <span className="font-headline-sm text-headline-sm text-secondary">
-              ${order.price.toFixed(2)}
+              ₹{order.price.toFixed(2)}
             </span>
           </div>
 

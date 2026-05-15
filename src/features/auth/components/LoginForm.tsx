@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { FormInput } from "@/components/form/FormInput";
 import { login } from "@/features/auth/actions/auth.actions";
 import { loginSchema, type LoginInput } from "@/types/auth";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface LoginFormProps {
   role: string;
@@ -16,6 +17,7 @@ interface LoginFormProps {
 
 export function LoginForm({ role: _role }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -28,9 +30,14 @@ export function LoginForm({ role: _role }: LoginFormProps) {
       const res = await login(data);
       if (res?.error) {
         toast.error(res.error);
+      } else {
+        queryClient.clear();
       }
     } catch (error: any) {
-      if (error.message === 'NEXT_REDIRECT') return;
+      if (error.message === 'NEXT_REDIRECT') {
+        queryClient.clear();
+        return;
+      }
       console.error(error);
       toast.error("Something went wrong. Please try again.");
     } finally {

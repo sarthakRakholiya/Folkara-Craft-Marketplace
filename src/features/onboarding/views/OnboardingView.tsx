@@ -110,18 +110,22 @@ export const OnboardingView = ({ initialData }: { initialData?: any }) => {
 
         if (currentStep === 2) {
           const shopResult = await createShop(stepData.shopName);
-          if ('error' in shopResult) {
-            toast.error(shopResult.error);
+          if (!('success' in shopResult) || !('data' in shopResult)) {
+            toast.error('error' in shopResult ? shopResult.error : 'Failed to create shop');
             setIsSaving(false);
             return;
           }
           
-          stepData.shopId = shopResult.shopId;
+          const shopId = shopResult.data;
+          stepData.shopId = shopId;
 
           if (stepData.logoUrl && stepData.logoPublicId) {
-            await updateShopLogo(shopResult.shopId, { 
-              url: stepData.logoUrl, 
-              publicId: stepData.logoPublicId 
+            await updateShopLogo({ 
+              shopId, 
+              data: {
+                url: stepData.logoUrl, 
+                publicId: stepData.logoPublicId 
+              }
             });
           }
         }
@@ -135,10 +139,10 @@ export const OnboardingView = ({ initialData }: { initialData?: any }) => {
           }
         }
 
-        const result = await saveOnboardingStep(currentStep, stepData);
-        if (!result.success) {
-          console.error("Failed to save onboarding step:", result.error);
-          return; // Stop if save fails
+        const result = await saveOnboardingStep({ step: currentStep, data: stepData });
+        if ("error" in result) {
+          toast.error("Failed to save progress", { description: result.error });
+          return;
         }
 
         // Animate out
@@ -184,16 +188,23 @@ export const OnboardingView = ({ initialData }: { initialData?: any }) => {
     gsap.fromTo(
       stepContainerRef.current,
       { opacity: 0, x: direction },
-      { opacity: 1, x: 0, duration: 0.5, ease: "power2.out", delay: 0.1 },
+      { 
+        opacity: 1, 
+        x: 0, 
+        duration: 0.5, 
+        ease: "power2.out", 
+        delay: 0.1,
+        clearProps: "all"
+      },
     );
   }, [currentStep]);
 
   return (
     <FormProvider {...methods}>
-      <div className="min-h-screen bg-surface flex flex-col">
+      <div className="flex-1 flex flex-col bg-surface">
         <OnboardingHeader currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
-        <main className="flex-1 flex flex-col items-center justify-start py-6 md:py-10 px-margin-page">
+        <main className="flex-1 flex flex-col items-center justify-start py-8 md:py-12 pb-20 md:pb-24 px-margin-page">
           <div ref={stepContainerRef} className="w-full">
             {currentStep === 1 && <Step1CraftSelection />}
             {currentStep === 2 && <Step2ShopName />}

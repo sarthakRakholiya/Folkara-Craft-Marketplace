@@ -18,6 +18,8 @@ interface FormInputProps<T extends FieldValues> {
   disabled?: boolean;
   variant?: "default" | "underlined";
   size?: "sm" | "md" | "lg";
+  onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function FormInput<T extends FieldValues>({
@@ -33,6 +35,8 @@ export function FormInput<T extends FieldValues>({
   disabled,
   variant = "default",
   size = "md",
+  onFocus,
+  onChange,
 }: FormInputProps<T>) {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === "password";
@@ -67,6 +71,19 @@ export function FormInput<T extends FieldValues>({
               type={inputType}
               placeholder={placeholder}
               disabled={disabled}
+              onFocus={onFocus}
+              onChange={(e) => {
+                if (type === "number") {
+                  // Remove leading zeros for cleaner number input
+                  let val = e.target.value.replace(/^0+/, "");
+                  if (val === "" && e.target.value.startsWith("0")) {
+                    val = "0";
+                  }
+                  e.target.value = val;
+                }
+                onChange?.(e);
+                field.onChange(e);
+              }}
               className={cn(
                 "w-full transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-on-surface-variant/40",
                 variant === "default" &&

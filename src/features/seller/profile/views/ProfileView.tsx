@@ -107,12 +107,12 @@ export function ProfileView({ initialData }: ProfileViewProps) {
 
     setIsGeneratingQuote(true);
     try {
-      const result = await generateMakerQuote(shopName, []);
-      if (result.success && result.quote) {
-        setValue("makerQuote", result.quote, { shouldDirty: true });
+      const result = await generateMakerQuote({ shopName, craftIds: [] });
+      if ("success" in result && "data" in result) {
+        setValue("makerQuote", result.data, { shouldDirty: true });
         toast.success("AI generated a quote for you!");
       } else {
-        toast.error(result.error || "Failed to generate quote");
+        toast.error("error" in result ? result.error : "Failed to generate quote");
       }
     } catch {
       toast.error("Something went wrong");
@@ -134,12 +134,16 @@ export function ProfileView({ initialData }: ProfileViewProps) {
 
     setIsGeneratingStory(true);
     try {
-      const result = await generateMakerStory(shopName, [], artisanName);
-      if (result.success && result.story) {
-        setValue("bio", result.story, { shouldDirty: true });
+      const result = await generateMakerStory({ 
+        shopName, 
+        craftIds: [], 
+        artisanName 
+      });
+      if ("success" in result && "data" in result) {
+        setValue("bio", result.data, { shouldDirty: true });
         toast.success("AI crafted your maker story!");
       } else {
-        toast.error(result.error || "Failed to generate story");
+        toast.error("error" in result ? result.error : "Failed to generate story");
       }
     } catch {
       toast.error("Something went wrong");
@@ -149,7 +153,7 @@ export function ProfileView({ initialData }: ProfileViewProps) {
   };
 
   return (
-    <div className="px-margin-page py-16 max-w-6xl mx-auto">
+    <div className="px-margin-page pt-16 pb-40 max-w-6xl mx-auto">
       <div className="mb-12">
         <h1 className="font-display-lg text-4xl text-primary mb-2">Artisan Profile</h1>
         <p className="font-body-lg text-outline italic">
@@ -330,29 +334,32 @@ export function ProfileView({ initialData }: ProfileViewProps) {
           </div>
         </section>
 
-        {/* Final Actions */}
-        <footer className="flex justify-end items-center gap-8 pt-12 border-t border-outline-variant/10">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            shape="rounded"
-            onClick={() => router.back()}
-            className="px-10 h-16 text-xs tracking-[0.2em]"
-          >
-            CANCEL CHANGES
-          </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            shape="rounded"
-            className="px-16 h-16 shadow-2xl shadow-primary/20 text-xs tracking-[0.2em]"
-            disabled={isSaving || !isDirty}
-          >
-            {isSaving ? "SAVING..." : "SAVE PROFILE"}
-          </Button>
-        </footer>
+        {/* Final Actions - Mac Dock Style */}
+        <div className="fixed bottom-8 left-0 right-0 lg:left-72 flex justify-center pointer-events-none z-50">
+          <footer className="pointer-events-auto flex items-center gap-4 px-6 py-4 bg-white/70 backdrop-blur-xl border border-outline-variant/20 rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] animate-in slide-in-from-bottom-8 duration-700 mx-4">
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              shape="rounded"
+              onClick={() => form.reset()}
+              className="px-8 h-12 text-[10px] tracking-[0.2em] font-bold text-outline hover:text-primary transition-colors"
+            >
+              RESET
+            </Button>
+            <div className="w-[1px] h-8 bg-outline-variant/30 mx-2" />
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              shape="rounded"
+              className="px-10 h-12 shadow-lg shadow-primary/20 text-[10px] tracking-[0.2em] font-bold"
+              disabled={isSaving}
+            >
+              {isSaving ? "SAVING..." : "SAVE PROFILE"}
+            </Button>
+          </footer>
+        </div>
       </form>
     </div>
   );

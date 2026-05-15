@@ -1,0 +1,13 @@
+/**
+ * @file queryKeys.ts
+ * Central registry of all React Query cache keys.
+ * Always use these — never inline string arrays in components.
+ */
+export const queryKeys = {
+  buyerProfile: ["buyer", "profile"] as const,
+  sellerProfile: ["seller", "profile"] as const,
+  shop: (id: string) => ["shop", id] as const,
+  products: ["products"] as const,
+  product: (id: string) => ["product", id] as const,
+  onboarding: ["onboarding"] as const,
+} as const;

@@ -1,18 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
-import type { Role } from '@/types/auth';
-
-// ── What gets stored inside the JWT ─────────────────────────────────────────
-export interface SessionPayload {
-  userId: string;           // DB user id
-  role: Role;               // 'BUYER' | 'SELLER'
-  onboardingComplete: boolean;
-  currentStep: number;
-  firstName?: string | null;
-  lastName?: string | null;
-  avatarUrl?: string | null;
-  shopName?: string | null;
-}
+import type { Role, SessionPayload } from '@/types/auth';
 
 // ── Key setup ────────────────────────────────────────────────────────────────
 // Converts the string secret to a Uint8Array that jose requires

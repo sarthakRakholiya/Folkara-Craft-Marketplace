@@ -1,16 +1,14 @@
-'use server';
+"use server";
 
 import { db } from '@/lib/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { cookies } from 'next/headers';
 import { z } from 'zod';
-import {
-  getSession, encrypt, sessionCookieOptions, SESSION_DURATION_MS,
-} from '@/lib/session';
+import { setSession } from '@/lib/session';
 import type { Role } from '@/types/auth';
+import { withAuthAction, withAuthQuery } from '@/lib/actionMiddleware';
 
-// Validates data coming from each onboarding step (Buyer or Seller)
+// Validates data coming from each onboarding step
 const onboardingStepSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
@@ -31,20 +29,12 @@ const onboardingStepSchema = z.object({
 });
 
 export type OnboardingStepData = z.infer<typeof onboardingStepSchema>;
-type ActionResult = { success: true } | { success: false; error: string };
 
-export async function saveOnboardingStep(
-  step: number,
-  data: OnboardingStepData
-): Promise<ActionResult> {
-  const session = await getSession();
-  if (!session) return { success: false, error: 'Unauthorized' };
-
-  const parsed = onboardingStepSchema.safeParse(data);
-  if (!parsed.success) return { success: false, error: parsed.error.issues[0].message };
-
-  try {
-    // Load existing saved data and merge the new step's data into it
+/**
+ * Saves progress of an onboarding step.
+ */
+export const saveOnboardingStep = withAuthAction(
+  async ({ session }, { step, data }: { step: number; data: OnboardingStepData }) => {
     const existing = await db.query.users.findFirst({
       where: eq(users.id, session.userId),
       columns: { onboardingData: true },
@@ -52,7 +42,7 @@ export async function saveOnboardingStep(
 
     const mergedData = {
       ...(existing?.onboardingData as object ?? {}),
-      ...parsed.data,
+      ...data,
     };
 
     const nextStep = step + 1;
@@ -62,23 +52,17 @@ export async function saveOnboardingStep(
       .set({ currentStep: nextStep, onboardingData: mergedData })
       .where(eq(users.id, session.userId));
 
-    const expires = new Date(Date.now() + SESSION_DURATION_MS);
-    const newSession = await encrypt({ ...session, currentStep: nextStep });
-    const cookieStore = await cookies();
-    cookieStore.set('session', newSession, sessionCookieOptions(expires));
+    await setSession({ ...session, currentStep: nextStep });
 
     return { success: true };
-  } catch (error) {
-    console.error('saveOnboardingStep error:', error);
-    return { success: false, error: 'Failed to save progress. Please try again.' };
   }
-}
+);
 
-export async function finalizeOnboarding(role: Role): Promise<ActionResult> {
-  const session = await getSession();
-  if (!session) return { success: false, error: 'Unauthorized' };
-
-  try {
+/**
+ * Finalizes onboarding and marks it as complete.
+ */
+export const finalizeOnboarding = withAuthAction(
+  async ({ session }, role: Role) => {
     const user = await db.query.users.findFirst({
       where: eq(users.id, session.userId),
       columns: { onboardingData: true },
@@ -86,7 +70,6 @@ export async function finalizeOnboarding(role: Role): Promise<ActionResult> {
 
     const data = (user?.onboardingData ?? {}) as OnboardingStepData;
 
-    // Write all accumulated onboarding data to the actual profile columns
     await db
       .update(users)
       .set({
@@ -100,9 +83,7 @@ export async function finalizeOnboarding(role: Role): Promise<ActionResult> {
       })
       .where(eq(users.id, session.userId));
 
-    // Issue a new JWT with onboardingComplete: true so middleware lets them through
-    const expires = new Date(Date.now() + SESSION_DURATION_MS);
-    const newSession = await encrypt({
+    await setSession({
       ...session,
       onboardingComplete: true,
       role,
@@ -110,21 +91,16 @@ export async function finalizeOnboarding(role: Role): Promise<ActionResult> {
       lastName: data.lastName ?? null,
       avatarUrl: data.avatarUrl ?? null,
     });
-    const cookieStore = await cookies();
-    cookieStore.set('session', newSession, sessionCookieOptions(expires));
 
     return { success: true };
-  } catch (error) {
-    console.error('finalizeOnboarding error:', error);
-    return { success: false, error: 'Failed to complete onboarding. Please try again.' };
   }
-}
+);
 
-export async function getOnboardingData(): Promise<OnboardingStepData | null> {
-  const session = await getSession();
-  if (!session) return null;
-
-  try {
+/**
+ * Fetches current onboarding data.
+ */
+export const getOnboardingData = withAuthQuery(
+  async ({ session }) => {
     const user = await db.query.users.findFirst({
       where: eq(users.id, session.userId),
       columns: { 
@@ -139,7 +115,6 @@ export async function getOnboardingData(): Promise<OnboardingStepData | null> {
 
     if (!user) return null;
 
-    // Merge core profile fields with the temporary onboarding data
     return {
       firstName: user.firstName || '',
       lastName: user.lastName || '',
@@ -148,8 +123,5 @@ export async function getOnboardingData(): Promise<OnboardingStepData | null> {
       avatarPublicId: user.avatarPublicId || '',
       ...(user.onboardingData as object ?? {}),
     } as OnboardingStepData;
-  } catch (error) {
-    console.error('getOnboardingData error:', error);
-    return null;
   }
-}
+);

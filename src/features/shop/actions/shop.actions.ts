@@ -1,75 +1,77 @@
-'use server';
+"use server";
 
 import { db } from '@/lib/db';
 import { shops } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
-import { getSession } from '@/lib/session';
 import { deleteImage } from '@/lib/cloudinary';
 import { createId } from '@paralleldrive/cuid2';
 import { z } from 'zod';
+import { setSession } from '@/lib/session';
+import { withAuthAction, withAuthQuery } from '@/lib/actionMiddleware';
 
 const imageSchema = z.object({
   url: z.string().url(),
   publicId: z.string().min(1),
 });
 
-type ActionResult = { success: true } | { error: string };
-
 // Security helper — ensures the shop belongs to the logged-in user
 async function getShopForUser(shopId: string, userId: string) {
   return db.query.shops.findFirst({
     where: and(eq(shops.id, shopId), eq(shops.userId, userId)),
+    columns: { id: true, logoPublicId: true },
   });
 }
 
-export async function createShop(
-  name: string
-): Promise<{ shopId: string } | { error: string }> {
-  const session = await getSession();
-  if (!session) return { error: 'Unauthorized' };
+/**
+ * Creates or updates a shop.
+ */
+export const createShop = withAuthAction(
+  async ({ session }, name: string) => {
+    const existingShop = await db.query.shops.findFirst({
+      where: eq(shops.userId, session.userId),
+      columns: { id: true },
+    });
 
-  try {
-    const [shop] = await db
+    if (existingShop) {
+      await db
+        .update(shops)
+        .set({ name, updatedAt: new Date() })
+        .where(eq(shops.id, existingShop.id));
+      
+      await setSession({ ...session, shopName: name });
+      return { success: true, data: existingShop.id };
+    }
+
+    const id = createId();
+    await db
       .insert(shops)
-      .values({ id: createId(), userId: session.userId, name })
-      .returning({ id: shops.id });
+      .values({ id, userId: session.userId, name });
 
-    return { shopId: shop.id };
-  } catch {
-    return { error: 'Failed to create shop. Please try again.' };
+    await setSession({ ...session, shopName: name });
+    return { success: true, data: id };
   }
-}
+);
 
-export async function updateShopLogo(
-  shopId: string,
-  data: z.infer<typeof imageSchema>
-): Promise<ActionResult> {
-  const session = await getSession();
-  if (!session) return { error: 'Unauthorized' };
-
-  const parsed = imageSchema.safeParse(data);
-  if (!parsed.success) return { error: 'Invalid image data' };
-
-  try {
-    // Verify the shop belongs to the logged-in user before updating
+/**
+ * Updates shop logo.
+ */
+export const updateShopLogo = withAuthAction(
+  async ({ session }, { shopId, data }: { shopId: string; data: z.infer<typeof imageSchema> }) => {
     const shop = await getShopForUser(shopId, session.userId);
-    if (!shop) return { error: 'Shop not found' };
+    if (!shop) throw new Error("Shop not found");
 
-    // Delete old logo from Cloudinary to avoid orphaned files
-    if (shop.logoPublicId && shop.logoPublicId !== parsed.data.publicId) {
+    if (shop.logoPublicId && shop.logoPublicId !== data.publicId) {
       await deleteImage(shop.logoPublicId);
     }
 
     await db
       .update(shops)
       .set({
-        logoUrl: parsed.data.url,
-        logoPublicId: parsed.data.publicId,
+        logoUrl: data.url,
+        logoPublicId: data.publicId,
       })
       .where(eq(shops.id, shopId));
 
     return { success: true };
-  } catch {
-    return { error: 'Failed to update shop logo. Please try again.' };
   }
-}
+);

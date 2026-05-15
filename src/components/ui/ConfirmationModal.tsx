@@ -26,63 +26,64 @@ export function ConfirmationModal({
   title,
   message,
   confirmText = "Confirm",
-  cancelText = "Cancel",
+  cancelText = "Keep",
   icon: Icon,
   variant = "primary",
   isLoading = false,
 }: ConfirmationModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} showCloseButton={false} className="max-w-[380px] p-0">
-      <div className="relative overflow-hidden">
-        {/* Decorative Background Element */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-gradient-to-b from-surface-bright/50 to-transparent pointer-events-none" />
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      showCloseButton={false} 
+      maxWidth="max-w-[420px]" 
+      noPadding 
+      className="rounded-[2rem] bg-surface"
+    >
+      <div className="relative">
+        {/* Subtle Decorative Pattern */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none paper-texture" />
         
-        <div className="relative flex flex-col items-center text-center p-10 pt-12 space-y-8">
+        <div className="relative p-8 flex flex-col items-center text-center">
           {Icon && (
-            <div className="relative group">
-              {/* Outer Glow */}
-              <div className={cn(
-                "absolute inset-0 blur-2xl opacity-20 transition-all duration-500 group-hover:opacity-40",
-                variant === "destructive" ? "bg-error" : "bg-primary"
-              )} />
-              
-              {/* Icon Container */}
-              <div className={cn(
-                "relative w-20 h-20 rounded-[28px] flex items-center justify-center border transition-transform duration-500 group-hover:scale-105",
-                variant === "destructive" 
-                  ? "bg-error/5 border-error/10 text-error shadow-[0_0_40px_rgba(var(--error-rgb),0.1)]" 
-                  : "bg-primary/5 border-primary/10 text-primary shadow-[0_0_40px_rgba(var(--primary-rgb),0.1)]"
-              )}>
-                <Icon size={36} strokeWidth={1.5} />
-              </div>
+            <div className={cn(
+              "w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500",
+              variant === "destructive" 
+                ? "bg-error/5 text-error border border-error/10" 
+                : "bg-primary/5 text-primary border border-primary/10"
+            )}>
+              <Icon size={28} strokeWidth={1.5} />
             </div>
           )}
 
-          <div className="space-y-3">
-            <h3 className="font-display-sm text-3xl tracking-tight text-primary">{title}</h3>
-            <p className="font-body-md text-outline/80 leading-relaxed max-w-[280px] mx-auto">
+          <div className="space-y-2 mb-8">
+            <h3 className="font-display-md text-2xl text-primary leading-tight tracking-tight">
+              {title}
+            </h3>
+            <p className="font-body-md text-on-surface-variant/70 text-sm leading-relaxed max-w-[300px] mx-auto">
               {message}
             </p>
           </div>
 
-          <div className="flex flex-col w-full gap-3 pt-4">
-            <Button
-              variant={variant === "destructive" ? "destructive" : "primary"}
-              shape="full"
-              onClick={onConfirm}
-              className="w-full h-14 font-label-caps tracking-[0.2em] text-[11px] font-black shadow-lg shadow-primary/10"
-              disabled={isLoading}
-            >
-              {isLoading ? "PROCESSING..." : confirmText.toUpperCase()}
-            </Button>
+          <div className="grid grid-cols-2 gap-3 w-full">
             <Button
               variant="outline"
-              shape="full"
               onClick={onClose}
-              className="w-full h-14 font-label-caps tracking-[0.2em] text-[11px] font-black border-outline/10 hover:bg-surface-bright"
+              className="h-12 rounded-xl font-label-caps tracking-widest text-[10px] font-bold border-outline-variant/30 text-primary hover:bg-primary/5 transition-all duration-300"
               disabled={isLoading}
             >
               {cancelText.toUpperCase()}
+            </Button>
+            <Button
+              variant={variant === "destructive" ? "destructive" : "primary"}
+              onClick={onConfirm}
+              className={cn(
+                "h-12 rounded-xl font-label-caps tracking-widest text-[10px] font-bold shadow-lg transition-all duration-300",
+                variant === "destructive" ? "bg-error text-white shadow-error/20" : "shadow-primary/10"
+              )}
+              disabled={isLoading}
+            >
+              {isLoading ? "WAIT..." : confirmText.toUpperCase()}
             </Button>
           </div>
         </div>

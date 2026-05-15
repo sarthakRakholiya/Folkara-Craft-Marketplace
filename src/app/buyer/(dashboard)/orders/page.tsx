@@ -1,4 +1,4 @@
-import { OrderListView } from "@/features/buyerDashboard/views/OrderListView";
+import { OrderListView } from "@/features/buyer/orders/views/OrderListView";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

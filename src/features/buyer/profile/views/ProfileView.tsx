@@ -19,21 +19,8 @@ import { useRouter } from "next/navigation";
 import type { User } from "@/db/schemas/users.schema";
 import { CRAFT_OPTIONS } from "@/features/onboarding/constants/onboarding.constants";
 import { cn } from "@/lib/utils";
+import type { BuyerProfileViewData } from "../types/profile.types";
 
-type BuyerOnboardingData = Partial<{
-  firstName: string;
-  lastName: string;
-  bio: string;
-  country: string;
-  birthday: string;
-  interests: string[];
-  avatarUrl: string;
-  avatarPublicId: string;
-}>;
-
-type BuyerProfileViewData = Omit<User, "onboardingData"> & {
-  onboardingData: BuyerOnboardingData;
-};
 
 interface ProfileViewProps {
   initialData: BuyerProfileViewData;
@@ -98,7 +85,7 @@ export function ProfileView({ initialData }: ProfileViewProps) {
   };
 
   return (
-    <main className="px-margin-page py-16 max-w-6xl mx-auto">
+    <main className="px-margin-page pt-16 pb-40 max-w-6xl mx-auto">
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-24"
@@ -221,29 +208,32 @@ export function ProfileView({ initialData }: ProfileViewProps) {
           </div>
         </section>
 
-        {/* Final Actions */}
-        <footer className="flex justify-end items-center gap-8 pt-12 border-t border-outline-variant/10">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            shape="rounded"
-            onClick={() => form.reset()}
-            className="px-10 h-16 text-xs tracking-[0.2em]"
-          >
-            CANCEL CHANGES
-          </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            shape="rounded"
-            className="px-16 h-16 shadow-2xl shadow-primary/20 text-xs tracking-[0.2em]"
-            disabled={isSaving}
-          >
-            {isSaving ? "SAVING..." : "SAVE PROFILE"}
-          </Button>
-        </footer>
+        {/* Final Actions - Mac Dock Style */}
+        <div className="fixed bottom-8 left-0 right-0 lg:left-72 flex justify-center pointer-events-none z-50">
+          <footer className="pointer-events-auto flex items-center gap-4 px-6 py-4 bg-white/70 backdrop-blur-xl border border-outline-variant/20 rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] animate-in slide-in-from-bottom-8 duration-700 mx-4">
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              shape="rounded"
+              onClick={() => form.reset()}
+              className="px-8 h-12 text-[10px] tracking-[0.2em] font-bold text-outline hover:text-primary transition-colors"
+            >
+              RESET
+            </Button>
+            <div className="w-[1px] h-8 bg-outline-variant/30 mx-2" />
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              shape="rounded"
+              className="px-10 h-12 shadow-lg shadow-primary/20 text-[10px] tracking-[0.2em] font-bold"
+              disabled={isSaving}
+            >
+              {isSaving ? "SAVING..." : "SAVE PROFILE"}
+            </Button>
+          </footer>
+        </div>
       </form>
     </main>
   );

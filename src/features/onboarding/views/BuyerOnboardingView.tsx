@@ -53,7 +53,14 @@ export const BuyerOnboardingView = ({ initialData }: { initialData?: any }) => {
     gsap.fromTo(
       stepContainerRef.current,
       { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", delay: 0.1 },
+      { 
+        opacity: 1, 
+        y: 0, 
+        duration: 0.5, 
+        ease: "power2.out", 
+        delay: 0.1,
+        clearProps: "all"
+      },
     );
   }, [currentStep]);
 
@@ -74,8 +81,8 @@ export const BuyerOnboardingView = ({ initialData }: { initialData?: any }) => {
       setIsSaving(true);
       try {
         // Save data to DB
-        const result = await saveOnboardingStep(currentStep, methods.getValues());
-        if (!result.success) {
+        const result = await saveOnboardingStep({ step: currentStep, data: methods.getValues() });
+        if ("error" in result) {
           console.error("Failed to save onboarding step:", result.error);
           setIsSaving(false);
           return; // Stop if save fails
@@ -116,10 +123,10 @@ export const BuyerOnboardingView = ({ initialData }: { initialData?: any }) => {
 
   return (
     <FormProvider {...methods}>
-      <div className="min-h-screen bg-surface flex flex-col">
+      <div className="flex-1 flex flex-col bg-surface">
         <OnboardingHeader currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
-        <main className="flex-1 flex flex-col items-center justify-start py-4 md:py-6 px-margin-page">
+        <main className="flex-1 flex flex-col items-center justify-start py-8 md:py-12 pb-20 md:pb-24 px-margin-page">
           <div ref={stepContainerRef} className="w-full max-w-7xl mx-auto">
             {currentStep === 1 && <Step1BuyerWelcome onContinue={handleNext} />}
             {currentStep === 2 && (

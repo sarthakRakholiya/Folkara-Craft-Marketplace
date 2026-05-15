@@ -1,4 +1,4 @@
-import { ProfileView } from "@/features/sellerDashboard/views/ProfileView";
+import { ProfileView } from "@/features/seller/profile/views/ProfileView";
 import { getSellerProfile } from "@/features/auth/actions/profile.actions";
 
 import { redirect } from "next/navigation";

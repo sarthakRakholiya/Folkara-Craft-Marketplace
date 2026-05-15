@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -6,29 +6,29 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export type UploadFolder = 'profiles' | 'shops/logos';
+export type UploadFolder = "profiles" | "shops/logos" | "products";
 
 export interface UploadResult {
-  url: string;        // secure HTTPS URL to display the image
-  publicId: string;   // Cloudinary ID needed for deletion
+  url: string; // secure HTTPS URL to display the image
+  publicId: string; // Cloudinary ID needed for deletion
   width: number;
   height: number;
 }
 
 export async function uploadImage(
-  file: string,           // base64 data URI: "data:image/png;base64,..."
+  file: string, // base64 data URI: "data:image/png;base64,..."
   folder: UploadFolder,
-  publicId?: string,      // pass userId for profiles — ensures one file per user
+  publicId?: string, // pass userId for profiles — ensures one file per user
 ): Promise<UploadResult> {
   const result = await cloudinary.uploader.upload(file, {
     folder: `folkara/${folder}`,
     public_id: publicId,
     overwrite: true,
-    resource_type: 'image',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    resource_type: "image",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
     transformation: [
-      { quality: 'auto' },        // Cloudinary picks best quality/size ratio
-      { fetch_format: 'auto' },   // serves WebP to browsers that support it
+      { quality: "auto" }, // Cloudinary picks best quality/size ratio
+      { fetch_format: "auto" }, // serves WebP to browsers that support it
     ],
   });
 

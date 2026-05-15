@@ -55,7 +55,7 @@ Result: if all pass → Stage 2. If any fail → list what's wrong, fix, re-run.
   - Components: `PascalCase`
   - Functions/Variables/Hooks: `camelCase`
   - Folders: `camelCase`
-  - Files: `kebab-case`
+  - Files: `camelCase`
   - Route Segments: `kebab-case`
 - No deeply nested logic (max 3 levels)
 - Complex logic has a WHY comment

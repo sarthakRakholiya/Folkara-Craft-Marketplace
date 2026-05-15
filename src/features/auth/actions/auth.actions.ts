@@ -26,7 +26,7 @@ export async function signup(data: SignupInput): Promise<ActionResult> {
   // 2. Check email uniqueness
   const existing = await db.query.users.findFirst({
     where: eq(users.email, parsed.data.email),
-    columns: { id: true },     
+    columns: { id: true },
   });
   if (existing) return { error: 'An account with this email already exists' };
 
@@ -37,7 +37,7 @@ export async function signup(data: SignupInput): Promise<ActionResult> {
   const [newUser] = await db
     .insert(users)
     .values({
-      id: createId(),           
+      id: createId(),
       email: parsed.data.email,
       password: hashedPassword,
       role: parsed.data.role,
@@ -68,17 +68,29 @@ export async function login(data: LoginInput): Promise<ActionResult> {
 
   const user = await db.query.users.findFirst({
     where: eq(users.email, parsed.data.email),
+    columns: {
+      id: true,
+      email: true,
+      password: true,
+      role: true,
+      isOnboardingComplete: true,
+      currentStep: true,
+      firstName: true,
+      lastName: true,
+      avatarUrl: true,
+    },
   });
 
-  // SECURITY: same message whether email or password is wrong.
-  // If you say "email not found", attackers can enumerate which emails exist.
   if (!user) return { error: 'Invalid email or password' };
 
   const isPasswordValid = await bcrypt.compare(parsed.data.password, user.password);
   if (!isPasswordValid) return { error: 'Invalid email or password' };
 
   const shop = user.role === 'SELLER' 
-    ? await db.query.shops.findFirst({ where: eq(shops.userId, user.id) })
+    ? await db.query.shops.findFirst({ 
+        where: eq(shops.userId, user.id),
+        columns: { name: true }
+      })
     : null;
 
   const expires = new Date(Date.now() + SESSION_DURATION_MS);

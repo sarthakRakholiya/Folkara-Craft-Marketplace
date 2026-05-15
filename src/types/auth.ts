@@ -2,6 +2,17 @@ import { z } from 'zod';
 
 export type Role = 'BUYER' | 'SELLER';
 
+export interface SessionPayload {
+  userId: string;           // DB user id
+  role: Role;               // 'BUYER' | 'SELLER'
+  onboardingComplete: boolean;
+  currentStep: number;
+  firstName?: string | null;
+  lastName?: string | null;
+  avatarUrl?: string | null;
+  shopName?: string | null;
+}
+
 // ── Signup schema ─────────────────────────────────────────────────────────────
 export const signupSchema = z
   .object({

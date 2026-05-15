@@ -157,14 +157,14 @@ export const AiAssistantSidebar = () => {
                   <RecommendationCard 
                     title="Shallow Clay Dish"
                     description="Hand-burnished terra sigillata"
-                    price="$48.00"
+                    price="₹48.00"
                     imageUrl="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?q=80&w=2070&auto=format&fit=crop"
                   />
 
                   <RecommendationCard 
                     title="Smoked Oak Tray"
                     description="Single-piece carved oak"
-                    price="$65.00"
+                    price="₹65.00"
                     icon="filter_vintage"
                   />
                 </div>

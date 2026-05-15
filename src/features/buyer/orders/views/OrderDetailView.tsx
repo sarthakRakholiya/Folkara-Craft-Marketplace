@@ -189,19 +189,19 @@ export function OrderDetailView({ orderId }: { orderId: string }) {
             </p>
             <div className="flex justify-between text-sm">
               <span className="text-on-surface-variant">Subtotal</span>
-              <span className="text-primary font-bold">${order.price.toFixed(2)}</span>
+              <span className="text-primary font-bold">₹{order.price.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-on-surface-variant">Shipping</span>
-              <span className="text-primary font-bold">$12.00</span>
+              <span className="text-primary font-bold">₹12.00</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-on-surface-variant">Service Fee</span>
-              <span className="text-primary font-bold">$4.50</span>
+              <span className="text-primary font-bold">₹4.50</span>
             </div>
             <div className="flex justify-between pt-4 border-t border-outline-variant/20">
               <span className="font-headline-sm text-lg text-primary">Total</span>
-              <span className="font-headline-sm text-lg text-primary">${(order.price + 12 + 4.5).toFixed(2)}</span>
+              <span className="font-headline-sm text-lg text-primary">₹{(order.price + 12 + 4.5).toFixed(2)}</span>
             </div>
           </div>
         </div>

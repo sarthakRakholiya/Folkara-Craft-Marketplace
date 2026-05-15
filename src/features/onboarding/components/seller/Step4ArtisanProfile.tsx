@@ -28,12 +28,12 @@ export const Step4ArtisanProfile = () => {
 
     setIsGenerating(true);
     try {
-      const result = await generateMakerQuote(shopName, craftIds);
-      if (result.success && result.quote) {
-        setValue('makerQuote', result.quote, { shouldValidate: true, shouldDirty: true });
+      const result = await generateMakerQuote({ shopName, craftIds });
+      if ('success' in result && result.success && 'data' in result) {
+        setValue('makerQuote', result.data, { shouldValidate: true, shouldDirty: true });
         toast.success('AI generated a soulful quote for you!');
-      } else {
-        toast.error(result.error || 'Failed to generate quote');
+      } else if ('error' in result) {
+        toast.error(result.error);
       }
     } catch (error) {
       toast.error('Something went wrong');
@@ -61,12 +61,12 @@ export const Step4ArtisanProfile = () => {
 
     setIsGeneratingStory(true);
     try {
-      const result = await generateMakerStory(shopName, craftIds, artisanName);
-      if (result.success && result.story) {
-        setValue('bio', result.story, { shouldValidate: true, shouldDirty: true });
+      const result = await generateMakerStory({ shopName, craftIds, artisanName });
+      if ('success' in result && result.success && 'data' in result) {
+        setValue('bio', result.data, { shouldValidate: true, shouldDirty: true });
         toast.success('AI crafted your maker story!');
-      } else {
-        toast.error(result.error || 'Failed to generate story');
+      } else if ('error' in result) {
+        toast.error(result.error);
       }
     } catch (error) {
       toast.error('Something went wrong');

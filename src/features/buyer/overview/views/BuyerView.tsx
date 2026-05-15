@@ -25,7 +25,7 @@ export function BuyerView({ user }: BuyerViewProps) {
       id: "ORD-9482",
       shop: "Amber & Earth",
       item: "Hand-thrown Pitcher",
-      price: "$124.00",
+      price: "₹124.00",
       status: "In Transit",
       image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCZyjBFms7uSYsSne-yGEyhAYdqCHraTXx2cHnvtrRXkQkMz2qYb5PEjHQvDJwMA5uX7mY0QqMYwbJ54QJP08Bpl9PvgAQ85YScfAgy0vQEjZYzBizoMFdZyhRQwbUt8KnNwyhoZnBhXRE2jMOaUrXSSIMjwTQgWFtTSHormmzb-xDYnLMjO0NqkfFQuN41h0eXqcoCcISKJ1q9As6bAv70m7jscIw9xgiIdTBRRYXplCQwOHb2-WSHtNV1jmETbiHWYchdznQeDrw"
     },
@@ -33,7 +33,7 @@ export function BuyerView({ user }: BuyerViewProps) {
       id: "ORD-9479",
       shop: "Indigo Weaves",
       item: "Organic Cotton Runner",
-      price: "$85.00",
+      price: "₹85.00",
       status: "Delivered",
       image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAXjCe3zSqIcySaZ13nk3brQ3Xu4EwnJTONKpD26J2xQkdMzJDUXG6r7UbWwzPUv7mWGieod3OuJ1-NDNtsRCGiZeAEbp78RBx47wB8dgQNCPNMEs-gzCLaXxWExQzxFvAnGKk8ah6fNeZRwgCf2A8KULTO9JjjwpdlF6IJBV-NWJwklM-q_ePesRlOVocgYIO2VcLCpGxQ7b931-frIwnJADcZPzhlz-ifbAaqf5xS5-c3AEdO_Uf7b_PPhVIEvXjL8_KfXclWoWw"
     }

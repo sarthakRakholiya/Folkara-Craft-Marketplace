@@ -1,0 +1,11 @@
+node_modules/
+build/
+dist/
+.next/
+.env*
+.DS_Store
+*.local
+.git/
+.ai/
+.agents/
+graphify-out/

@@ -25,11 +25,11 @@ export function DashboardShell({ children, navItems, rootHref }: DashboardShellP
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 h-screen overflow-y-auto custom-scrollbar flex flex-col min-w-0">
         <DashboardHeader 
           onMenuClick={() => setIsMobileMenuOpen(true)} 
         />
-        <div className="flex-1 overflow-y-auto custom-scrollbar pb-6 lg:pb-0">
+        <div className="flex-1 pb-6 lg:pb-0">
           {children}
         </div>
       </main>

@@ -13,6 +13,8 @@ interface ModalProps {
   children: React.ReactNode;
   className?: string;
   showCloseButton?: boolean;
+  maxWidth?: string;
+  noPadding?: boolean;
 }
 
 export function Modal({
@@ -22,6 +24,8 @@ export function Modal({
   children,
   className,
   showCloseButton = true,
+  maxWidth = "max-w-md",
+  noPadding = false,
 }: ModalProps) {
   const [mounted, setMounted] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -92,13 +96,18 @@ export function Modal({
       <div
         ref={modalRef}
         className={cn(
-          "relative w-full max-w-md bg-white rounded-[32px] shadow-2xl overflow-hidden z-10 opacity-0 border border-outline/10",
+          "relative w-full rounded-[32px] shadow-2xl overflow-hidden z-10 opacity-0 border border-outline/10",
+          !className?.includes("bg-") && "bg-white",
+          maxWidth,
           className
         )}
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-6 pb-0">
+          <div className={cn(
+            "flex items-center justify-between p-6 pb-0",
+            noPadding && "absolute top-2 right-2 z-20 p-0"
+          )}>
             {title && (
               <h3 className="font-display-sm text-xl text-primary">{title}</h3>
             )}
@@ -114,7 +123,7 @@ export function Modal({
         )}
 
         {/* Content */}
-        <div className="p-8 pt-6">{children}</div>
+        <div className={cn(!noPadding && "p-8 pt-6")}>{children}</div>
       </div>
     </div>,
     document.body

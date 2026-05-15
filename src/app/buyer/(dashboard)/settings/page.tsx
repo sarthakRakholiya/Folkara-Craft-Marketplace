@@ -1,4 +1,4 @@
-import { SettingsView } from "@/features/buyerDashboard/views/SettingsView";
+import { SettingsView } from "@/features/buyer/settings/views/SettingsView";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

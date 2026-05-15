@@ -7,6 +7,7 @@ import { gsap } from "gsap";
 import { logout } from "@/features/auth/actions/auth.actions";
 import { getInitials, cn } from "@/lib/utils";
 import { useSession } from "@/hooks/useSession";
+import { useQueryClient } from "@tanstack/react-query";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { LogOut } from "lucide-react";
 
@@ -24,11 +25,16 @@ export function UserMenu({
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
       await logout();
+      queryClient.clear();
+    } catch (error: any) {
+      // Next.js redirect throws an error, we still want to clear the cache
+      queryClient.clear();
     } finally {
       setIsLoggingOut(false);
     }

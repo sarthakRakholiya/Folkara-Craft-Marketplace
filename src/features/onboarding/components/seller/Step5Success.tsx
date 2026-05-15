@@ -23,7 +23,7 @@ export const Step5Success = () => {
     setIsFinishing(true);
     try {
       const result = await finalizeOnboarding("SELLER");
-      if (result.success) {
+      if ("success" in result) {
         router.push(targetPath);
       }
     } catch (error) {
