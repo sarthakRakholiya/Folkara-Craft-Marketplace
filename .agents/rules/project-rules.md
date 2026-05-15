@@ -237,7 +237,7 @@ Validate and sanitise every server input. Never expose secrets — `.env.local` 
 | React Hooks               | `camelCase` + `use` prefix | `useProductFilters`, `useAuthSession` |
 | Variables & Constants     | `camelCase`                | `isLoading`, `productList`            |
 | Folders                   | `camelCase`                | `productCatalog/`, `formControls/`    |
-| Source Files              | `kebab-case`               | `product-card.tsx`, `use-filters.ts`  |
+| Source Files              | `camelCase`               | `productCard.tsx`, `useFilters.ts`    |
 | Route Segments            | `kebab-case`               | `product-listings/`, `sign-in/`       |
 | Prisma Models             | `PascalCase`               | `Product`, `UserProfile`              |
 | Prisma Fields             | `camelCase`                | `createdAt`, `sellerId`               |
@@ -301,15 +301,15 @@ function get_product_by_id() { ... }  // snake_case
 
 ---
 
-### 19.4 File Names — `kebab-case`
+### 19.4 File Names — `camelCase`
 
 ```
-✓ product-card.tsx           ✓ use-product-filters.ts
-✓ auth-session.service.ts    ✓ create-product.action.ts
-✓ login.validation.ts        ✓ product.types.ts
+✓ productCard.tsx            ✓ useProductFilters.ts
+✓ authSessionService.ts      ✓ createProductAction.ts
+✓ loginValidation.ts         ✓ productTypes.ts
 
 ✗ ProductCard.tsx    // PascalCase not allowed
-✗ productCard.tsx    // camelCase not allowed
+✗ product-card.tsx   // kebab-case not allowed
 ```
 
 > **Exception:** Next.js special files keep exact names: `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`, `middleware.ts`.

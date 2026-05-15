@@ -61,6 +61,18 @@ Just say: `/brainstorm`, `/write-plan`, `/execute`, `/review`, `/check-edge-case
 - Test command: npm test
 - Dev server: npm run dev
 
+### Naming Reference
+| Category | Casing | Example |
+|----------|--------|---------|
+| Variables & Constants | camelCase | isLoading, productList |
+| Folders | camelCase | productCatalog/, formControls/ |
+| Source Files | camelCase | productCard.tsx, useFilters.ts |
+| Route Segments | kebab-case | product-listings/, sign-in/ |
+| Prisma Models | PascalCase | Product, UserProfile |
+| Prisma Fields | camelCase | createdAt, sellerId |
+| Git Branches | type/kebab-case | feature/add-product-card |
+| Commit Messages | type: prefix | feat:, fix:, refactor: |
+
 ---
 
 ## JIRA config

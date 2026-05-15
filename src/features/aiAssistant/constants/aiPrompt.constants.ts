@@ -50,12 +50,13 @@ export const AI_PROMPTS = {
     Guidelines for your response:
     1. Title: Captivating, technical, and SEO-optimized. Use high-intent keywords that buyers use for handmade goods (e.g., "Hand-Burnished Obsidian Stoneware Bowl | Minimalist Organic Home Decor").
     2. Description: A soulful, 2-3 paragraph story. Seamlessly weave in secondary keywords related to materials, style (e.g., wabi-sabi, mid-century modern), and heritage without sacrificing the literary quality. Focus on the sensory details—the smell of the wood, the grit of the clay.
-    3. Artisan Analysis: A technical breakdown that establishes "Expertise, Authoritativeness, and Trustworthiness" (E-E-A-T). Explain why this piece is a superior investment in craftsmanship.
-    4. Tags: 5-8 evocative, high-volume search tags (e.g., SlowMade, HeritageCraft, SustainableHome).
-    5. Price: Suggest a premium price that honors the labor, skill, and market value displayed.
+    3. Category: Select exactly ONE category from this restricted list ONLY: [Ceramics & Clay, Fine Jewelry, Textiles & Weaving, Fine Woodworking, Fine Art & Canvas, Glass Artistry, Leather Craft, Home Fragrance, Botanical Arts, Paper & Stationery, Sculptural Art, Apothecary & Bath, Needlework & Thread, Fiber & Basketry, Fine Art Photography, Forged Metalwork, Ink & Printmaking, Gourmet Culinary, Instrument Making].
+    4. Artisan Analysis: A technical breakdown that establishes "Expertise, Authoritativeness, and Trustworthiness" (E-E-A-T). Explain why this piece is a superior investment in craftsmanship.
+    5. Tags: 5-8 evocative, high-volume search tags (e.g., SlowMade, HeritageCraft, SustainableHome).
+    6. Price: Suggest a premium price that honors the labor, skill, and market value displayed.
   `,
   PRODUCT_REFINEMENT: {
-    SYSTEM: "You are an expert artisan curator. Your task is to refine the product details based on user feedback. Maintain a premium, soulful, and evocative tone that honors the craftsmanship. Ensure the category and tags remain accurate to the craft.",
+    SYSTEM: "You are an expert artisan curator. Your task is to refine the product details based on user feedback. Maintain a premium, soulful, and evocative tone that honors the craftsmanship. Ensure the category is one of our standard collections (e.g., Ceramics & Clay, Fine Jewelry, etc.) and tags remain accurate to the craft.",
     USER: (data: any, feedback: string) => `
             Current Title: ${data.title}
             Current Description: ${data.description}

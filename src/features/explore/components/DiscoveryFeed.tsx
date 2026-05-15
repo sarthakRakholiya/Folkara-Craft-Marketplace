@@ -1,78 +1,110 @@
 "use client";
 
 import React, { useMemo } from 'react';
-import { ExploreItem } from '../explore.types';
+import { ExploreItem } from '../exploreTypes';
 import { ProductCard } from './ProductCard';
 import { cn } from '@/lib/utils';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useWindowSize } from '@/hooks/useWindowSize';
 
 interface DiscoveryFeedProps {
   items: ExploreItem[];
+  isLoading: boolean;
+  isFetchingNextPage: boolean;
+  hasNextPage: boolean;
+  fetchNextPage: () => void;
   className?: string;
 }
 
-export const DiscoveryFeed = ({ items, className }: DiscoveryFeedProps) => {
-  // Distribute items into columns for different breakpoints
-  const columns4 = useMemo(() => {
-    const cols: ExploreItem[][] = [[], [], [], []];
+export const DiscoveryFeed = ({ 
+  items, 
+  isLoading, 
+  isFetchingNextPage, 
+  hasNextPage, 
+  fetchNextPage,
+  className 
+}: DiscoveryFeedProps) => {
+  const { width } = useWindowSize();
+  
+  // Sentinel for infinite scroll
+  const sentinelRef = useIntersectionObserver(() => {
+    if (hasNextPage && !isFetchingNextPage && !isLoading) {
+      fetchNextPage();
+    }
+  });
+
+  // Calculate columns based on width
+  const columnCount = useMemo(() => {
+    if (width > 1280) return 4;
+    if (width > 1024) return 3;
+    if (width > 640) return 2;
+    return 1;
+  }, [width]);
+
+  // Distribute items into columns
+  const columns = useMemo(() => {
+    const cols: ExploreItem[][] = Array.from({ length: columnCount }, () => []);
     items.forEach((item, index) => {
-      cols[index % 4].push(item);
+      cols[index % columnCount].push(item);
     });
     return cols;
-  }, [items]);
-
-  const columns3 = useMemo(() => {
-    const cols: ExploreItem[][] = [[], [], []];
-    items.forEach((item, index) => {
-      cols[index % 3].push(item);
-    });
-    return cols;
-  }, [items]);
-
-  const columns2 = useMemo(() => {
-    const cols: ExploreItem[][] = [[], []];
-    items.forEach((item, index) => {
-      cols[index % 2].push(item);
-    });
-    return cols;
-  }, [items]);
-
-  const renderItem = (item: ExploreItem) => {
-    return <ProductCard key={item.id} product={item} />;
-  };
+  }, [items, columnCount]);
 
   return (
-    <section className={cn("px-4 md:px-margin-page py-section-gap max-w-container-max mx-auto", className)}>
-      {/* XL Desktop Grid (4 columns) */}
-      <div className="hidden xl:grid grid-cols-4 gap-gutter">
-        {columns4.map((col, i) => (
-          <div key={`col-4-${i}`} className="flex flex-col gap-gutter">
-            {col.map(renderItem)}
+    <section className={cn("w-full", className)}>
+      {isLoading && items.length === 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+           {[...Array(8)].map((_, i) => (
+             <div key={i} className="space-y-4">
+               <div className="aspect-[3/4] bg-surface-container-low animate-pulse rounded-xl" />
+               <div className="h-6 w-2/3 bg-surface-container-low animate-pulse rounded" />
+               <div className="h-4 w-1/2 bg-surface-container-low animate-pulse rounded" />
+             </div>
+           ))}
+        </div>
+      ) : (
+        <div className="flex gap-6 md:gap-8 items-start">
+          {columns.map((column, colIndex) => (
+            <div key={colIndex} className="flex-1 flex flex-col gap-8">
+              {column.map((item) => (
+                <ProductCard key={item.id} product={item} />
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Sentinel for infinite scroll */}
+      <div ref={sentinelRef} className="h-40 w-full flex items-center justify-center mt-12">
+        {isFetchingNextPage && (
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+            <p className="font-serif italic text-sm text-primary/40">Uncovering more treasures...</p>
           </div>
-        ))}
+        )}
       </div>
 
-      {/* Large Desktop Grid (3 columns) */}
-      <div className="hidden lg:grid xl:hidden grid-cols-3 gap-gutter">
-        {columns3.map((col, i) => (
-          <div key={`col-3-${i}`} className="flex flex-col gap-gutter">
-            {col.map(renderItem)}
-          </div>
-        ))}
-      </div>
+      {!hasNextPage && items.length > 0 && !isLoading && (
+        <div className="text-center py-24 px-4 border-t border-outline-variant/10 mt-16">
+          <p className="text-xl md:text-2xl text-primary font-serif italic mb-2">
+            &quot;The discovery ends here.&quot;
+          </p>
+          <p className="text-sm text-on-surface-variant/60 font-sans tracking-widest uppercase">
+            You&apos;ve viewed our entire curated collection.
+          </p>
+        </div>
+      )}
 
-      {/* Tablet Grid (2 columns) */}
-      <div className="hidden md:grid lg:hidden grid-cols-2 gap-gutter">
-        {columns2.map((col, i) => (
-          <div key={`col-2-${i}`} className="flex flex-col gap-gutter">
-            {col.map(renderItem)}
-          </div>
-        ))}
-      </div>
-
-      {/* Mobile Grid (1 column) */}
-      <div className="grid md:hidden grid-cols-1 gap-gutter">
-        {items.map(renderItem)}
-      </div>
+      {!isLoading && items.length === 0 && (
+        <div className="text-center py-32 px-4 bg-surface-container-low/30 rounded-3xl border border-dashed border-outline-variant/20">
+          <p className="text-2xl text-primary font-serif italic mb-4">
+            No items found matching your filters.
+          </p>
+          <p className="text-on-surface-variant max-w-md mx-auto">
+            Try adjusting your filters or clearing them to see all public listings.
+          </p>
+        </div>
+      )}
     </section>
   );
 };
