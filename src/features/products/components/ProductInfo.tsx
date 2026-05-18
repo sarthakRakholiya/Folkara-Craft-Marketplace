@@ -8,6 +8,7 @@ import { Bookmark, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getSessionData } from '@/features/auth/actions/auth.actions';
 import { useFavoriteQuery, useToggleFavoriteMutation } from '../hooks/useFavorite';
+import { useAddToCartMutation } from '@/features/cart/hooks/useCart';
 
 interface ProductInfoProps {
   product: {
@@ -37,6 +38,21 @@ export const ProductInfo = ({ product, initialIsFavorite }: ProductInfoProps) =>
   // TanStack Query for favorite status
   const { data: isFavorite } = useFavoriteQuery(product.id, initialIsFavorite);
   const { mutate: toggleFavorite, isPending } = useToggleFavoriteMutation(product.id);
+  const { mutate: addToCart, isPending: isAdding } = useAddToCartMutation();
+
+  const handleAddToCart = async () => {
+    try {
+      const session = await getSessionData();
+      if (!session) {
+        const nextPath = encodeURIComponent(window.location.pathname);
+        router.push(`/auth?next=${nextPath}`);
+        return;
+      }
+      addToCart({ productId: product.id, quantity: 1 });
+    } catch (err) {
+      console.error('Failed to add item to bag:', err);
+    }
+  };
 
   const handleSaveClick = async () => {
     setIsChecking(true);
@@ -104,8 +120,15 @@ export const ProductInfo = ({ product, initialIsFavorite }: ProductInfoProps) =>
 
       {/* Actions */}
       <div className="flex flex-col gap-3 md:gap-4 pt-2 md:pt-4">
-        <button className="bg-primary text-white py-4 md:py-5 px-8 rounded-full font-sans text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase hover:bg-primary/90 transition-all active:scale-[0.98] shadow-lg shadow-primary/10 cursor-pointer">
-          Add to Cart
+        <button
+          onClick={handleAddToCart}
+          disabled={isAdding || product.quantity <= 0}
+          className="bg-primary text-white py-4 md:py-5 px-8 rounded-full font-sans text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase hover:bg-primary/90 transition-all active:scale-[0.98] shadow-lg shadow-primary/10 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {isAdding ? (
+            <Loader2 className="w-[18px] h-[18px] animate-spin text-white" />
+          ) : null}
+          {product.quantity <= 0 ? "Out of Stock" : "Add to Cart"}
         </button>
         <button 
           onClick={handleSaveClick}

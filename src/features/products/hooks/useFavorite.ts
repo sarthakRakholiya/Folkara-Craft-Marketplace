@@ -2,8 +2,18 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
-import { checkIsFavorited, toggleFavorite } from '../actions/favorite.actions';
+import { checkIsFavorited, toggleFavorite, getUserFavorites } from '../actions/favorite.actions';
 import { toast } from 'sonner';
+
+/**
+ * Hook to query all "Save for Later" items for the current user.
+ */
+export function useFavoritesListQuery() {
+  return useQuery({
+    queryKey: queryKeys.favorites,
+    queryFn: () => getUserFavorites(),
+  });
+}
 
 /**
  * Hook to query whether a product is in the user's "Save for Later" collection.

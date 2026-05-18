@@ -37,7 +37,7 @@ Each task must:
 
 - Take 2-10 minutes to implement
 - Have a single, clear outcome
-- Include exact file paths (following `camelCase` naming)
+- Include exact file paths (following codebase casing: PascalCase for components/views, camelCase for others)
 - Include enough context that no prior knowledge is needed
 - Have a verification step
 - **Naming Check**: Ensure new components use `PascalCase` and functions use `camelCase`.
@@ -89,7 +89,7 @@ STOP. Do not begin execution. Wait for explicit approval.
 - **Conventions**:
   - Components: `PascalCase` (e.g., `ProductCard`)
   - Functions: `camelCase` (e.g., `getProduct`)
-  - Files: `camelCase` (e.g., `productCard.tsx`)
+  - Files: `PascalCase` for component/view files (e.g., `ProductCard.tsx`), `camelCase` for non-component files (e.g., `useFilters.ts`)
   - Folders: `camelCase` (e.g., `productCatalog`)
 - Max 15 tasks per plan. If more, split into phases.
 - Frontend: include component name, props, state, event handlers

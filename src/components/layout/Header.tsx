@@ -11,12 +11,17 @@ import Image from "next/image";
 import { UserMenu } from "./UserMenu";
 
 import { useSession } from "@/hooks/useSession";
+import { useCartQuery } from "@/features/cart/hooks/useCart";
 
 export function Header() {
   const { data: session } = useSession();
   const isAuthenticated = !!session;
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const { data: cartItems = [] } = useCartQuery();
+  const cartItemsCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
 
   const navLinks = [
     { name: "Explore crafts", href: "/explore" },
@@ -90,13 +95,18 @@ export function Header() {
                     bookmark
                   </span>
                 </Link>
-                <Link href="/cart" aria-label="Cart" className="flex items-center">
+                <Link href="/cart" aria-label="Cart" className="flex items-center relative">
                   <span
                     className="material-symbols-outlined text-primary cursor-pointer hover:text-secondary transition-colors text-[20px]"
                     data-icon="shopping_bag"
                   >
                     shopping_bag
                   </span>
+                  {cartItemsCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-secondary text-white font-sans text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-surface shadow-sm">
+                      {cartItemsCount}
+                    </span>
+                  )}
                 </Link>
                 <UserMenu position="bottom" />
               </div>

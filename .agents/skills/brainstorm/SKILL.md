@@ -71,7 +71,7 @@ Update **Acceptance Criteria** if brainstorm revealed new requirements.
   - Components: `PascalCase`
   - Functions/Variables/Hooks: `camelCase`
   - Folders: `camelCase`
-  - Files: `camelCase`
+  - Files: `PascalCase` for component/view files, `camelCase` for non-component files
   - Route Segments: `kebab-case`
 - **Data Fetching**: Use **Axios** and **TanStack Query**.
 - **Database**: Use **Drizzle**.
