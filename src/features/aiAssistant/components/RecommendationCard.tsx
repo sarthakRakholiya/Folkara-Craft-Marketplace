@@ -24,50 +24,53 @@ export const RecommendationCard = ({
 }: RecommendationCardProps) => {
   return (
     <div className={cn(
-      "group relative flex items-center gap-5 p-3 pr-5 bg-surface/40 backdrop-blur-md border border-outline-variant/10 rounded-[1.5rem] hover:bg-surface-container-low/60 transition-all duration-500 cursor-pointer overflow-hidden shadow-sm hover:shadow-md hover:border-outline-variant/30",
+      "group relative flex flex-col w-[170px] bg-surface-container-low border border-outline-variant/15 rounded-2xl hover:bg-surface-container transition-all duration-500 cursor-pointer overflow-hidden shadow-sm hover:shadow-md hover:border-outline-variant/30 flex-shrink-0 snap-start",
       className
     )}>
-      {/* Visual Indicator/Image */}
-      <div className="relative w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-inner bg-surface-container">
+      {/* Product Image */}
+      <div className="relative w-full h-[105px] overflow-hidden bg-surface-container shrink-0">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={title}
-            width={80}
-            height={80}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+            fill
+            sizes="170px"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <span className="material-symbols-outlined text-secondary/40 scale-125">
+            <span className="material-symbols-outlined text-secondary/40 text-lg">
               {icon || 'filter_vintage'}
+            </span>
+          </div>
+        )}
+        
+        {/* Price Tag Overlay */}
+        {price && (
+          <div className="absolute top-2 right-2 px-2 py-0.5 bg-background/85 backdrop-blur-md border border-outline-variant/15 rounded-full shadow-sm z-20">
+            <span className="font-sans text-[11px] font-semibold text-secondary">
+              {price}
             </span>
           </div>
         )}
       </div>
       
       {/* Content */}
-      <div className="flex-1 min-w-0 py-1">
-        <div className="flex justify-between items-baseline gap-2">
-          <h4 className="font-serif text-lg text-primary leading-tight truncate">
-            {title}
-          </h4>
-          {price && (
-            <span className="font-sans text-xs font-bold text-secondary shrink-0">
-              {price}
-            </span>
-          )}
-        </div>
-        <p className="font-sans text-xs text-on-surface-variant/70 italic mt-0.5 line-clamp-1">
+      <div className="flex flex-col flex-1 p-3 min-w-0">
+        <h4 className="font-serif text-[13px] text-primary leading-tight font-medium truncate">
+          {title}
+        </h4>
+        <p className="font-sans text-[10px] text-on-surface-variant/70 italic mt-1 line-clamp-2 leading-relaxed flex-1">
           {description}
         </p>
-      </div>
-
-      {/* Action Arrow */}
-      <div className="w-8 h-8 rounded-full border border-outline-variant/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all duration-300">
-        <span className="material-symbols-outlined text-sm">
-          arrow_forward
-        </span>
+        
+        {/* Action Button */}
+        <div className="mt-2.5 flex items-center justify-between text-primary font-sans text-[10px] font-bold group-hover:text-secondary transition-colors shrink-0">
+          <span>View Details</span>
+          <span className="material-symbols-outlined text-[10px] translate-x-0 group-hover:translate-x-0.5 transition-transform">
+            arrow_forward
+          </span>
+        </div>
       </div>
       
       {/* Subtle Link Overlay */}

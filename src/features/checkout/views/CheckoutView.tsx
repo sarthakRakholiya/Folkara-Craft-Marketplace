@@ -36,6 +36,11 @@ export function CheckoutView() {
   const { data: cartItems = [], isLoading: isCartLoading } = useCartQuery();
   const clearCartMutation = useClearCartMutation();
 
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const [paymentMethod, setPaymentMethod] = useState<"creditCard" | "applePay">(
     "creditCard",
   );
@@ -166,7 +171,7 @@ export function CheckoutView() {
     }
   };
 
-  if (isCartLoading) {
+  if (isCartLoading || !isMounted) {
     return (
       <div className="w-full max-w-[1140px] mx-auto px-12 py-24 flex flex-col items-center justify-center min-h-[500px]">
         <div className="w-12 h-12 rounded-full border-2 border-outline-variant border-t-secondary animate-spin mb-4" />
