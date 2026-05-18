@@ -33,3 +33,22 @@ export const COUNTRY_OPTIONS = [
   { value: "CA", label: "Canada" },
   { value: "AU", label: "Australia" },
 ];
+
+/**
+ * Helper to resolve any craft ID, craft name, or category string to the canonical, human-readable Collection Category name.
+ * Example: 'pottery' -> 'Ceramics & Clay'
+ */
+export function getCraftCategory(value: string | null | undefined): string {
+  if (!value) return "Other";
+  
+  const normalized = value.toLowerCase().trim();
+  const option = CRAFT_OPTIONS.find(
+    (opt) =>
+      opt.id.toLowerCase() === normalized ||
+      opt.name.toLowerCase() === normalized ||
+      opt.category.toLowerCase() === normalized
+  );
+  
+  return option ? option.category : value;
+}
+

@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { productService } from "@/features/products/services/product.service";
 import { ProductDetailView } from "@/features/products/views/ProductDetailView";
+import { checkIsFavorited } from "@/features/products/actions/favorite.actions";
+
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -46,5 +48,7 @@ export default async function ProductPage({ params }: Props) {
     notFound();
   }
 
-  return <ProductDetailView initialData={data} />;
+  const isFavorite = await checkIsFavorited(id);
+
+  return <ProductDetailView initialData={data} isFavorite={isFavorite} />;
 }

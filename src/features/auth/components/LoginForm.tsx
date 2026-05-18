@@ -11,6 +11,8 @@ import { login } from "@/features/auth/actions/auth.actions";
 import { loginSchema, type LoginInput } from "@/types/auth";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { useSearchParams } from "next/navigation";
+
 interface LoginFormProps {
   role: string;
 }
@@ -18,6 +20,8 @@ interface LoginFormProps {
 export function LoginForm({ role: _role }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -27,7 +31,7 @@ export function LoginForm({ role: _role }: LoginFormProps) {
   const onSubmit = async (data: LoginInput) => {
     setIsLoading(true);
     try {
-      const res = await login(data);
+      const res = await login(data, nextParam);
       if (res?.error) {
         toast.error(res.error);
       } else {

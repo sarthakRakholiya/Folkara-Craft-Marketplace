@@ -11,6 +11,8 @@ import { signup } from "@/features/auth/actions/auth.actions";
 import { signupSchema, type SignupInput } from "@/types/auth";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { useSearchParams } from "next/navigation";
+
 interface SignupFormProps {
   role: string;
 }
@@ -18,6 +20,8 @@ interface SignupFormProps {
 export function SignupForm({ role }: SignupFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
 
   const form = useForm<SignupInput>({
     resolver: zodResolver(signupSchema) as any,
@@ -36,7 +40,7 @@ export function SignupForm({ role }: SignupFormProps) {
   const onSubmit = async (data: SignupInput) => {
     setIsLoading(true);
     try {
-      const res = await signup(data);
+      const res = await signup(data, nextParam);
       if (res?.error) {
         toast.error(res.error);
       } else {

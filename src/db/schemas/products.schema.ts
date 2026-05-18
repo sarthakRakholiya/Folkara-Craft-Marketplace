@@ -81,6 +81,18 @@ export const products = pgTable("products", {
   };
 });
 
+// Import relations in products schema file
+import { relations } from "drizzle-orm";
+import { favorites } from "./favorites.schema";
+
+export const productsRelations = relations(products, ({ many, one }) => ({
+  favorites: many(favorites),
+  shop: one(shops, {
+    fields: [products.shopId],
+    references: [shops.id],
+  }),
+}));
+
 // TypeScript types
 export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;

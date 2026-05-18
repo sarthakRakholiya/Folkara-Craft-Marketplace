@@ -82,7 +82,15 @@ export function Header() {
           <div className="flex items-center justify-end gap-2">
             {isAuthenticated ? (
               <div className="hidden lg:flex items-center gap-4 mr-2">
-                <Link href="/cart" aria-label="Cart">
+                <Link href="/favorites" aria-label="Saved Objects" className="flex items-center">
+                  <span
+                    className="material-symbols-outlined text-primary cursor-pointer hover:text-secondary transition-colors text-[20px]"
+                    data-icon="bookmark"
+                  >
+                    bookmark
+                  </span>
+                </Link>
+                <Link href="/cart" aria-label="Cart" className="flex items-center">
                   <span
                     className="material-symbols-outlined text-primary cursor-pointer hover:text-secondary transition-colors text-[20px]"
                     data-icon="shopping_bag"

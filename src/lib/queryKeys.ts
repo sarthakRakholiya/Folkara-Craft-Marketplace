@@ -10,4 +10,6 @@ export const queryKeys = {
   products: ["products"] as const,
   product: (id: string) => ["product", id] as const,
   onboarding: ["onboarding"] as const,
+  favorite: (productId: string) => ["favorite", productId] as const,
 } as const;
+

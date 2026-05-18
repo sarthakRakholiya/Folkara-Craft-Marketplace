@@ -40,6 +40,9 @@ export function NavigationProgress() {
   // Intercept link clicks to start progress bar
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
+      // Ignore clicks that originate inside button elements (such as save/bookmark toggles)
+      if ((e.target as HTMLElement).closest("button")) return;
+
       const anchor = (e.target as HTMLElement).closest("a");
       if (!anchor) return;
 

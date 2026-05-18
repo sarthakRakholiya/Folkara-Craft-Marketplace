@@ -1,44 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 export function PremiumLoader() {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) return 100;
-        const diff = Math.random() * 15;
-        return Math.min(prev + diff, 100);
-      });
-    }, 200);
-
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-surface overflow-hidden">
       {/* Background Soft Gradients */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/5 blur-[120px] rounded-full" />
 
-      <div className="relative flex flex-col items-center gap-12 w-full max-w-xs">
+      <div className="relative flex flex-col items-center gap-7 w-full max-w-xs">
         {/* Logo with Breathing Animation */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ 
-            opacity: 1, 
-            scale: [0.95, 1, 0.95],
-          }}
-          transition={{
-            opacity: { duration: 0.8 },
-            scale: { duration: 3, repeat: Infinity, ease: "easeInOut" }
-          }}
-          className="relative w-24 h-24"
-        >
+        <div className="relative w-24 h-24 animate-[pulse_3s_ease-in-out_infinite]">
           <Image
             src="/logo.png"
             alt="Folkara Logo"
@@ -46,43 +21,18 @@ export function PremiumLoader() {
             className="object-contain"
             priority
           />
-        </motion.div>
+        </div>
 
-        {/* Circular Progress Container */}
-        <div className="flex flex-col items-center gap-6 mt-4">
-          <div className="relative w-16 h-16">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-              <circle
-                cx="50"
-                cy="50"
-                r="45"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="4"
-                className="text-outline-variant/30"
-              />
-              <motion.circle
-                cx="50"
-                cy="50"
-                r="45"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="4"
-                strokeLinecap="round"
-                className="text-primary"
-                initial={{ strokeDasharray: "283", strokeDashoffset: "283" }}
-                animate={{ strokeDashoffset: 283 - (283 * progress) / 100 }}
-                transition={{ ease: "easeOut", duration: 0.5 }}
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-[10px] font-bold tabular-nums text-primary/80">
-                {Math.round(progress)}%
-              </span>
-            </div>
+        {/* Dual-Orbital Center-Aligned Premium Spinner */}
+        <div className="flex flex-col items-center gap-6">
+          <div className="relative flex items-center justify-center w-24 h-24">
+            {/* Outer spinning ring - primary color arcs */}
+            <div className="absolute w-20 h-20 rounded-full border-[3.5px] border-transparent border-t-primary border-b-primary animate-[spin_1.5s_linear_infinite]" />
+            {/* Inner reverse-spinning ring - secondary color arcs */}
+            <div className="absolute w-12 h-12 rounded-full border-[2.5px] border-transparent border-l-secondary border-r-secondary animate-[spin_1s_linear_infinite_reverse] opacity-80" />
           </div>
-          
-          <motion.span 
+
+          <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-[10px] font-medium tracking-[0.2em] uppercase text-on-surface-variant/60"

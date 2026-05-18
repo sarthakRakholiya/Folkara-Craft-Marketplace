@@ -16,7 +16,7 @@ export async function getSessionData() {
 
 type ActionResult = { error: string } | undefined;
 
-export async function signup(data: SignupInput): Promise<ActionResult> {
+export async function signup(data: SignupInput, nextUrl?: string | null): Promise<ActionResult> {
   // 1. Validate input server-side
   const parsed = signupSchema.safeParse(data);
   if (!parsed.success) {
@@ -57,10 +57,13 @@ export async function signup(data: SignupInput): Promise<ActionResult> {
 
   // 6. Redirect 
   const onboardingRoute = parsed.data.role === 'SELLER' ? '/seller/onboarding' : '/buyer/onboarding';
+  if (nextUrl) {
+    redirect(`${onboardingRoute}?step=1&next=${encodeURIComponent(nextUrl)}`);
+  }
   redirect(`${onboardingRoute}?step=1`);
 }
 
-export async function login(data: LoginInput): Promise<ActionResult> {
+export async function login(data: LoginInput, nextUrl?: string | null): Promise<ActionResult> {
   const parsed = loginSchema.safeParse(data);
   if (!parsed.success) {
     return { error: parsed.error.issues[0].message };
@@ -108,7 +111,13 @@ export async function login(data: LoginInput): Promise<ActionResult> {
   cookieStore.set('session', session, sessionCookieOptions(expires));
 
   if (!user.isOnboardingComplete) {
+    if (nextUrl) {
+      redirect(`/${user.role.toLowerCase()}/onboarding?step=${user.currentStep}&next=${encodeURIComponent(nextUrl)}`);
+    }
     redirect(`/${user.role.toLowerCase()}/onboarding?step=${user.currentStep}`);
+  }
+  if (nextUrl) {
+    redirect(nextUrl);
   }
   redirect(`/${user.role.toLowerCase()}/overview`);
 }

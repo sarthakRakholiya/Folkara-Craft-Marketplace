@@ -5,10 +5,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Check, Sparkles, Loader2 } from "lucide-react";
 import { finalizeOnboarding } from "../../actions/onboarding.action";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export const Step4BuyerCompletion = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
   const [isFinishing, setIsFinishing] = useState(false);
 
   const handleComplete = async () => {
@@ -16,7 +18,7 @@ export const Step4BuyerCompletion = () => {
     try {
       const result = await finalizeOnboarding("BUYER");
       if ("success" in result) {
-        router.push("/buyer/overview");
+        router.push(nextParam || "/buyer/overview");
       }
     } catch (error) {
       console.error("Failed to finalize onboarding:", error);
