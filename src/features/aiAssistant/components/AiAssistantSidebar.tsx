@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAiSidebar } from "../hooks/useAiSidebar";
 import { ChatMessage } from "./ChatMessage";
@@ -26,12 +27,36 @@ export const AiAssistantSidebar = () => {
   ]);
   const [inputValue, setInputValue] = React.useState("");
   const [isThinking, setIsThinking] = React.useState(false);
+  const [thinkingText, setThinkingText] = React.useState("Lore is curating slow-made treasures...");
   const chatEndRef = React.useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isThinking]);
+
+  // Cycle thinking phrases while assistant is thinking
+  useEffect(() => {
+    if (!isThinking) return;
+
+    const phrases = [
+      "Lore is listening to the stories...",
+      "Lore is searching our quiet archives...",
+      "Lore is curating slow-made treasures...",
+      "Lore is matching your space's character...",
+      "Lore is finding the artisan's touch..."
+    ];
+
+    const interval = setInterval(() => {
+      setThinkingText((prev) => {
+        const currentIndex = phrases.indexOf(prev);
+        const nextIndex = (currentIndex + 1) % phrases.length;
+        return phrases[nextIndex];
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isThinking]);
 
   const handleSend = () => {
     if (!inputValue.trim() || isThinking) return;
@@ -41,6 +66,16 @@ export const AiAssistantSidebar = () => {
       role: "user" as const,
       content: inputValue,
     };
+
+    const phrases = [
+      "Lore is listening to the stories...",
+      "Lore is curating slow-made treasures...",
+      "Lore is finding the artisan's touch...",
+      "Lore is matching your space's character...",
+      "Lore is searching our quiet archives..."
+    ];
+    const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+    setThinkingText(randomPhrase);
 
     setMessages((prev) => [...prev, newMessage]);
     setInputValue("");
@@ -154,17 +189,29 @@ export const AiAssistantSidebar = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
-                    className="flex flex-col gap-3 max-w-[90%]"
+                    className="flex gap-3 items-start max-w-[90%]"
                   >
-                    <div className="bg-surface-container-low/40 p-5 rounded-2xl rounded-tl-none border border-outline-variant/10">
-                      <div className="flex items-center gap-3">
-                        <div className="flex gap-1.5">
-                          <div className="w-1.5 h-1.5 rounded-full bg-secondary/60 animate-bounce [animation-delay:-0.3s]"></div>
-                          <div className="w-1.5 h-1.5 rounded-full bg-secondary/40 animate-bounce [animation-delay:-0.15s]"></div>
-                          <div className="w-1.5 h-1.5 rounded-full bg-secondary/20 animate-bounce"></div>
+                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 relative border border-outline-variant bg-surface flex items-center justify-center">
+                      <Image
+                        src="/logo.png"
+                        alt="Lore"
+                        fill
+                        sizes="32px"
+                        className="object-contain p-1"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1 max-w-[calc(100%-2.5rem)]">
+                      <span className="font-sans text-[10px] uppercase tracking-widest text-on-surface-variant/60 font-bold px-1 mb-1">
+                        Lore
+                      </span>
+                      <div className="bg-surface-container-low p-4 rounded-2xl rounded-tl-none border border-outline-variant/10 w-fit flex items-center justify-center min-h-[44px] gap-3">
+                        <div className="flex gap-1.5 items-center py-1 px-1 flex-shrink-0">
+                          <div className="w-2 h-2 rounded-full bg-secondary animate-bounce [animation-delay:-0.3s]"></div>
+                          <div className="w-2 h-2 rounded-full bg-secondary animate-bounce [animation-delay:-0.15s]"></div>
+                          <div className="w-2 h-2 rounded-full bg-secondary animate-bounce"></div>
                         </div>
-                        <span className="font-sans text-sm text-on-surface-variant italic">
-                          Curating for your space...
+                        <span className="font-sans text-xs text-on-surface-variant/80 italic border-l border-outline-variant/30 pl-3 select-none">
+                          {thinkingText}
                         </span>
                       </div>
                     </div>

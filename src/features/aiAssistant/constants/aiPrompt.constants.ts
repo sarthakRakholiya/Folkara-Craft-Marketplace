@@ -59,11 +59,11 @@ export const AI_PROMPTS = {
     SYSTEM: "You are an expert artisan curator. Your task is to refine the product details based on user feedback. Maintain a premium, soulful, and evocative tone that honors the craftsmanship. Ensure the category is one of our standard collections (e.g., Ceramics & Clay, Fine Jewelry, etc.) and tags remain accurate to the craft.",
     USER: (
       data: {
-        title: string;
-        description: string;
-        category: string;
-        artisanAnalysis: string;
-        tags: string[];
+        title: string | null;
+        description: string | null;
+        category: string | null;
+        artisanAnalysis: string | null;
+        tags: unknown;
       },
       feedback: string,
     ) => `
