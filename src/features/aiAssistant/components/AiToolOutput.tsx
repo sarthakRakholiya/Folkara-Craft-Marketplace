@@ -4,6 +4,8 @@ import React from "react";
 import { RecommendationCard } from "./RecommendationCard";
 import { ShopCard } from "./ShopCard";
 
+import { CartSummaryCard } from "./CartSummaryCard";
+
 interface AiToolOutputProps {
   parts: any[];
 }
@@ -29,7 +31,10 @@ export const AiToolOutput = React.memo(({ parts }: AiToolOutputProps) => {
       {parts.map((part: any, partIdx: number) => {
         const toolName = resolveToolName(part);
 
-        const isReady = part.state === "output-available" && Array.isArray(part.output) && part.output.length > 0;
+        const isArrayOutputReady = Array.isArray(part.output) && part.output.length > 0;
+        const isObjectOutputReady = typeof part.output === "object" && part.output !== null && !Array.isArray(part.output);
+        const isReady = part.state === "output-available" && (isArrayOutputReady || isObjectOutputReady);
+        
         if (!isReady) return null;
 
         const key = part.toolCallId ?? partIdx;
@@ -50,7 +55,7 @@ export const AiToolOutput = React.memo(({ parts }: AiToolOutputProps) => {
                 {label}
               </p>
               <div className="flex gap-3 overflow-x-auto pb-3 pt-1 scroll-smooth snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] w-full">
-                {part.output.map((product: any) => (
+                {Array.isArray(part.output) && part.output.map((product: any) => (
                   <RecommendationCard
                     key={product.id}
                     title={product.title}
@@ -78,7 +83,7 @@ export const AiToolOutput = React.memo(({ parts }: AiToolOutputProps) => {
                 Artisan studios on Folkara
               </p>
               <div className="flex gap-3 overflow-x-auto pb-3 pt-1 scroll-smooth snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] w-full">
-                {part.output.map((shop: any) => (
+                {Array.isArray(part.output) && part.output.map((shop: any) => (
                   <ShopCard
                     key={shop.id}
                     name={shop.name}
@@ -90,6 +95,27 @@ export const AiToolOutput = React.memo(({ parts }: AiToolOutputProps) => {
                   />
                 ))}
               </div>
+            </div>
+          );
+        }
+
+        // ── Cart Summary (getCartDetails) ───────────────────────────────────
+        if (toolName === "getCartDetails") {
+          const cartOutput = part.output;
+          
+          if (!cartOutput.success || cartOutput.isEmpty) {
+             return null;
+          }
+
+          return (
+            <div
+              key={key}
+              className="mt-2.5 pl-9 md:pl-10 animate-in fade-in slide-in-from-bottom-2 duration-500 w-full"
+            >
+              <CartSummaryCard 
+                items={cartOutput.items} 
+                calculations={cartOutput.calculations} 
+              />
             </div>
           );
         }

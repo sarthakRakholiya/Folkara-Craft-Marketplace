@@ -216,10 +216,9 @@ export const chatTools = {
           };
         });
 
-        // Step 4: Add platform tax rates (18% GST) and delivery rules (flat ₹150, free for >₹1500)
+        // Step 4: Add platform tax rates (18% GST)
         const gst = subtotal * 0.18;
-        const deliveryFee = subtotal > 1500 ? 0 : 150;
-        const totalAmount = subtotal + gst + deliveryFee;
+        const totalAmount = subtotal + gst;
 
         return {
           success: true,
@@ -228,7 +227,6 @@ export const chatTools = {
           calculations: {
             subtotal,
             gstTax18: gst,
-            deliveryFee,
             totalAmount,
           },
         };

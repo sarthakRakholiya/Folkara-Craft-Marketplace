@@ -23,7 +23,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createCheckoutSessionAction } from "@/features/checkout/actions/checkout.actions";
 
-
 export function CartView() {
   const router = useRouter();
   const { data: cartItems = [], isLoading: isCartLoading } = useCartQuery();
@@ -45,18 +44,9 @@ export function CartView() {
     return sum + price * item.quantity;
   }, 0);
 
-  const isFreeShipping = subtotal >= 2000;
-
-  // Shipping is always standard (chosen in Stripe checkout page)
-  const shippingFee = subtotal === 0 ? 0 : isFreeShipping ? 0 : 100;
-
   // 18% GST
   const gst = subtotal * 0.18;
-  const grandTotal = subtotal + shippingFee + gst;
-
-  // Free shipping progress variables
-  const remainingForFreeShipping = Math.max(0, 2000 - subtotal);
-  const freeShippingProgress = Math.min(100, (subtotal / 2000) * 100);
+  const grandTotal = subtotal + gst;
 
   const [isCheckingOut, setIsCheckingOut] = React.useState(false);
 
@@ -76,7 +66,6 @@ export function CartView() {
       setIsCheckingOut(false);
     }
   };
-
 
   // Dynamic AI Guide Note generator
   const getGuidesNote = () => {
@@ -152,7 +141,7 @@ export function CartView() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-12 md:py-16 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-background py-12 md:py-16 !pt-24 px-4 sm:px-6 lg:px-8 font-sans">
       <main className="max-w-7xl mx-auto">
         {/* Page Title */}
         <h1 className="font-serif text-3xl md:text-[48px] font-normal tracking-wide text-primary mb-12 italic">
@@ -199,8 +188,7 @@ export function CartView() {
                     const price = getItemPrice(item.product.price);
                     const imageUrl =
                       item.product.images[0]?.url || "/placeholder.jpg";
-                    const shopName =
-                      item.product.shop?.name || "Seller Shop";
+                    const shopName = item.product.shop?.name || "Seller Shop";
 
                     return (
                       <motion.div
@@ -301,44 +289,7 @@ export function CartView() {
                 <h3 className="font-serif text-xl md:text-2xl text-primary italic font-normal">
                   Order Summary
                 </h3>
-
-                {/* Free Shipping Goal Indicator */}
-                <div className="space-y-2 pb-2">
-                  <div className="flex justify-between font-sans text-xs text-on-surface-variant font-medium">
-                    <span>
-                      {isFreeShipping
-                        ? "🎉 Free shipping unlocked!"
-                        : `Add ₹${remainingForFreeShipping.toLocaleString("en-IN")} more for FREE Delivery`}
-                    </span>
-                    <span className="text-[10px] font-bold text-secondary">
-                      Goal: ₹2,000
-                    </span>
-                  </div>
-                  <div className="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${freeShippingProgress}%` }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                      className="h-full bg-secondary rounded-full"
-                    />
-                  </div>
-                </div>
-
-                {/* Shipping Info */}
-                <div className="pb-2 border-b border-outline-variant/20">
-                  <div className="flex items-center justify-between">
-                    <span className="font-sans text-[10px] uppercase tracking-widest font-bold text-on-surface-variant/80">
-                      Shipping
-                    </span>
-                    <span className="font-sans text-xs font-semibold text-secondary">
-                      {isFreeShipping ? "FREE (Standard)" : "₹100 (Standard)"}
-                    </span>
-                  </div>
-                  <p className="font-sans text-[11px] text-on-surface-variant/60 mt-1">
-                    4–7 business days · You can choose Express at checkout
-                  </p>
-                </div>
-
+                Your Selection
                 {/* Pricing Breakdowns */}
                 <div className="space-y-4 font-sans text-sm text-on-surface-variant border-b border-outline-variant/20 pb-5">
                   <div className="flex justify-between">
@@ -348,19 +299,18 @@ export function CartView() {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Shipping (Standard)</span>
+                    <span>Shipping</span>
                     <span className="font-semibold text-primary">
-                      {isFreeShipping ? (
-                        <span className="text-secondary font-bold">FREE</span>
-                      ) : (
-                        `₹${shippingFee}`
-                      )}
+                      Calculated at checkout
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>GST (18%)</span>
                     <span className="font-semibold text-primary">
-                      ₹{gst.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                      ₹
+                      {gst.toLocaleString("en-IN", {
+                        maximumFractionDigits: 2,
+                      })}
                     </span>
                   </div>
                   <div className="pt-4 border-t border-outline-variant/40 flex justify-between font-serif text-lg text-primary">
@@ -370,7 +320,6 @@ export function CartView() {
                     </span>
                   </div>
                 </div>
-
                 {/* CTA Action Panel */}
                 <div className="space-y-4">
                   <button
@@ -378,15 +327,17 @@ export function CartView() {
                     onClick={handleCheckout}
                     className="w-full bg-primary text-white py-4 px-6 font-sans text-xs font-bold tracking-[0.2em] uppercase hover:bg-primary/95 transition-all duration-300 rounded-full flex items-center justify-center gap-2 group cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <span>{isCheckingOut ? "Initiating Checkout..." : "Continue to Checkout"}</span>
+                    <span>
+                      {isCheckingOut
+                        ? "Initiating Checkout..."
+                        : "Continue to Checkout"}
+                    </span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </button>
                   <p className="text-center text-[10px] text-on-surface-variant/70 font-sans uppercase tracking-widest font-semibold">
                     Secure payment · Fast delivery · Easy returns
                   </p>
-
                 </div>
-
                 {/* AI Guide Hint - "The Guide's Note" */}
                 <div className="mt-2 p-6 bg-white/40 border border-secondary-container/30 rounded-2xl relative overflow-hidden">
                   <div className="absolute inset-0 bg-secondary-fixed/5 blur-xl"></div>
