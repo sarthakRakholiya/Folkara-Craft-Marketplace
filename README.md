@@ -2,7 +2,9 @@
 
 > A premium marketplace connecting independent artisans with conscious buyers. Built for craftsmanship, story, and intentional commerce.
 
-**Live Site:** [https://folkara.vercel.app](https://folkara.vercel.app) (Developed by Sarthak Rakholiya)
+**Live Site:** [https://folkara.vercel.app](https://folkara.vercel.app)
+
+(Developed by Sarthak Rakholiya)
 
 ---
 
@@ -34,6 +36,7 @@ An embedded **AI Craft Assistant** helps buyers discover products through natura
 ## ✨ Features
 
 ### 🛍️ Buyer Experience
+
 - Browse and filter products by category, price range, and sort order
 - Infinite scroll product feed (`/explore`)
 - Product detail pages with dynamic SEO, social preview images, and "Maker Story"
@@ -44,6 +47,7 @@ An embedded **AI Craft Assistant** helps buyers discover products through natura
 - Buyer onboarding flow (role selection, craft interests, profile setup)
 
 ### 🎨 Artisan / Seller Experience
+
 - Multi-step product listing wizard:
   1. General info & image upload (Cloudinary)
   2. AI-powered narrative & artisan analysis (Gemini 2.5 Flash)
@@ -56,6 +60,7 @@ An embedded **AI Craft Assistant** helps buyers discover products through natura
 - Seller analytics dashboard
 
 ### 🤖 AI Features
+
 - **Lore AI Craft Assistant** — conversational sidebar that searches the product catalog, artisan shops, and saved items using semantic tool calls with inline generative UI cards
   - `searchProducts` → inline `RecommendationCard` grid (pgvector semantic search + text fallback)
   - `findSellers` → inline `ShopCard` grid (artisan studio discovery)
@@ -64,6 +69,7 @@ An embedded **AI Craft Assistant** helps buyers discover products through natura
 - **AI Listing Analysis** — auto-generates product descriptions, tags, and artisan narrative from uploaded images and basic info
 
 ### 🔐 Auth & Security
+
 - Custom JWT session-based authentication (no third-party auth provider)
 - Middleware route protection (`src/middleware.ts`) with role-based redirects
 - Separate onboarding flows for buyers and sellers
@@ -72,23 +78,23 @@ An embedded **AI Craft Assistant** helps buyers discover products through natura
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|---|---|
-| **Framework** | Next.js 15 (App Router) |
-| **Language** | TypeScript |
-| **Styling** | Tailwind CSS v4 |
-| **Database** | Neon PostgreSQL (serverless) |
-| **ORM** | Drizzle ORM |
-| **Auth** | Custom JWT sessions (`jose`) |
-| **Payments** | Stripe (Checkout + Connect) |
-| **File Storage** | Cloudinary |
-| **AI / LLM** | Google Gemini 2.5 Flash (Vercel AI SDK) |
-| **State (Server)** | TanStack Query (React Query) |
-| **State (URL)** | nuqs (URL search params) |
-| **Animations** | Framer Motion + GSAP |
-| **Forms** | React Hook Form + Zod |
-| **Deployment** | Vercel |
-| **Package Manager** | npm |
+| Layer               | Technology                              |
+| ------------------- | --------------------------------------- |
+| **Framework**       | Next.js 15 (App Router)                 |
+| **Language**        | TypeScript                              |
+| **Styling**         | Tailwind CSS v4                         |
+| **Database**        | Neon PostgreSQL (serverless)            |
+| **ORM**             | Drizzle ORM                             |
+| **Auth**            | Custom JWT sessions (`jose`)            |
+| **Payments**        | Stripe (Checkout + Connect)             |
+| **File Storage**    | Cloudinary                              |
+| **AI / LLM**        | Google Gemini 2.5 Flash (Vercel AI SDK) |
+| **State (Server)**  | TanStack Query (React Query)            |
+| **State (URL)**     | nuqs (URL search params)                |
+| **Animations**      | Framer Motion + GSAP                    |
+| **Forms**           | React Hook Form + Zod                   |
+| **Deployment**      | Vercel                                  |
+| **Package Manager** | npm                                     |
 
 ---
 
@@ -251,6 +257,7 @@ NEXT_PUBLIC_APP_URL=https://folkara.vercel.app
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 20+
 - npm
 - A Neon PostgreSQL database
@@ -294,28 +301,28 @@ npx drizzle-kit studio # Open Drizzle Studio (DB GUI)
 
 ## 🗺️ Key Routes
 
-| Route | Description | Auth Required |
-|---|---|---|
-| `/` | Landing page | No |
-| `/explore` | Infinite scroll product feed with filters | No |
-| `/browse` | Category browser | No |
-| `/products/[id]` | Product detail page | No |
-| `/story` | Our story / about page | No |
-| `/cart` | Shopping cart | No |
-| `/checkout` | Stripe checkout | Yes (Buyer) |
-| `/favorites` | Wishlist | Yes (Buyer) |
-| `/buyer/overview` | Buyer dashboard home | Yes (Buyer) |
-| `/buyer/orders` | Order history | Yes (Buyer) |
-| `/buyer/orders/[id]` | Order detail + invoice | Yes (Buyer) |
-| `/buyer/onboarding` | Buyer onboarding wizard | Yes (Buyer) |
-| `/seller/overview` | Seller dashboard home | Yes (Seller) |
-| `/seller/listings` | Product inventory | Yes (Seller) |
-| `/seller/listings/create` | Multi-step listing wizard | Yes (Seller) |
-| `/seller/orders` | Incoming orders management | Yes (Seller) |
-| `/seller/analytics` | Sales analytics | Yes (Seller) |
-| `/seller/payouts` | Stripe Connect payouts | Yes (Seller) |
-| `/seller/onboarding` | Seller onboarding wizard | Yes (Seller) |
-| `/auth` | Login / Signup | No |
+| Route                     | Description                               | Auth Required |
+| ------------------------- | ----------------------------------------- | ------------- |
+| `/`                       | Landing page                              | No            |
+| `/explore`                | Infinite scroll product feed with filters | No            |
+| `/browse`                 | Category browser                          | No            |
+| `/products/[id]`          | Product detail page                       | No            |
+| `/story`                  | Our story / about page                    | No            |
+| `/cart`                   | Shopping cart                             | No            |
+| `/checkout`               | Stripe checkout                           | Yes (Buyer)   |
+| `/favorites`              | Wishlist                                  | Yes (Buyer)   |
+| `/buyer/overview`         | Buyer dashboard home                      | Yes (Buyer)   |
+| `/buyer/orders`           | Order history                             | Yes (Buyer)   |
+| `/buyer/orders/[id]`      | Order detail + invoice                    | Yes (Buyer)   |
+| `/buyer/onboarding`       | Buyer onboarding wizard                   | Yes (Buyer)   |
+| `/seller/overview`        | Seller dashboard home                     | Yes (Seller)  |
+| `/seller/listings`        | Product inventory                         | Yes (Seller)  |
+| `/seller/listings/create` | Multi-step listing wizard                 | Yes (Seller)  |
+| `/seller/orders`          | Incoming orders management                | Yes (Seller)  |
+| `/seller/analytics`       | Sales analytics                           | Yes (Seller)  |
+| `/seller/payouts`         | Stripe Connect payouts                    | Yes (Seller)  |
+| `/seller/onboarding`      | Seller onboarding wizard                  | Yes (Seller)  |
+| `/auth`                   | Login / Signup                            | No            |
 
 ---
 
@@ -332,6 +339,7 @@ vercel --prod
 ```
 
 **Required Vercel settings:**
+
 - Add all environment variables from `.env.local`
 - Enable [Fluid compute](https://vercel.com/docs/functions/fluid-compute) for long-running AI streaming functions
 - Set the root directory to `/` (default)
@@ -352,9 +360,9 @@ vercel --prod
 ## 👤 Developer Profile
 
 - **Developer:** Sarthak Rakholiya
-- **Email:** [rakholiyasarthak9@gmail.com](mailto:rakholiyasarthak9@gmail.com)
+- **Email:** [rakholiysarthak9@gmail.com](mailto:rakholiysarthak9@gmail.com)
 - **Phone:** [+91 9979930867](tel:+919979930867)
 
 ---
 
-*Built with ♥ for the slow-made movement.*
+_Built with ♥ for the slow-made movement._
