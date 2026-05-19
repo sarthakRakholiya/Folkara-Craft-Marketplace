@@ -4,7 +4,7 @@
 
 **Live Site:** [https://folkara.vercel.app](https://folkara.vercel.app)
 
-(Developed by Sarthak Rakholiya)
+(Developed by ** Sarthak Rakholiya **)
 
 ---
 
