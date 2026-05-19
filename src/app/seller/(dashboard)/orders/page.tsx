@@ -1,12 +1,7 @@
-import { ComingSoonView } from "@/components/dashboard/ComingSoonView";
-import { ShoppingBag } from "lucide-react";
+import { SellerOrdersView } from "@/features/seller/orders/views/SellerOrdersView";
 
 export default function OrdersPage() {
   return (
-    <ComingSoonView 
-      title="Orders" 
-      icon={ShoppingBag} 
-      description="Track your sales, manage shipments, and ensure your crafts reach their new homes."
-    />
+    <SellerOrdersView />
   );
 }

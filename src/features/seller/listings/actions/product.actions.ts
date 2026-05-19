@@ -17,7 +17,7 @@ import {
 } from "@/lib/actionMiddleware";
 
 // Helper to get user's shop with retry logic for transient network blips
-async function getShop(userId: string, retries = 2): Promise<any> {
+async function getShop(userId: string, retries = 2): Promise<{ id: string; name: string } | undefined> {
   try {
     return await db.query.shops.findFirst({
       where: eq(shops.userId, userId),
@@ -25,7 +25,6 @@ async function getShop(userId: string, retries = 2): Promise<any> {
     });
   } catch (error) {
     if (retries > 0) {
-      console.warn(`[DB Retry] getShop failed for user ${userId}. Retrying... (${retries} left)`);
       await new Promise(resolve => setTimeout(resolve, 800)); // Wait 800ms
       return getShop(userId, retries - 1);
     }
@@ -87,9 +86,6 @@ export const createDraftProductAction = withAuthAction(
       );
 
       if (orphans.length > 0) {
-        console.log(
-          `[Cloudinary Cleanup] Deleting ${orphans.length} orphaned images for product ${productId}`,
-        );
         await Promise.all(orphans.map((img) => deleteImage(img.publicId)));
       }
 

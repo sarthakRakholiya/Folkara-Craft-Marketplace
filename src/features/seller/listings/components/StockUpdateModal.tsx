@@ -32,7 +32,7 @@ export function StockUpdateModal({
   const updateStockMutation = useUpdateProductStockMutation();
 
   const form = useForm<StockUpdateValues>({
-    resolver: zodResolver(stockUpdateSchema) as any,
+    resolver: zodResolver(stockUpdateSchema) as never,
     defaultValues: {
       additionalQuantity: 0,
     },
@@ -76,7 +76,7 @@ export function StockUpdateModal({
           </p>
         </div>
 
-        <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit as never)} className="space-y-6">
           <div className="flex justify-between items-center p-4 bg-surface-container-low rounded-2xl border border-outline-variant/10">
             <span className="text-xs font-label-caps font-bold tracking-widest text-on-surface-variant">Current Stock</span>
             <span className="text-lg font-headline-sm text-primary">{currentStock}</span>
@@ -90,8 +90,8 @@ export function StockUpdateModal({
             placeholder="0"
             inputClassName="text-center h-16 rounded-2xl text-2xl font-headline-sm font-bold"
             variant="default"
-            onFocus={(e: any) => e.target.select()}
-            onChange={(e: any) => {
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               const value = e.target.value;
               if (value.length > 1 && value.startsWith('0')) {
                 e.target.value = value.replace(/^0+/, '');

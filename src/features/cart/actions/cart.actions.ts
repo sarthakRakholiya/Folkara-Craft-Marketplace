@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { cartItems } from "@/db/schema";
+import { cartItems, products } from "@/db/schema";
 import { getSession } from "@/lib/session";
 import { eq, and } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
@@ -35,6 +35,22 @@ export async function getCartItemsAction() {
 export async function addToCartAction(productId: string, quantity: number = 1) {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
+
+  // Prevent sellers from purchasing their own products
+  const product = await db.query.products.findFirst({
+    where: eq(products.id, productId),
+    with: {
+      shop: true,
+    },
+  });
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  if (product.shop?.userId === session.userId) {
+    throw new Error("You cannot purchase your own product");
+  }
 
   // Check if item already exists inside this user's cart
   const existing = await db.query.cartItems.findFirst({

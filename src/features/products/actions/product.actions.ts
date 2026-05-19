@@ -1,10 +1,11 @@
+"use server";
+
 import { db } from "@/lib/db";
 import { products, shops, users } from "@/db/schema";
 import { eq, and, ne, desc, or, sql, type SQL } from "drizzle-orm";
 
-export const productService = {
-  async getProductById(id: string) {
-    const result = await db
+export async function getProductByIdAction(id: string) {
+  const result = await db
       .select({
         product: products,
         shop: shops,
@@ -16,10 +17,10 @@ export const productService = {
       .where(eq(products.id, id))
       .limit(1);
 
-    return result[0] || null;
-  },
+  return result[0] || null;
+}
 
-  async getRelatedProducts(category: string | null, tags: string[] = [], excludeId: string, limit = 4) {
+export async function getRelatedProductsAction(category: string | null, tags: string[] = [], excludeId: string, limit = 4) {
     const conditions = [
       ne(products.id, excludeId),
       eq(products.status, "ACTIVE")
@@ -48,6 +49,5 @@ export const productService = {
       .limit(limit)
       .orderBy(desc(products.createdAt));
 
-    return result;
-  },
-};
+  return result;
+}

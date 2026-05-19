@@ -80,7 +80,7 @@ export function CreateListingView() {
     [pathname, router, searchParams]
   );
 
-  const handleNext = useCallback((id?: any) => {
+  const handleNext = useCallback((id?: string | { url: string }) => {
     const productId = typeof id === 'string' ? id : undefined;
     if (activeStep !== null && activeStep < 4) {
       updateStep(activeStep + 1, productId);
@@ -173,7 +173,7 @@ export function CreateListingView() {
           price: Number(product.price) || 0,
           quantity: Number(product.quantity) || 1,
           tags: (product.tags as string[]) || [],
-          images: (product.images as any[]) || [],
+          images: (product.images as { url: string }[]) || [],
         });
         setListingId(id);
       } else {

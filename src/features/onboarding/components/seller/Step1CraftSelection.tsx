@@ -6,6 +6,7 @@ import { CRAFT_OPTIONS } from '../../constants/onboarding.constants';
 import { CraftSelectionSchema } from '../../types/onboarding.types';
 import { cn } from '@/lib/utils';
 import { Search, X } from 'lucide-react';
+import { CheckmarkIcon } from '@/assets/icons/CheckmarkIcon';
 
 export const Step1CraftSelection = () => {
   const { register, watch, setValue, formState: { errors } } = useFormContext<CraftSelectionSchema>();
@@ -43,9 +44,7 @@ export const Step1CraftSelection = () => {
       >
         {isSelected && (
           <div className="absolute top-3 right-3 bg-primary text-white p-1 rounded-full animate-in zoom-in duration-300">
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-            </svg>
+            <CheckmarkIcon className="w-3 h-3" />
           </div>
         )}
         <span 

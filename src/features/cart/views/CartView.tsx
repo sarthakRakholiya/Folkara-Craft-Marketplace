@@ -22,6 +22,8 @@ import {
 import { useFavoritesListQuery } from "@/features/products/hooks/useFavorite";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { createCheckoutSessionAction } from "@/features/checkout/actions/checkout.actions";
+
 
 export function CartView() {
   const router = useRouter();
@@ -62,9 +64,25 @@ export function CartView() {
   const remainingForFreeShipping = Math.max(0, 2000 - subtotal);
   const freeShippingProgress = Math.min(100, (subtotal / 2000) * 100);
 
-  const handleCheckout = () => {
-    router.push(`/checkout?delivery=${deliveryMethod}`);
+  const [isCheckingOut, setIsCheckingOut] = React.useState(false);
+
+  const handleCheckout = async () => {
+    try {
+      setIsCheckingOut(true);
+      const res = await createCheckoutSessionAction();
+      if (!res.success || !res.url) {
+        toast.error(res.error || "Failed to initiate checkout");
+        return;
+      }
+
+      window.location.href = res.url;
+    } catch (err) {
+      toast.error("An unexpected error occurred during checkout");
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
+
 
   // Dynamic AI Guide Note generator
   const getGuidesNote = () => {
@@ -418,16 +436,17 @@ export function CartView() {
                 {/* CTA Action Panel */}
                 <div className="space-y-4">
                   <button
-                    disabled={cartItems.length === 0}
+                    disabled={cartItems.length === 0 || isCheckingOut}
                     onClick={handleCheckout}
                     className="w-full bg-primary text-white py-4 px-6 font-sans text-xs font-bold tracking-[0.2em] uppercase hover:bg-primary/95 transition-all duration-300 rounded-full flex items-center justify-center gap-2 group cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <span>Continue to Checkout</span>
+                    <span>{isCheckingOut ? "Initiating Checkout..." : "Continue to Checkout"}</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </button>
                   <p className="text-center text-[10px] text-on-surface-variant/70 font-sans uppercase tracking-widest font-semibold">
                     Secure payment &amp; carbon-neutral shipping
                   </p>
+
                 </div>
 
                 {/* AI Guide Hint - "The Guide's Note" */}

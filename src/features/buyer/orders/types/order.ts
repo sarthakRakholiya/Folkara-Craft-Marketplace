@@ -1,7 +1,13 @@
-export type OrderStatus = "IN_TRANSIT" | "DELIVERED" | "CANCELLED" | "PENDING";
+export type OrderStatus =
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED"
+  | "PENDING"
+  | "IN_PROGRESS";
 
 export interface OrderItem {
   id: string;
+  orderId?: string;
   title: string;
   price: number;
   image: string;
@@ -13,4 +19,5 @@ export interface OrderItem {
   trackingNumber?: string;
   rating?: number;
   status: OrderStatus;
+  stripeSessionId?: string | null;
 }

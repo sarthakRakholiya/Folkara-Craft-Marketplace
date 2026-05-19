@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { productService } from "@/features/products/services/product.service";
+import { getProductByIdAction } from "@/features/products/actions/product.actions";
 import { ProductDetailView } from "@/features/products/views/ProductDetailView";
 import { checkIsFavorited } from "@/features/products/actions/favorite.actions";
 
@@ -11,7 +11,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const data = await productService.getProductById(id);
+  const data = await getProductByIdAction(id);
 
   if (!data) {
     return {
@@ -25,24 +25,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${product.title} | ${shop.name} on Folkara`,
     description: product.description,
+    keywords: product.tags ?? [],
     openGraph: {
       title: product.title ?? "Product",
       description: product.description ?? "",
-      images: images.length > 0 ? [images[0]] : [],
+      images: images.length > 0 ? [images[0]] : ["/og-image.png"],
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
       title: product.title ?? "Product",
       description: product.description ?? "",
-      images: images.length > 0 ? [images[0]] : [],
+      images: images.length > 0 ? [images[0]] : ["/og-image.png"],
     },
   };
 }
 
 export default async function ProductPage({ params }: Props) {
   const { id } = await params;
-  const data = await productService.getProductById(id);
+  const data = await getProductByIdAction(id);
 
   if (!data) {
     notFound();

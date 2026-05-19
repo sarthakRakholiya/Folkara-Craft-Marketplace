@@ -12,6 +12,7 @@ import { Filter, RotateCcw, ChevronDown, ChevronUp, X } from "lucide-react";
 import { CRAFT_OPTIONS } from "@/features/onboarding/constants/onboarding.constants";
 import gsap from "gsap";
 import { useLayoutEffect, useRef } from "react";
+import { CheckmarkIcon } from "@/assets/icons/CheckmarkIcon";
 
 interface ExploreSidebarProps {
   onFilterApplied?: () => void;
@@ -199,19 +200,10 @@ export const ExploreSidebar = ({
                     onChange={() => toggleCategory(cat)}
                     className="peer appearance-none w-5 h-5 border border-outline-variant rounded bg-surface-container-low transition-all checked:bg-primary checked:border-primary cursor-pointer"
                   />
-                  <svg
+                  <CheckmarkIcon
                     className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
+                    strokeWidth={4}
+                  />
                 </div>
                 <span
                   className={cn(

@@ -16,16 +16,53 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://folkara.vercel.app"),
   title: "Folkara | Artisan Marketplace",
   description:
     "Discover curated handmade goods from master artisans. Experience the beauty of unhurried discovery.",
+  keywords: [
+    "handmade",
+    "artisan",
+    "craft",
+    "marketplace",
+    "slow-made",
+    "folkara",
+    "handcrafted",
+    "authentic",
+    "pottery",
+    "ceramics",
+    "woodworking",
+    "textiles",
+  ],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: "Folkara",
+    title: "Folkara | Artisan Marketplace",
+    description: "Discover curated handmade goods from master artisans. Experience the beauty of unhurried discovery.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Folkara - Slow-Made Craft Marketplace",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Folkara | Artisan Marketplace",
+    description: "Discover curated handmade goods from master artisans. Experience the beauty of unhurried discovery.",
+    images: ["/og-image.png"],
+  },
   icons: {
     icon: "/favicon.png",
   },
 };
 
 import { QueryProvider } from "@/providers/QueryProvider";
-import { NavigationProgress } from "@/components/NavigationProgress";
+import { NavigationProgress } from "@/components/layout/NavigationProgress";
 import { AiAssistantSidebar } from "@/features/aiAssistant/components/AiAssistantSidebar";
 import { Toaster } from "sonner";
 import { Suspense } from "react";

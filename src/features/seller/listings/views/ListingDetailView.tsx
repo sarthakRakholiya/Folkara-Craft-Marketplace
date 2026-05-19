@@ -59,8 +59,7 @@ export function ListingDetailView({ product }: ListingDetailViewProps) {
       setIsDeleteModalOpen(false);
     }
   };
-  
-  const images = (product.images as any[]) || [];
+  const images = (product.images as { url: string }[]) || [];
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {

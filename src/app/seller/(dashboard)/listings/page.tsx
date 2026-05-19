@@ -1,5 +1,5 @@
 import { InventoryView } from "@/features/seller/listings/views/InventoryView";
-import { inventoryService } from "@/features/seller/listings/services/inventory.service";
+import { getSellerListingsAction, getInventoryStatsAction } from "@/features/seller/listings/actions/inventory.actions";
 import { getSession } from "@/lib/session";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
@@ -32,18 +32,18 @@ export default async function ListingsPage({
   const sort = (resolvedSearchParams.sort as SortOption) || "recently-added";
 
   // Fetch listings and stats in parallel to avoid waterfalls
-  const [listingData, stats] = await Promise.all([
-    inventoryService.getSellerListings({
+  const [productsData, stats] = await Promise.all([
+    getSellerListingsAction({
       shopId: shop.id,
       page,
       limit: 8,
-      status,
-      sort,
+      status: resolvedSearchParams.status as any,
+      sort: resolvedSearchParams.sort as any,
     }),
-    inventoryService.getInventoryStats(shop.id)
+    getInventoryStatsAction(shop.id)
   ]);
 
-  const { products, totalPages, totalCount } = listingData;
+  const { products, totalPages, totalCount } = productsData;
   return (
     <InventoryView
       initialProducts={products}

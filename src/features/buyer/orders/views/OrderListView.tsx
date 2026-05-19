@@ -1,57 +1,28 @@
 "use client";
 
 import React from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, ShoppingBag, ArrowRight } from "lucide-react";
 import { OrderCard } from "../components/OrderCard";
-import { OrderItem } from "../types/order";
 import { Button } from "@/components/ui/Button";
-
-const MOCK_ORDERS: OrderItem[] = [
-  {
-    id: "90021",
-    title: "Hand-speckled Oatmeal Pasta Bowl",
-    price: 84.0,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAc_djh6IBGSwEbiGRCY_TfgWHPe-kPU7aOFbhkZJqkdpuEVw5yx00JH_6hQJj6aJZbtwdurXPL5i4f_IN6q8DMnyggX0sfLObHLTCtuoUWxv4Ot2ofyITp3n9EpnpM1D7BZI2c8GFQe9Ec_lHbEAkQJ99b330FNAM8UesjNueTMf5jWFlyv00ReRwOHnhKIChScZ9Sozi2oYIc2CnTnq_WDkLnv9_G2kkRCVn1GVLrv2LdNwRD0_OLi3mTIIi4AGf2lUtVhKLwOEA",
-    tags: ["HAND-THROWN", "LOCAL CLAY", "STUDIO RELEASE #12"],
-    artisan: "Elena Moretti",
-    orderDate: "Oct 24, 2023",
-    arrivalDate: "Oct 30, 2023",
-    trackingNumber: "FLK-90021",
-    status: "IN_TRANSIT",
-  },
-  {
-    id: "85421",
-    title: "Organic Sage Linen Throw",
-    price: 142.0,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBYObFg3Nk2-iutZY-4PSrCdbQZauZmD-q_mj66Ps5evK5dqGd7h5-IpikD9Zb4-ZqEPU2zqUFThIkWmnNTFBFH-lS71vQbcYm1GwQXUECPsXVoD7spKtTFDE_FMZaC6MHAoG2g29Pdv_gcABHsKm7COLEVW0JBCz4qaflwvi_F9h8GH1vH3bIUvtIWFE5zCQOblW1N2j06GedtLkIkN8GrtxwOsraEiRWuXFX3TieTt6g0ykZTkIphriIGQZIW8p1pSWSF6F3nZPQ",
-    tags: ["VEGAN DYE", "HAND-LOOMED"],
-    artisan: "The Weaving Shed",
-    orderDate: "Sept 12, 2023",
-    deliveredDate: "Sept 18, 2023",
-    rating: 5,
-    status: "DELIVERED",
-  },
-  {
-    id: "72109",
-    title: "Petrichor & Cedar Soy Candle",
-    price: 38.0,
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCzomgSHanl2avLL4tQvyAByvmh5kZ9kdZKcSUwKCbNFu4sG3BK9ssVd2rf_Va2L41A2NlWtdjCUWV_pQmekBSUDiycj0PdvnC1GHKCA-_oam5A27q6Oxib2H2k73C1R9iu5iK-0o6P-fkCj75jBe0POgb_1Y1LSUszBCT5Gbw6WQWZ2IDMxrvABT3FYUJWo9vEGB5BW5zCcUafdlx4FT3Q6pAo3q10MFflQxPgVl-jQyl_5rIsUcYeMqwKKve9H9kFVbgrTBHyO1k",
-    tags: ["SMALL BATCH"],
-    artisan: "Lume Apothecary",
-    orderDate: "Aug 02, 2023",
-    deliveredDate: "Aug 08, 2023",
-    status: "DELIVERED",
-  },
-];
+import { useBuyerOrdersQuery } from "../hooks/useBuyerOrders";
+import Link from "next/link";
 
 export function OrderListView() {
+  const { data: orders = [], isLoading, error } = useBuyerOrdersQuery();
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const ITEMS_PER_PAGE = 2;
+
+  // Calculate pagination details
+  const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
+  const paginatedOrders = orders.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <section className="max-w-5xl mx-auto px-margin-page py-16">
       {/* Order List Header */}
-      <div className="flex justify-between items-end mb-12">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-12">
         <div>
           <h3 className="font-label-caps text-label-caps text-on-surface-variant mb-1">
             YOUR PURCHASES
@@ -60,44 +31,140 @@ export function OrderListView() {
             Refining the timeline of your curated collection.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 shrink-0">
           <Button
             variant="secondary"
             size="sm"
             shape="rounded"
-            className="font-label-caps text-[10px] tracking-widest"
+            className="font-label-caps text-[10px] tracking-widest pointer-events-none"
           >
             ALL TIME
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            shape="rounded"
-            className="border-outline-variant/30 font-label-caps text-[10px] tracking-widest"
-          >
-            FILTER
+        </div>
+      </div>
+
+      {/* LOADING SHIMMER STATE */}
+      {isLoading && (
+        <div className="space-y-12 animate-pulse">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="flex flex-col md:flex-row gap-8 pb-12 border-b border-outline-variant/10">
+              <div className="w-full md:w-64 h-64 bg-slate-200/60 rounded-lg shrink-0"></div>
+              <div className="flex-1 space-y-6 py-2">
+                <div className="flex justify-between items-start">
+                  <div className="w-2/3 h-6 bg-slate-200/60 rounded"></div>
+                  <div className="w-16 h-6 bg-slate-200/60 rounded"></div>
+                </div>
+                <div className="flex gap-2">
+                  <div className="w-20 h-5 bg-slate-200/60 rounded-full"></div>
+                  <div className="w-24 h-5 bg-slate-200/60 rounded-full"></div>
+                </div>
+                <div className="grid grid-cols-2 gap-y-4 max-w-sm pt-4">
+                  <div className="space-y-1"><div className="w-12 h-3 bg-slate-200/40 rounded"></div><div className="w-20 h-4 bg-slate-200/60 rounded"></div></div>
+                  <div className="space-y-1"><div className="w-16 h-3 bg-slate-200/40 rounded"></div><div className="w-16 h-4 bg-slate-200/60 rounded"></div></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ERROR STATE */}
+      {error && !isLoading && (
+        <div className="py-16 text-center space-y-4 bg-white border border-outline-variant/20 rounded-2xl p-8 max-w-md mx-auto">
+          <p className="text-sm text-rose-500 font-medium">Failed to retrieve order history.</p>
+          <Button onClick={() => window.location.reload()} variant="outline" className="mx-auto">
+            Try Again
           </Button>
         </div>
-      </div>
+      )}
 
-      {/* Vertical Order List */}
-      <div className="space-y-12">
-        {MOCK_ORDERS.map((order) => (
-          <OrderCard key={order.id} order={order} />
-        ))}
-      </div>
-
-      {/* Load More / Loader */}
-      <div className="py-24 flex flex-col items-center">
-        <div className="flex gap-1 mb-6">
-          <div className="w-1.5 h-1.5 bg-primary/20 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-          <div className="w-1.5 h-1.5 bg-primary/20 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-          <div className="w-1.5 h-1.5 bg-primary/20 rounded-full animate-bounce"></div>
+      {/* EMPTY STATE */}
+      {!isLoading && !error && orders.length === 0 && (
+        <div className="py-24 text-center max-w-md mx-auto space-y-6">
+          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
+            <ShoppingBag className="w-8 h-8" />
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-serif text-lg text-slate-800 font-semibold">No purchases recorded</h4>
+            <p className="text-slate-500 text-xs leading-relaxed">
+              You haven&apos;t added any slow-made, handcrafted relic treasures to your collection yet.
+            </p>
+          </div>
+          <Link
+            href="/"
+            className="inline-flex bg-slate-900 text-white hover:bg-slate-800 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-colors items-center gap-2 group mx-auto"
+          >
+            <span>Discover Slow-Made Crafts</span>
+            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
-        <p className="font-label-caps text-[10px] text-outline tracking-[0.4em] uppercase animate-pulse">
-          Retrieving More Memories
-        </p>
-      </div>
+      )}
+
+      {/* ACTIVE LIVE LIST */}
+      {!isLoading && !error && paginatedOrders.length > 0 && (
+        <div className="space-y-12">
+          {paginatedOrders.map((order) => (
+            <OrderCard key={order.id} order={order} />
+          ))}
+        </div>
+      )}
+
+      {/* CUSTOM PAGINATION COMPONENT */}
+      {!isLoading && !error && totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-16 pt-8 border-t border-outline-variant/15">
+          <button
+            onClick={() => {
+              setCurrentPage((prev) => Math.max(prev - 1, 1));
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            disabled={currentPage === 1}
+            className="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant/30 hover:border-primary disabled:opacity-30 disabled:pointer-events-none transition-colors text-primary font-bold text-sm"
+            aria-label="Previous Page"
+          >
+            ←
+          </button>
+          {[...Array(totalPages)].map((_, idx) => {
+            const pageNum = idx + 1;
+            const isActive = pageNum === currentPage;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => {
+                  setCurrentPage(pageNum);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className={`w-10 h-10 rounded-full font-label-caps text-xs tracking-wider font-bold transition-all ${
+                  isActive
+                    ? "bg-primary text-white scale-105 shadow-sm"
+                    : "bg-transparent text-outline hover:text-primary hover:bg-surface-container"
+                }`}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          <button
+            onClick={() => {
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            disabled={currentPage === totalPages}
+            className="w-10 h-10 rounded-full flex items-center justify-center border border-outline-variant/30 hover:border-primary disabled:opacity-30 disabled:pointer-events-none transition-colors text-primary font-bold text-sm"
+            aria-label="Next Page"
+          >
+            →
+          </button>
+        </div>
+      )}
+
+      {/* End of list indicator */}
+      {!isLoading && !error && orders.length > 0 && (
+        <div className="py-16 text-center">
+          <p className="font-label-caps text-[9px] text-outline/50 tracking-[0.4em] uppercase">
+            Curated Collection Synchronized
+          </p>
+        </div>
+      )}
     </section>
   );
 }

@@ -51,7 +51,7 @@ export function Step4Pricing({
   const previews = useMemo(() => {
     const images = form.getValues("images");
     if (!images || images.length === 0) return [];
-    return images.map((file: any) => 
+    return images.map((file: File | { url: string }) => 
       file instanceof File ? URL.createObjectURL(file) : file.url
     );
   }, [form]);

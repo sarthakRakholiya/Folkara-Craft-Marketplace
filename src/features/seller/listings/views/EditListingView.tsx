@@ -25,7 +25,7 @@ export function EditListingView() {
     Number(searchParams.get("step")) || 1,
   );
   const [isUpdating, setIsUpdating] = useState(false);
-  const [initialData, setInitialData] = useState<any>(null);
+  const [initialData, setInitialData] = useState<Record<string, unknown> | null>(null);
   const stepContainerRef = useRef<HTMLDivElement>(null);
   const form = useCreateListingForm();
 
@@ -53,7 +53,7 @@ export function EditListingView() {
         price: Number(product.price) || 0,
         quantity: product.quantity || 1,
         tags: (product.tags as string[]) || [],
-        images: (product.images as any[]) || [],
+        images: (product.images as { url: string }[]) || [],
       };
       form.reset(normalizedData);
       setInitialData(normalizedData);

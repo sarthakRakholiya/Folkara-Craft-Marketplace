@@ -1,3 +1,5 @@
+"use server";
+
 import { db } from "@/lib/db";
 import { products } from "@/db/schema";
 import { type SQL, eq, and, desc, asc, count, sql } from "drizzle-orm";
@@ -21,14 +23,13 @@ const orderByMap: Record<string, SQL> = {
   "stock-low-to-high": asc(products.quantity),
 };
 
-export const inventoryService = {
-  async getSellerListings(params: {
-    shopId: string;
-    page: number;
-    limit: number;
-    status?: ProductStatus | "all";
-    sort?: SortOption;
-  }) {
+export async function getSellerListingsAction(params: {
+  shopId: string;
+  page: number;
+  limit: number;
+  status?: ProductStatus | "all";
+  sort?: SortOption;
+}) {
     const { shopId, page, limit, status, sort } = params;
     const offset = (page - 1) * limit;
 
@@ -88,10 +89,10 @@ export const inventoryService = {
       totalCount,
       totalPages: Math.ceil(totalCount / limit),
     };
-  },
+}
 
-  async getInventoryStats(shopId: string) {
-    console.time(`[InventoryService] getInventoryStats: ${shopId}`);
+export async function getInventoryStatsAction(shopId: string) {
+
 
     // Optimized single-query stats
     const statsResult = await db
@@ -104,14 +105,12 @@ export const inventoryService = {
       .from(products)
       .where(eq(products.shopId, shopId));
 
-    console.timeEnd(`[InventoryService] getInventoryStats: ${shopId}`);
 
-    const s = statsResult[0];
-    return {
-      all: s.all,
-      active: s.active,
-      draft: s.draft,
-      "out-of-stock": s.outOfStock,
-    };
-  },
-};
+  const s = statsResult[0];
+  return {
+    all: s.all,
+    active: s.active,
+    draft: s.draft,
+    "out-of-stock": s.outOfStock,
+  };
+}

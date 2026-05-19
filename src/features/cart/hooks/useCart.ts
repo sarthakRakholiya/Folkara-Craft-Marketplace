@@ -40,7 +40,7 @@ export function useAddToCartMutation() {
     },
     onError: (err) => {
       console.error("Failed to add to cart:", err);
-      toast.error("Could not add item to bag");
+      toast.error(err instanceof Error ? err.message : "Could not add item to bag");
     },
   });
 }
