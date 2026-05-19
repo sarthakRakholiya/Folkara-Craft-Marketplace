@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from '@/lib/db';
-import { shops } from '@/db/schema';
+import { shops, users, products } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { deleteImage } from '@/lib/cloudinary';
 import { createId } from '@paralleldrive/cuid2';
@@ -75,3 +75,42 @@ export const updateShopLogo = withAuthAction(
     return { success: true };
   }
 );
+
+/**
+ * Retrieves the public shop profile details, including the owner (artisan/seller) information and their active products.
+ */
+export async function getShopProfile(shopId: string) {
+  try {
+    const shop = await db.query.shops.findFirst({
+      where: eq(shops.id, shopId),
+    });
+
+    if (!shop) {
+      return null;
+    }
+
+    const seller = await db.query.users.findFirst({
+      where: eq(users.id, shop.userId),
+    });
+
+    const activeProducts = await db.query.products.findMany({
+      where: and(eq(products.shopId, shopId), eq(products.status, 'ACTIVE')),
+    });
+
+    return {
+      shop,
+      seller: seller ? {
+        id: seller.id,
+        firstName: seller.firstName,
+        lastName: seller.lastName,
+        bio: seller.bio,
+        avatarUrl: seller.avatarUrl,
+        onboardingData: seller.onboardingData,
+      } : null,
+      products: activeProducts,
+    };
+  } catch (err) {
+    console.error("Failed to fetch shop profile:", err);
+    return null;
+  }
+}

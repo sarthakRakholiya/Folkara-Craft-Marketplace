@@ -54,7 +54,7 @@ export function Footer() {
               CONTACT
             </span>
             <Link href="/apply" className="text-on-surface-variant hover:text-primary transition-all duration-500 font-sans text-base">
-              Artisan Application
+              Seller Application
             </Link>
             <Link href="/shipping" className="text-on-surface-variant hover:text-primary transition-all duration-500 font-sans text-base">
               Shipping & Care

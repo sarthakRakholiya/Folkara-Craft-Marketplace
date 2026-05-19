@@ -22,7 +22,6 @@ import { z } from "zod";
 import Image from "next/image";
 import {
   saveOnboardingStep,
-  finalizeOnboarding,
 } from "../actions/onboarding.action";
 import { createShop, updateShopLogo } from "@/features/shop/actions/shop.actions";
 import { updateProfilePicture } from "@/features/auth/actions/profile.actions";
@@ -30,7 +29,8 @@ import { toast } from "sonner";
 
 const TOTAL_STEPS = 5;
 
-export const OnboardingView = ({ initialData }: { initialData?: any }) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const OnboardingView = ({ initialData }: { initialData?: Record<string, any> | null }) => {
   const [currentStep, setCurrentStep] = useQueryState(
     "step",
     parseAsInteger.withDefault(1).withOptions({ shallow: false }),
@@ -66,15 +66,11 @@ export const OnboardingView = ({ initialData }: { initialData?: any }) => {
     mode: "onChange",
   });
 
-  const {
-    trigger,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = methods;
+  const { trigger } = methods;
 
   const handleNext = async () => {
     // Validate only current step fields
-    let fieldsToValidate: any[] = [];
+    let fieldsToValidate: (keyof z.infer<typeof combinedSchema>)[] = [];
     if (currentStep === 1) fieldsToValidate = ["craftIds", "customCraft"];
     if (currentStep === 2) fieldsToValidate = ["shopName", "logoUrl", "logoPublicId"];
     if (currentStep === 3) fieldsToValidate = ["country", "city", "showLocation"];
@@ -82,7 +78,7 @@ export const OnboardingView = ({ initialData }: { initialData?: any }) => {
       fieldsToValidate = ["firstName", "lastName", "bio", "makerQuote", "avatarUrl", "avatarPublicId"];
     if (currentStep === 5) return; // Already on success page
 
-    const isValid = await trigger(fieldsToValidate as any);
+    const isValid = await trigger(fieldsToValidate);
 
     if (isValid && currentStep < TOTAL_STEPS) {
       // If fields exist for this step, check if any were modified.
@@ -106,10 +102,17 @@ export const OnboardingView = ({ initialData }: { initialData?: any }) => {
 
       setIsSaving(true);
       try {
-        const stepData = methods.getValues() as Record<string, any>;
+        const stepData = methods.getValues() as Record<string, unknown> & {
+          shopName?: string;
+          shopId?: string;
+          logoUrl?: string;
+          logoPublicId?: string;
+          avatarUrl?: string;
+          avatarPublicId?: string;
+        };
 
         if (currentStep === 2) {
-          const shopResult = await createShop(stepData.shopName);
+          const shopResult = await createShop(stepData.shopName || "");
           if (!('success' in shopResult) || !('data' in shopResult)) {
             toast.error('error' in shopResult ? shopResult.error : 'Failed to create shop');
             setIsSaving(false);
@@ -201,7 +204,7 @@ export const OnboardingView = ({ initialData }: { initialData?: any }) => {
 
   return (
     <FormProvider {...methods}>
-      <div className="flex-1 flex flex-col bg-surface">
+      <div className="min-h-screen flex flex-col bg-surface">
         <OnboardingHeader currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
         <main className="flex-1 flex flex-col items-center justify-start py-8 md:py-12 pb-20 md:pb-24 px-margin-page">

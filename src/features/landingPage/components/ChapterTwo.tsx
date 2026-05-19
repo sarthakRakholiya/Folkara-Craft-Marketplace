@@ -6,7 +6,7 @@ export function ChapterTwo() {
     <section className="bg-primary text-on-primary py-16 md:py-section-gap relative overflow-hidden">
       <div className="max-w-container-max mx-auto px-6 md:px-margin-page">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-section-gap items-center">
-          <div className="order-2 lg:order-1 relative mt-12 lg:mt-0">
+          <div className="order-2 lg:order-1 relative mt-12 lg:mt-0 gsap-slide-right">
             <div className="text-[60px] md:text-[120px] font-serif opacity-5 absolute -top-10 md:-top-20 -left-5 md:-left-10 select-none pointer-events-none">
               CRAFT
             </div>
@@ -31,17 +31,18 @@ export function ChapterTwo() {
               </div>
             </div>
           </div>
-          <div className="order-1 lg:order-2">
-            <span className="font-sans text-xs font-semibold tracking-widest text-primary-fixed mb-4 block uppercase">
+          <div className="order-1 lg:order-2 gsap-stagger">
+            <span className="font-sans text-xs font-semibold tracking-widest text-primary-fixed mb-4 block uppercase gsap-stagger-item">
               CHAPTER II
             </span>
-            <h2 className="font-serif text-[36px] md:text-[48px] text-primary-fixed mb-6 leading-tight">
+            <h2 className="font-serif text-[36px] md:text-[48px] text-primary-fixed mb-6 leading-tight gsap-stagger-item">
               The Intentional Pulse
             </h2>
-            <p className="text-on-primary-container text-lg mb-8 leading-relaxed">
-              Speed is the enemy of soul. Our makers work at the pace of the material, listening to the wood&apos;s grain and the clay&apos;s moisture. It is a dialogue that cannot be rushed.
+            <p className="text-on-primary-container text-lg mb-8 leading-relaxed gsap-stagger-item">
+              Our sellers take time to make every piece with care and skill. Each
+              handmade item is crafted to last and built to be loved.
             </p>
-            <div className="space-y-6">
+            <div className="space-y-6 gsap-stagger-item">
               <Button 
                 variant="fixed" 
                 shape="full"

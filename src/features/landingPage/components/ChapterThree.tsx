@@ -5,7 +5,7 @@ export function ChapterThree() {
   return (
     <section className="relative py-16 md:py-section-gap overflow-hidden bg-surface-container">
       <div className="max-w-container-max mx-auto px-6 md:px-margin-page text-center">
-        <div className="mb-12">
+        <div className="mb-12 gsap-fade-up">
           <span className="font-sans text-xs font-semibold tracking-widest text-secondary mb-4 block uppercase">
             CHAPTER III
           </span>
@@ -13,7 +13,7 @@ export function ChapterThree() {
             Where Intention Resides
           </h2>
         </div>
-        <div className="relative max-w-4xl mx-auto">
+        <div className="relative max-w-4xl mx-auto gsap-scale-up">
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
           <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-secondary/10 rounded-full blur-3xl" />
           <div className="relative z-10 aspect-video rounded-xl shadow-sm overflow-hidden">
@@ -26,7 +26,7 @@ export function ChapterThree() {
             />
           </div>
         </div>
-        <div className="mt-16 flex flex-col items-center gap-8">
+        <div className="mt-16 flex flex-col items-center gap-8 gsap-fade-up">
           <p className="text-lg text-on-surface-variant max-w-lg leading-relaxed">
             The journey concludes in your hands. These are not just objects; they are the artifacts of a slower, more deliberate way of living.
           </p>

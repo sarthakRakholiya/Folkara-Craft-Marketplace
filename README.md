@@ -2,7 +2,7 @@
 
 > A premium marketplace connecting independent artisans with conscious buyers. Built for craftsmanship, story, and intentional commerce.
 
-**Live Site:** [https://folkara.vercel.app](https://folkara.vercel.app)
+**Live Site:** [https://folkara.vercel.app](https://folkara.vercel.app) (Developed by Sarthak Rakholiya)
 
 ---
 
@@ -56,7 +56,11 @@ An embedded **AI Craft Assistant** helps buyers discover products through natura
 - Seller analytics dashboard
 
 ### 🤖 AI Features
-- **AI Craft Assistant** — conversational sidebar that searches the product catalog using semantic tool calls
+- **Lore AI Craft Assistant** — conversational sidebar that searches the product catalog, artisan shops, and saved items using semantic tool calls with inline generative UI cards
+  - `searchProducts` → inline `RecommendationCard` grid (pgvector semantic search + text fallback)
+  - `findSellers` → inline `ShopCard` grid (artisan studio discovery)
+  - `getSavedItems` → inline `RecommendationCard` grid (user's bookmarked items)
+  - `getCartDetails` → live cart summary with GST + delivery calculations
 - **AI Listing Analysis** — auto-generates product descriptions, tags, and artisan narrative from uploaded images and basic info
 
 ### 🔐 Auth & Security
@@ -140,7 +144,19 @@ src/
 │   │   └── orders/              # Seller order management
 │   ├── shop/                    # Shop profile actions
 │   ├── onboarding/              # Multi-step onboarding for both roles
-│   ├── aiAssistant/             # AI chat sidebar component + streaming
+│   ├── aiAssistant/             # Lore AI chat sidebar
+│   │   ├── components/
+│   │   │   ├── AiAssistantSidebar.tsx  # Root orchestrator — imports only, no inline defs
+│   │   │   ├── DrawerShell.tsx         # MUI-style always-mounted drawer (CSS translate, no remount)
+│   │   │   ├── AiChatInputArea.tsx     # Isolated input form (keystrokes don't re-render parent)
+│   │   │   ├── ThinkingIndicator.tsx   # Animated typing/thinking indicator
+│   │   │   ├── AiToolOutput.tsx        # Renders product, shop & saved-item cards from tool calls
+│   │   │   ├── ChatMessage.tsx         # Individual message bubble (streaming-aware)
+│   │   │   ├── RecommendationCard.tsx  # Product card with add-to-cart
+│   │   │   ├── ShopCard.tsx            # Artisan shop card
+│   │   │   └── SuggestionChips.tsx     # Quick-send suggestion chips
+│   │   └── hooks/
+│   │       └── useAiSidebar.ts         # nuqs URL state — single source of truth, flicker-free
 │   ├── landingPage/             # Landing page section components
 │   ├── browse/                  # Browse page components
 │   └── story/                   # Our Story page components
@@ -329,6 +345,15 @@ vercel --prod
 - **Security layers**: Every server action passes through auth validation before calling business logic.
 - **Type safety**: Zod validates all inputs. No `any` in critical data paths.
 - **No inline SVGs**: All SVG icons are extracted to `src/assets/icons/` as reusable components.
+- **Component isolation**: Sub-components are never defined inside parent component files. Each component lives in its own file for stable identity and clean imports.
+- **Single state source**: `useAiSidebar` uses nuqs URL state only — no local mirror, no custom events — eliminating double-render flicker.
+- **Always-mounted drawer**: `DrawerShell` uses CSS `translateX` + `visibility` transition delay so content is never unmounted mid-animation, preventing layout flicker.
+
+## 👤 Developer Profile
+
+- **Developer:** Sarthak Rakholiya
+- **Email:** [rakholiyasarthak9@gmail.com](mailto:rakholiyasarthak9@gmail.com)
+- **Phone:** [+91 9979930867](tel:+919979930867)
 
 ---
 

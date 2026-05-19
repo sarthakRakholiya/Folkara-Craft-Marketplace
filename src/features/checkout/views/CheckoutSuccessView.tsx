@@ -5,16 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import {
-  CheckCircle2,
+  CheckCircle2 as _CheckCircle2,
   Sparkles,
   ArrowRight,
   Truck,
   BookOpen,
-  ShoppingBag,
+  ShoppingBag as _ShoppingBag,
 } from "lucide-react";
 import { AnimatedCheckIcon } from "@/assets/icons/AnimatedCheckIcon";
 
 interface CheckoutSuccessViewProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   order: any;
 }
 
@@ -54,8 +55,8 @@ export function CheckoutSuccessView({ order }: CheckoutSuccessViewProps) {
   const firstItemTitle = firstItem?.product?.title || "slow-made object";
   const firstItemShop = firstItem?.shop?.name || "Independent Workshop";
 
-  // Dynamic personalized note from "Artisan Guide"
-  const artisanGuideNote = `The ${firstItemTitle.toLowerCase()} you chose pairs beautifully with soft morning light and a warm cup of herbal tea. Consider placing it in a dedicated corner of your room to create a quiet, intentional space for reflection.`;
+  // Dynamic personalized note from "Folkara Guide"
+  const artisanGuideNote = `Thank you for buying the ${firstItemTitle.toLowerCase()} from ${firstItemShop}. We hope you love it! Your item is packed carefully and will be on its way soon.`;
 
   return (
     <main className="min-h-screen bg-background text-on-background font-sans mt-24">
@@ -111,6 +112,7 @@ export function CheckoutSuccessView({ order }: CheckoutSuccessViewProps) {
               </h2>
 
               <div className="space-y-6 max-h-[380px] overflow-y-auto pr-2 scrollbar-thin">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {order.items?.map((item: any) => {
                   const product = item.product;
                   if (!product) return null;
@@ -157,7 +159,7 @@ export function CheckoutSuccessView({ order }: CheckoutSuccessViewProps) {
                   <span>{formatCurrency(order.subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant">
-                  <span>Shipping (Climate Neutral)</span>
+                  <span>Shipping</span>
                   <span>
                     {parseFloat(order.shippingCost) === 0 ? (
                       <span className="text-emerald-700 font-bold">FREE</span>
@@ -167,8 +169,8 @@ export function CheckoutSuccessView({ order }: CheckoutSuccessViewProps) {
                   </span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant">
-                  <span>Estimated Taxes</span>
-                  <span>₹0.00</span>
+                  <span>GST (18%)</span>
+                  <span>{formatCurrency(order.tax ?? 0)}</span>
                 </div>
                 <div className="flex justify-between text-primary font-bold text-lg pt-2 border-t border-outline-variant/10">
                   <span>Total</span>
@@ -209,7 +211,7 @@ export function CheckoutSuccessView({ order }: CheckoutSuccessViewProps) {
               </p>
               <div className="flex items-center gap-2 text-secondary font-sans text-label-caps">
                 <span className="w-8 h-[1px] bg-secondary"></span>
-                Your Artisan Guide
+                Your Folkara Guide
               </div>
             </div>
 
@@ -229,9 +231,7 @@ export function CheckoutSuccessView({ order }: CheckoutSuccessViewProps) {
                 Meet the Makers
               </h3>
               <p className="font-sans text-body-md text-on-surface-variant mt-2 leading-relaxed">
-                See how your slow-made objects were created with love,
-                precision, and history by {firstItemShop} in their local
-                community.
+                See how your handmade items were crafted with skill by {firstItemShop}.
               </p>
             </div>
           </div>

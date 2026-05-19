@@ -70,7 +70,7 @@ export const Step3Location = () => {
           auto_awesome
         </span>
         <p className="font-sans text-xs text-on-secondary-fixed-variant italic leading-relaxed">
-          Artisan communities thrive on transparency. Sharing your location
+          Maker communities thrive on transparency. Sharing your location
           helps collectors find your workshop.
         </p>
       </div>

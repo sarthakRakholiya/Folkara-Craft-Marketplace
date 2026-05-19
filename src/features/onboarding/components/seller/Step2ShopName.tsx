@@ -98,7 +98,7 @@ export const Step2ShopName = () => {
                  <div key={i} className="w-5 h-5 rounded-full bg-surface-container-highest border-2 border-surface-container-low" />
                ))}
              </div>
-             <span className="font-sans text-[8px] font-bold text-on-surface-variant uppercase tracking-widest">Joining 2k+ Artisans</span>
+             <span className="font-sans text-[8px] font-bold text-on-surface-variant uppercase tracking-widest">Joining 2k+ Sellers</span>
           </div>
         </div>
       </div>

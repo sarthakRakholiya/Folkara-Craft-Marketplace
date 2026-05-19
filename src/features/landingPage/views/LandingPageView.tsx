@@ -6,13 +6,16 @@ import { ArtisanSpotlight } from "../components/ArtisanSpotlight";
 import { JournalPreview } from "../components/JournalPreview";
 import { Newsletter } from "../components/Newsletter";
 import { ChapterThree } from "../components/ChapterThree";
+import { getTopProductsAction } from "@/features/products/actions/product.actions";
 
-export function LandingPageView() {
+export async function LandingPageView() {
+  const topProducts = await getTopProductsAction(8);
+
   return (
     <div className="pt-20">
       <Hero />
       <ChapterTwo />
-      <ProductShowcase />
+      <ProductShowcase products={topProducts} />
       <Testimonials />
       <ArtisanSpotlight />
       <JournalPreview />

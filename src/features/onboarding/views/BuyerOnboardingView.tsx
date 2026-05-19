@@ -5,22 +5,21 @@ import { gsap } from "gsap";
 import { useQueryState, parseAsInteger } from "nuqs";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import Image from "next/image";
 import { OnboardingHeader } from "../components/OnboardingHeader";
 import {
   saveOnboardingStep,
-  finalizeOnboarding,
 } from "../actions/onboarding.action";
 import { Step1BuyerWelcome } from "../components/buyer/Step1BuyerWelcome";
 import { Step2BuyerProfile } from "../components/buyer/Step2BuyerProfile";
 import { Step3BuyerInterests } from "../components/buyer/Step3BuyerInterests";
 import { Step4BuyerCompletion } from "../components/buyer/Step4BuyerCompletion";
-import { buyerProfileSchema } from "../schemas/buyer.schema";
+import { buyerProfileSchema, type BuyerProfileSchema } from "../schemas/buyer.schema";
 
 const TOTAL_STEPS = 4;
 
-export const BuyerOnboardingView = ({ initialData }: { initialData?: any }) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const BuyerOnboardingView = ({ initialData }: { initialData?: Record<string, any> | null }) => {
   const [currentStep, setCurrentStep] = useQueryState(
     "step",
     parseAsInteger.withDefault(1).withOptions({ shallow: false }),
@@ -70,12 +69,12 @@ export const BuyerOnboardingView = ({ initialData }: { initialData?: any }) => {
       return;
     }
 
-    let fieldsToValidate: any[] = [];
+    let fieldsToValidate: (keyof BuyerProfileSchema)[] = [];
     if (currentStep === 2)
       fieldsToValidate = ["firstName", "lastName", "country", "birthday", "bio"];
     if (currentStep === 3) fieldsToValidate = ["interests"];
 
-    const isValid = await trigger(fieldsToValidate as any);
+    const isValid = await trigger(fieldsToValidate);
 
     if (isValid && currentStep < TOTAL_STEPS) {
       setIsSaving(true);
@@ -123,7 +122,7 @@ export const BuyerOnboardingView = ({ initialData }: { initialData?: any }) => {
 
   return (
     <FormProvider {...methods}>
-      <div className="flex-1 flex flex-col bg-surface">
+      <div className="min-h-screen flex flex-col bg-surface">
         <OnboardingHeader currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
         <main className="flex-1 flex flex-col items-center justify-start py-8 md:py-12 pb-20 md:pb-24 px-margin-page">

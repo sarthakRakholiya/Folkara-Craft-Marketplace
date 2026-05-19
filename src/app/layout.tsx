@@ -16,7 +16,9 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://folkara.vercel.app"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "https://folkara.vercel.app",
+  ),
   title: "Folkara | Artisan Marketplace",
   description:
     "Discover curated handmade goods from master artisans. Experience the beauty of unhurried discovery.",
@@ -40,7 +42,8 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "Folkara",
     title: "Folkara | Artisan Marketplace",
-    description: "Discover curated handmade goods from master artisans. Experience the beauty of unhurried discovery.",
+    description:
+      "Discover curated handmade goods from master artisans. Experience the beauty of unhurried discovery.",
     images: [
       {
         url: "/og-image.png",
@@ -53,7 +56,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Folkara | Artisan Marketplace",
-    description: "Discover curated handmade goods from master artisans. Experience the beauty of unhurried discovery.",
+    description:
+      "Discover curated handmade goods from master artisans. Experience the beauty of unhurried discovery.",
     images: ["/og-image.png"],
   },
   icons: {

@@ -3,9 +3,8 @@
 import { db } from "@/lib/db";
 import { cartItems, orders, orderItems, shops, products } from "@/db/schema";
 import { getSession } from "@/lib/session";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
-import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 
 // Initialize Stripe conditionally
@@ -85,6 +84,9 @@ export async function createCheckoutSessionAction() {
       const subtotal = items.reduce((sum, item) => {
         return sum + parsePrice(item.product.price) * item.quantity;
       }, 0);
+      const shippingCost = 150; // Standard shipping
+      const gst = subtotal * 0.18; // 18% GST
+      const grandTotal = subtotal + shippingCost + gst;
 
       // Pre-create the unpaid order sequentially
       await db.insert(orders).values({
@@ -99,10 +101,10 @@ export async function createCheckoutSessionAction() {
         shippingState: "Pending",
         shippingCountry: "IN",
         shippingPostalCode: "Pending",
-        shippingCost: "150.00",
+        shippingCost: shippingCost.toString(),
         subtotal: subtotal.toString(),
-        tax: "0.00",
-        grandTotal: (subtotal + 150).toString(),
+        tax: gst.toFixed(2),
+        grandTotal: grandTotal.toFixed(2),
       });
 
       const orderItemsValues = items.map((item) => ({
@@ -162,11 +164,12 @@ export async function createCheckoutSessionAction() {
       });
 
       return { success: true, url: stripeSession.url };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Stripe Session Creation Error:", error);
+      const message = error instanceof Error ? error.message : String(error);
       return {
         success: false,
-        error: `Stripe Checkout Session creation failed: ${error.message || error}`,
+        error: `Stripe Checkout Session creation failed: ${message}`,
       };
     }
   }
@@ -189,9 +192,36 @@ export async function fulfillStripeOrderAction(stripeSessionId: string) {
   }
 
   try {
-    // 1. Retrieve the session from Stripe
-    const stripeSession =
-      await stripe.checkout.sessions.retrieve(stripeSessionId) as any;
+    // NOTE: Stripe API 2026-04-22 (dahlia) moved shipping info to
+    // collected_information.shipping_details. We type-cast to support both.
+    const stripeSession = await stripe.checkout.sessions.retrieve(stripeSessionId) as Stripe.Checkout.Session & {
+      // Dahlia API path (2025-03-31+)
+      collected_information?: {
+        shipping_details?: {
+          name?: string | null;
+          address?: {
+            line1?: string | null;
+            line2?: string | null;
+            city?: string | null;
+            state?: string | null;
+            country?: string | null;
+            postal_code?: string | null;
+          } | null;
+        } | null;
+      } | null;
+      // Legacy path (pre-2025-03-31) kept for backward compatibility
+      shipping_details?: {
+        name?: string | null;
+        address?: {
+          line1?: string | null;
+          line2?: string | null;
+          city?: string | null;
+          state?: string | null;
+          country?: string | null;
+          postal_code?: string | null;
+        } | null;
+      } | null;
+    };
     if (!stripeSession) {
       return { success: false, error: "Stripe session not found" };
     }
@@ -238,13 +268,32 @@ export async function fulfillStripeOrderAction(stripeSessionId: string) {
     }
 
     // Complete the unpaid order inside a transaction
-    const shippingName = stripeSession.shipping_details?.name || "Customer";
-    const addressLine = stripeSession.shipping_details?.address?.line1 || "N/A";
-    const city = stripeSession.shipping_details?.address?.city || "N/A";
-    const state = stripeSession.shipping_details?.address?.state || "N/A";
-    const country = stripeSession.shipping_details?.address?.country || "IN";
-    const postalCode =
-      stripeSession.shipping_details?.address?.postal_code || "N/A";
+    // Try the new dahlia API location first (collected_information.shipping_details),
+    // then fall back to the legacy top-level shipping_details field.
+    const shippingInfo =
+      stripeSession.collected_information?.shipping_details ??
+      stripeSession.shipping_details;
+
+    const shippingName = shippingInfo?.name || "Customer";
+    const addr = shippingInfo?.address;
+
+    // Log what Stripe returned to help debug if address is missing
+    console.log("[Stripe Shipping Debug] collected_information.shipping_details:", stripeSession.collected_information?.shipping_details);
+    console.log("[Stripe Shipping Debug] shipping_details (legacy):", stripeSession.shipping_details);
+    console.log("[Stripe Shipping Debug] Final shippingInfo used:", shippingInfo);
+
+    const addressLine  = addr?.line1 || "";
+    const addressLine2 = addr?.line2 || "";
+    const city         = addr?.city || "";
+    const state        = addr?.state || "";
+    const country      = addr?.country || "IN";
+    const postalCode   = addr?.postal_code || "";
+
+    // Build a clean single-line address from available parts (skip empty pieces)
+    const fullAddress = [addressLine, addressLine2, city, state, postalCode, country]
+      .filter(Boolean)
+      .join(", ")
+      || "Address not provided";
 
     const shippingCost = (stripeSession.shipping_cost?.amount_total || 0) / 100;
     const subtotal = (stripeSession.amount_subtotal || 0) / 100;
@@ -259,7 +308,7 @@ export async function fulfillStripeOrderAction(stripeSessionId: string) {
         status: "PENDING",
         deliveryMethod,
         shippingName,
-        shippingAddress: addressLine,
+        shippingAddress: fullAddress,
         shippingCity: city,
         shippingState: state,
         shippingCountry: country,
@@ -289,9 +338,10 @@ export async function fulfillStripeOrderAction(stripeSessionId: string) {
     await db.delete(cartItems).where(eq(cartItems.userId, session.userId));
 
     return { success: true, orderId };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to fulfill Stripe order:", error);
-    return { success: false, error: error.message || "Fulfillment failed" };
+    const message = error instanceof Error ? error.message : "Fulfillment failed";
+    return { success: false, error: message };
   }
 }
 

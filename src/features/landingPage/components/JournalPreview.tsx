@@ -26,7 +26,7 @@ export function JournalPreview() {
   return (
     <section className="bg-surface-container-low py-16 md:py-section-gap">
       <div className="max-w-container-max mx-auto px-6 md:px-margin-page">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-0 mb-12 md:mb-16">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-0 mb-12 md:mb-16 gsap-fade-up">
           <div>
             <span className="font-sans text-xs font-semibold tracking-widest text-secondary mb-4 block uppercase">
               THE MAKER&apos;S JOURNAL
@@ -40,9 +40,9 @@ export function JournalPreview() {
             READ ALL STORIES
           </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 gsap-stagger">
           {articles.map((article) => (
-            <article key={article.title} className="group cursor-pointer">
+            <article key={article.title} className="group cursor-pointer gsap-stagger-item">
               <div className="overflow-hidden aspect-[16/10] mb-6 relative">
                 <Image 
                   src={article.image} 

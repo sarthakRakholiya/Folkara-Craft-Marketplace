@@ -92,7 +92,7 @@ export const MakerStory = ({ maker }: MakerStoryProps) => {
             className="group flex items-center gap-4 w-fit"
           >
             <span className="font-sans text-[10px] md:text-xs font-bold text-primary uppercase tracking-[0.2em] border-b border-primary/20 pb-1 group-hover:border-primary transition-all">
-              Explore the full collection
+              Explore Shop
             </span>
             <span className="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform duration-300">
               arrow_forward

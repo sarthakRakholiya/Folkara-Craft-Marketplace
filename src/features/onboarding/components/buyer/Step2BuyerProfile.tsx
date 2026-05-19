@@ -49,7 +49,7 @@ export const Step2BuyerProfile = ({
               Tell us a little about you
             </h1>
             <p className="text-xs md:text-sm text-on-surface-variant max-w-[360px] mx-auto">
-              Please provide your details to help us personalize your artisanal
+              Please provide your details to help us personalize your handmade
               journey.
             </p>
           </div>

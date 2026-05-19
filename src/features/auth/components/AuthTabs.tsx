@@ -97,7 +97,7 @@ export function AuthTabs({ mode, setMode, role, setRole }: AuthTabsProps) {
                   : "text-on-surface-variant hover:text-on-surface",
               )}
             >
-              Artisan
+              Seller
             </button>
           </div>
         </div>

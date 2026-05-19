@@ -23,13 +23,14 @@ export const ExploreHero = () => {
       <div className="relative z-10 max-w-container-max mx-auto w-full">
         <div className="max-w-xl">
           <span className="font-sans text-xs md:text-sm tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
-            CURATED SELECTION
+            HANDMADE COLLECTION
           </span>
           <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-primary mb-8 leading-[1.1] tracking-tight">
-            Curated for your earthy minimal style
+            Browse handmade products you&apos;ll love
           </h1>
           <p className="font-sans text-lg md:text-xl text-on-surface-variant mb-10 max-w-md leading-relaxed">
-            Discover unhurried pieces crafted by hand, reflecting the quiet soul of traditional artistry and modern minimalism.
+            Find unique handmade items from skilled sellers across India — made
+            with care, one piece at a time.
           </p>
           <Button variant="primary" size="lg" className="rounded-full px-10 py-6 tracking-[0.2em] uppercase text-xs">
             EXPLORE COLLECTION

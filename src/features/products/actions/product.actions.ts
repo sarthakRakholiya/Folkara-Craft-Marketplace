@@ -51,3 +51,25 @@ export async function getRelatedProductsAction(category: string | null, tags: st
 
   return result;
 }
+
+/**
+ * Fetches the most recent active products for the landing page showcase
+ */
+export async function getTopProductsAction(limit = 8) {
+  const result = await db
+    .select({
+      id: products.id,
+      title: products.title,
+      category: products.category,
+      price: products.price,
+      images: products.images,
+      shopId: products.shopId,
+    })
+    .from(products)
+    .where(eq(products.status, "ACTIVE"))
+    .orderBy(desc(products.createdAt))
+    .limit(limit);
+
+  return result;
+}
+

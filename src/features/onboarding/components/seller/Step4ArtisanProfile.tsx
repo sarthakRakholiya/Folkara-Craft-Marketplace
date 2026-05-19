@@ -79,7 +79,7 @@ export const Step4ArtisanProfile = () => {
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-6 pb-6">
       {/* Header Section */}
       <div className="text-center space-y-2">
-        <h1 className="font-serif text-2xl md:text-4xl text-primary leading-tight">Artisan Profile</h1>
+        <h1 className="font-serif text-2xl md:text-4xl text-primary leading-tight">Seller Profile</h1>
         <p className="font-sans text-sm md:text-base text-on-surface-variant italic max-w-md mx-auto">
           "Every piece has a heartbeat; your profile is the story of how that pulse began."
         </p>

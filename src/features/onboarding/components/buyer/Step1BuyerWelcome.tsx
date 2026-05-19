@@ -31,7 +31,7 @@ export const Step1BuyerWelcome = ({ onContinue }: Step1BuyerWelcomeProps) => {
           Welcome to Folkara
         </h1>
         <p className="text-base md:text-lg text-on-surface-variant leading-relaxed">
-          Discover handmade pieces curated around your personal style. We connect you with artisans who celebrate the maker's hand and intentional living.
+          Discover handmade pieces curated around your personal style. We connect you with sellers who celebrate the maker's hand and intentional living.
         </p>
       </div>
 

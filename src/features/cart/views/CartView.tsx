@@ -11,7 +11,6 @@ import {
   Trash2,
   ArrowRight,
   Sparkles,
-  Check,
 } from "lucide-react";
 import {
   useCartQuery,
@@ -39,11 +38,6 @@ export function CartView() {
     return parseFloat(priceStr.replace(/[^0-9.]/g, "")) || 0;
   };
 
-  // Delivery Method state
-  const [deliveryMethod, setDeliveryMethod] = React.useState<
-    "standard" | "express"
-  >("standard");
-
   // Math Calculations
   const subtotal = cartItems.reduce((sum, item) => {
     if (!item.product) return sum;
@@ -53,14 +47,14 @@ export function CartView() {
 
   const isFreeShipping = subtotal >= 2000;
 
-  // Calculate shipping charges based on selection & goals
-  const standardCost = subtotal === 0 ? 0 : isFreeShipping ? 0 : 100;
-  const expressCost = subtotal === 0 ? 0 : 250;
-  const shippingFee =
-    deliveryMethod === "standard" ? standardCost : expressCost;
-  const grandTotal = subtotal + shippingFee;
+  // Shipping is always standard (chosen in Stripe checkout page)
+  const shippingFee = subtotal === 0 ? 0 : isFreeShipping ? 0 : 100;
 
-  // Free shipping progress variables (only applicable for standard shipping)
+  // 18% GST
+  const gst = subtotal * 0.18;
+  const grandTotal = subtotal + shippingFee + gst;
+
+  // Free shipping progress variables
   const remainingForFreeShipping = Math.max(0, 2000 - subtotal);
   const freeShippingProgress = Math.min(100, (subtotal / 2000) * 100);
 
@@ -87,7 +81,7 @@ export function CartView() {
   // Dynamic AI Guide Note generator
   const getGuidesNote = () => {
     if (cartItems.length === 0) {
-      return "A blank canvas for quiet reflections. Select one of our slow-made stoneware incense burners or hand-woven tapestries to begin your collection.";
+      return "Your bag is empty! Browse our handmade pottery, textiles, and wood pieces to start shopping.";
     }
 
     const categories = cartItems.map(
@@ -113,19 +107,19 @@ export function CartView() {
     );
 
     if (hasCeramic && hasLinen) {
-      return "These items reflect a deep appreciation for the quiet moments. The Matcha Set pairs perfectly with the linen's raw texture for a truly grounded morning ritual.";
+      return "Great picks! The ceramic set and linen fabric go well together for a cozy home setup.";
     }
     if (hasCeramic) {
-      return "Earth and fire transformed. These handcrafted ceramics bring an organic, textured grace to your home, encouraging you to slow down and savor every sip.";
+      return "Nice choice! These handmade ceramics are crafted with care and will look great in your home.";
     }
     if (hasLinen) {
-      return "Soft, tactile warmth for intentional living. The natural drape and honest weave of these hand-woven fabrics add a gentle, calming presence to any room.";
+      return "Great choice! These hand-woven fabrics are made from natural materials and are very comfortable.";
     }
     if (hasWood) {
-      return "Grown from the earth, shaped by human hands. The rich grains and visible chisel marks in these wood carvings speak of patience, nature, and the passage of time.";
+      return "Lovely pick! These wood items are made by hand with skill and will last for years.";
     }
 
-    return "A beautiful gathering of slow-made artifacts. Each unique piece carries the breathing spirit of the artisan who shaped it, crafted to become a treasured heirloom.";
+    return "Great selection! Each item in your bag is handmade by a skilled seller on Folkara.";
   };
 
   // 1. Loading Skeleton State
@@ -185,14 +179,14 @@ export function CartView() {
                   &ldquo;Your bag awaits slow creations.&rdquo;
                 </p>
                 <p className="font-sans text-xs md:text-sm text-on-surface-variant/60 mb-8 max-w-sm leading-relaxed">
-                  Explore our curation of heritage pottery, organic textiles,
-                  and hand-carved wood to begin building your custom collection.
+                  Browse handmade pottery, textiles, and wood pieces from
+                  skilled sellers across India.
                 </p>
                 <Link
                   href="/explore"
                   className="bg-primary text-white py-3.5 px-8 rounded-full font-sans text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase hover:bg-primary/90 transition-all shadow-md active:scale-[0.98]"
                 >
-                  Explore slow-made objects
+                  Browse Handmade Products
                 </Link>
               </motion.div>
             ) : (
@@ -206,7 +200,7 @@ export function CartView() {
                     const imageUrl =
                       item.product.images[0]?.url || "/placeholder.jpg";
                     const shopName =
-                      item.product.shop?.name || "Artisan Workshop";
+                      item.product.shop?.name || "Seller Shop";
 
                     return (
                       <motion.div
@@ -245,7 +239,7 @@ export function CartView() {
                             </p>
                             <p className="text-on-surface-variant font-sans text-xs md:text-sm max-w-lg leading-relaxed line-clamp-3">
                               {item.product.description ||
-                                "A beautifully crafted artisan object tailored with pure natural materials, reflecting ages of slow-living heritage."}
+                                "A unique handmade item crafted with natural materials by a skilled seller."}
                             </p>
                           </div>
 
@@ -330,74 +324,19 @@ export function CartView() {
                   </div>
                 </div>
 
-                {/* Delivery Method Selector */}
-                <div className="space-y-4 pb-2 border-b border-outline-variant/20">
-                  <h4 className="font-sans text-[10px] uppercase tracking-widest font-bold text-on-surface-variant/80">
-                    Delivery Method
-                  </h4>
-                  <div className="flex flex-col gap-4">
-                    {/* Standard Ground Option */}
-                    <div
-                      onClick={() => setDeliveryMethod("standard")}
-                      className={`border p-6 rounded-2xl cursor-pointer transition-all group relative ${
-                        deliveryMethod === "standard"
-                          ? "border-secondary bg-secondary-fixed/5 shadow-sm"
-                          : "border-outline-variant hover:border-secondary bg-white/40"
-                      }`}
-                    >
-                      <div className="flex justify-between items-start mb-2 pr-6">
-                        <span className={`font-bold font-sans text-xs ${
-                          deliveryMethod === "standard" ? "text-primary" : "text-on-surface-variant"
-                        }`}>
-                          Standard Ground
-                        </span>
-                        <span className="text-secondary font-sans text-xs font-semibold select-none">
-                          {isFreeShipping ? "FREE" : "₹100"}
-                        </span>
-                      </div>
-                      <p className="text-on-surface-variant/70 font-sans text-xs">
-                        4–7 business days. Carbon-neutral transit.
-                      </p>
-                      {deliveryMethod === "standard" ? (
-                        <div className="absolute top-4 right-4 w-5 h-5 rounded-full bg-secondary flex items-center justify-center shadow-sm">
-                          <Check className="w-3 h-3 text-white stroke-[3.5]" />
-                        </div>
-                      ) : (
-                        <div className="absolute top-4 right-4 w-5 h-5 rounded-full border border-outline-variant/50 bg-transparent" />
-                      )}
-                    </div>
-
-                    {/* Express Air Option */}
-                    <div
-                      onClick={() => setDeliveryMethod("express")}
-                      className={`border p-6 rounded-2xl cursor-pointer transition-all group relative ${
-                        deliveryMethod === "express"
-                          ? "border-secondary bg-secondary-fixed/5 shadow-sm"
-                          : "border-outline-variant hover:border-secondary bg-white/40"
-                      }`}
-                    >
-                      <div className="flex justify-between items-start mb-2 pr-6">
-                        <span className={`font-bold font-sans text-xs ${
-                          deliveryMethod === "express" ? "text-primary" : "text-on-surface-variant"
-                        }`}>
-                          Express Air
-                        </span>
-                        <span className="text-secondary font-sans text-xs font-semibold select-none">
-                          ₹250
-                        </span>
-                      </div>
-                      <p className="text-on-surface-variant/70 font-sans text-xs">
-                        1–2 business days. Next-day dispatch.
-                      </p>
-                      {deliveryMethod === "express" ? (
-                        <div className="absolute top-4 right-4 w-5 h-5 rounded-full bg-secondary flex items-center justify-center shadow-sm">
-                          <Check className="w-3 h-3 text-white stroke-[3.5]" />
-                        </div>
-                      ) : (
-                        <div className="absolute top-4 right-4 w-5 h-5 rounded-full border border-outline-variant/50 bg-transparent" />
-                      )}
-                    </div>
+                {/* Shipping Info */}
+                <div className="pb-2 border-b border-outline-variant/20">
+                  <div className="flex items-center justify-between">
+                    <span className="font-sans text-[10px] uppercase tracking-widest font-bold text-on-surface-variant/80">
+                      Shipping
+                    </span>
+                    <span className="font-sans text-xs font-semibold text-secondary">
+                      {isFreeShipping ? "FREE (Standard)" : "₹100 (Standard)"}
+                    </span>
                   </div>
+                  <p className="font-sans text-[11px] text-on-surface-variant/60 mt-1">
+                    4–7 business days · You can choose Express at checkout
+                  </p>
                 </div>
 
                 {/* Pricing Breakdowns */}
@@ -409,12 +348,9 @@ export function CartView() {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>
-                      Shipping (
-                      {deliveryMethod === "standard" ? "Standard" : "Express"})
-                    </span>
+                    <span>Shipping (Standard)</span>
                     <span className="font-semibold text-primary">
-                      {deliveryMethod === "standard" && isFreeShipping ? (
+                      {isFreeShipping ? (
                         <span className="text-secondary font-bold">FREE</span>
                       ) : (
                         `₹${shippingFee}`
@@ -422,8 +358,10 @@ export function CartView() {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Taxes</span>
-                    <span className="font-semibold text-primary">₹0.00</span>
+                    <span>GST (18%)</span>
+                    <span className="font-semibold text-primary">
+                      ₹{gst.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                    </span>
                   </div>
                   <div className="pt-4 border-t border-outline-variant/40 flex justify-between font-serif text-lg text-primary">
                     <span>Total</span>
@@ -444,7 +382,7 @@ export function CartView() {
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </button>
                   <p className="text-center text-[10px] text-on-surface-variant/70 font-sans uppercase tracking-widest font-semibold">
-                    Secure payment &amp; carbon-neutral shipping
+                    Secure payment · Fast delivery · Easy returns
                   </p>
 
                 </div>

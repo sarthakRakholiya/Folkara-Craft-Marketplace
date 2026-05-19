@@ -14,7 +14,7 @@ import { eq } from 'drizzle-orm';
  */
 
 // These pages are accessible regardless of auth state (landing page, marketing, etc.)
-const EXPLORER_ROUTES = ['/', '/about', '/pricing', '/contact', '/explore'];
+const EXPLORER_ROUTES = ['/', '/about', '/pricing', '/contact', '/explore', '/browse', '/story', '/products', '/shop'];
 
 // Only for logged-out users — redirect logged-in users away
 const AUTH_ROUTES = ['/auth', '/signup', '/auth'];

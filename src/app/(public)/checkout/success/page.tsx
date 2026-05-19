@@ -7,7 +7,7 @@ import { ShieldCheck, XCircle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Order Confirmed | Folkara Craft Marketplace",
-  description: "Your secure checkout has been completed. Thank you for supporting independent slow-made artisans.",
+  description: "Your secure checkout has been completed. Thank you for supporting independent slow-made makers.",
 };
 
 interface SuccessPageProps {
