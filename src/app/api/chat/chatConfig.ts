@@ -152,7 +152,7 @@ export const chatTools = {
             Array.isArray(item.images) && item.images.length > 0
               ? item.images[0].url
               : typeof item.images === "string" &&
-                  item.images.startsWith("http")
+                item.images.startsWith("http")
                 ? item.images
                 : undefined,
         }));
@@ -366,7 +366,7 @@ export const chatTools = {
             Array.isArray(item.images) && item.images.length > 0
               ? item.images[0].url
               : typeof item.images === "string" &&
-                  item.images.startsWith("http")
+                item.images.startsWith("http")
                 ? item.images
                 : undefined,
         }));
