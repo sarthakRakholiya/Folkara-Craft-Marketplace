@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -38,13 +39,21 @@ export function StockUpdateModal({
     },
   });
 
+  useEffect(() => {
+    if (isOpen) {
+      form.reset({
+        additionalQuantity: 0,
+      });
+    }
+  }, [isOpen, form]);
+
   const additionalStock = form.watch("additionalQuantity");
   const safeCurrentStock = Number(currentStock) || 0;
   const safeAdditionalStock = Number(additionalStock) || 0;
   const newTotalDisplay = safeCurrentStock + safeAdditionalStock;
 
   const onSubmit: SubmitHandler<StockUpdateValues> = async (values) => {
-    const newTotal = currentStock + values.additionalQuantity;
+    const newTotal = safeCurrentStock + (Number(values.additionalQuantity) || 0);
     updateStockMutation.mutate({ productId, newQuantity: newTotal }, {
       onSuccess: () => {
         onClose();

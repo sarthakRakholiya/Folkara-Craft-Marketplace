@@ -8,6 +8,7 @@ import { Sparkles, ArrowRight, IndianRupee, Package, Tag } from "lucide-react";
 import { useMemo, useRef, useLayoutEffect } from "react";
 import Image from "next/image";
 import gsap from "gsap";
+import { toast } from "sonner";
 
 interface Step4PricingProps {
   form: UseFormReturn<CreateListingSchema>;
@@ -60,6 +61,25 @@ export function Step4Pricing({
   const description = form.watch("description");
   const category = form.watch("category");
   const tags = form.watch("tags") || [];
+  const price = form.watch("price");
+  const quantity = form.watch("quantity");
+
+  function handlePublish() {
+    const missing: string[] = [];
+    if (!title?.trim()) missing.push("Title");
+    if (!description?.trim()) missing.push("Description");
+    if (!category?.trim()) missing.push("Category");
+    if (!(Number(price) > 0)) missing.push("Price");
+    if (!(Number(quantity) >= 1)) missing.push("Stock quantity");
+
+    if (missing.length > 0) {
+      toast.error("Listing Incomplete", {
+        description: `Please fill in: ${missing.join(", ")}.`,
+      });
+      return;
+    }
+    onSubmit();
+  }
 
   return (
     <div ref={containerRef} className="space-y-8">
@@ -173,14 +193,14 @@ export function Step4Pricing({
                 BACK TO DETAILS
               </button>
               <Button 
-                onClick={onSubmit}
+                onClick={handlePublish}
                 variant="primary"
                 shape="rounded"
                 size="lg"
                 className="w-full sm:w-auto px-16 py-6 shadow-2xl"
                 endIcon={<ArrowRight className="w-4 h-4" />}
                 loading={loading}
-                disabled={loading || !form.watch("price") || form.watch("price") <= 0 || !form.watch("quantity") || form.watch("quantity") < 1}
+                disabled={loading}
               >
                 {isEdit ? "UPDATE LISTING" : "PUBLISH LISTING"}
               </Button>

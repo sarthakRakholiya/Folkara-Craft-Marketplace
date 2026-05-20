@@ -297,7 +297,10 @@ export function InventoryView({
       {stockUpdateData && (
         <StockUpdateModal
           isOpen={isStockModalOpen}
-          onClose={() => setIsStockModalOpen(false)}
+          onClose={() => {
+            setIsStockModalOpen(false);
+            setStockUpdateData(null);
+          }}
           productId={stockUpdateData.id}
           currentStock={stockUpdateData.current}
         />

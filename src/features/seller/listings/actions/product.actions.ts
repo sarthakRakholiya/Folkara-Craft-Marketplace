@@ -64,6 +64,15 @@ export const createDraftProductAction = withAuthAction(
     const uploadedImages = await Promise.all(
       data.images.map(async (img) => {
         if (img.startsWith("data:")) {
+          // Server-side size guard: decode base64 to measure actual binary bytes
+          const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+          const base64Data = img.split(",")[1] || img;
+          const imageSize = Buffer.from(base64Data, "base64").length;
+          if (imageSize > MAX_SIZE_BYTES) {
+            throw new Error(
+              "One or more images exceed the maximum limit of 10 MB.",
+            );
+          }
           const res = await uploadImage(img, "products");
           return { url: res.url, publicId: res.publicId };
         }
@@ -338,6 +347,10 @@ export const updateProductStockAction = withAuthAction(
     { session },
     { productId, newQuantity }: { productId: string; newQuantity: number },
   ) => {
+    if (typeof newQuantity !== "number" || Number.isNaN(newQuantity) || !Number.isFinite(newQuantity) || newQuantity < 0) {
+      throw new Error("Invalid stock quantity input");
+    }
+
     const product = await db.query.products.findFirst({
       where: eq(products.id, productId),
       columns: { shopId: true },

@@ -80,6 +80,16 @@ export function Step1GeneralInfo({ form, onNext, productId }: Step1GeneralInfoPr
       return;
     }
 
+    const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+    for (const file of files) {
+      if (file.size > MAX_SIZE_BYTES) {
+        toast.error("File Too Large", {
+          description: `"${file.name}" is too large. Maximum size is 10 MB.`,
+        });
+        return;
+      }
+    }
+
     const newPreviews = files.map((file) => URL.createObjectURL(file));
     setPreviews((prev) => [...prev, ...newPreviews]);
 
@@ -195,6 +205,9 @@ export function Step1GeneralInfo({ form, onNext, productId }: Step1GeneralInfoPr
                   </h2>
                   <p className="text-[11px] text-on-surface-variant max-w-[180px] mx-auto leading-relaxed opacity-60">
                     Showcase the soul of your Slow-Made piece.
+                  </p>
+                  <p className="text-[9px] text-on-surface-variant/40 max-w-[180px] mx-auto leading-relaxed uppercase tracking-wider font-semibold">
+                    JPG, PNG or WebP · max 10 MB
                   </p>
                 </div>
                 <Button

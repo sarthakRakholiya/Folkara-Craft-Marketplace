@@ -32,12 +32,13 @@ export function Modal({
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     return () => setMounted(false);
   }, []);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && mounted) {
       document.body.style.overflow = "hidden";
       
       // Animate In
@@ -54,7 +55,11 @@ export function Modal({
     } else {
       document.body.style.overflow = "unset";
     }
-  }, [isOpen]);
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, mounted]);
 
   const handleClose = () => {
     gsap.to(overlayRef.current, {
@@ -79,6 +84,7 @@ export function Modal({
     };
     if (isOpen) window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   if (!mounted || !isOpen) return null;

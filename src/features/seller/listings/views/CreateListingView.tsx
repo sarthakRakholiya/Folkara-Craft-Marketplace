@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useState, useCallback, useRef, useEffect, useLayoutEffect } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useCreateListingForm } from "@/features/seller/listings/hooks/useCreateListingForm";
 import { Step1GeneralInfo } from "@/features/seller/listings/components/createListing/Step1GeneralInfo";
 import { AIAnalysis } from "@/features/seller/listings/components/createListing/AIAnalysis";
@@ -19,7 +19,9 @@ export function CreateListingView() {
   const stepContainerRef = useRef<HTMLDivElement>(null);
 
   // Listing State
-  const [activeStep, setActiveStep] = useState<number | null>(null);
+  const [activeStep, setActiveStep] = useState<number | null>(
+    () => Number(searchParams.get("step")) || 1,
+  );
   const [listingId, setListingId] = useState<string | null>(searchParams.get("id"));
   const [isLoading, setIsLoading] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -113,19 +115,14 @@ export function CreateListingView() {
       toast.success("Listing Live! ✨", {
         description: "Your masterpiece is now visible to collectors worldwide. Happy selling!",
       });
-      router.push("/seller/listings");
+      router.push(`/seller/listings/${listingId}`);
     } else {
       toast.error("Failed to publish", { description: result.error });
       setIsPublishing(false);
     }
   };
 
-  // Initialize step from URL
-  useLayoutEffect(() => {
-    const step = Number(searchParams.get("step")) || 1;
-    setActiveStep(step);
-    lastStepRef.current = step;
-  }, []);
+  // lastStepRef is kept in sync by the navigation effect below.
 
   // Hydrate form if ID exists (Persistence on refresh)
   useEffect(() => {
@@ -188,12 +185,12 @@ export function CreateListingView() {
     hydrateListing();
   }, [searchParams, form, updateStep, listingId]);
 
-  // Handle URL navigation (back/forward) & the ONLY trigger for transitions
+  // Handle URL navigation (back/forward) — the ONLY trigger for step transitions
   useEffect(() => {
     const stepFromUrl = Number(searchParams.get("step")) || 1;
-    
+    lastStepRef.current = stepFromUrl;
+
     if (stepFromUrl !== activeStep && activeStep !== null) {
-      // Run the animation
       animateStepTransition(stepFromUrl);
     }
   }, [searchParams, activeStep, animateStepTransition]);
