@@ -1,5 +1,4 @@
 export const AI_CONFIG = {
-  MODEL: 'llama-3.1-8b-instant',
   MAX_WORDS_QUOTE: 15,
   MAX_WORDS_STORY: 60,
 };

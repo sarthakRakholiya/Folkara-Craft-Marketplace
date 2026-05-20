@@ -1,6 +1,6 @@
-import { groq } from "@ai-sdk/groq";
 import { streamText, stepCountIs, convertToModelMessages } from "ai";
 import { LORE_SYSTEM_PROMPT, chatTools } from "./chatConfig";
+import { chatModel } from "@/constants/ai";
 
 export async function POST(req: Request) {
   try {
@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
     // Stream the response. NOTE: We do not save any messages to Neon!
     const result = await streamText({
-      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+      model: chatModel,
       system: LORE_SYSTEM_PROMPT,
       messages: modelMessages,
       stopWhen: stepCountIs(5), // Allows the LLM to run tools, receive results, and formulate the final response

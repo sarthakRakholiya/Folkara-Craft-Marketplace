@@ -7,8 +7,7 @@ import { uploadImage, deleteImage } from "@/lib/cloudinary";
 import { createId } from "@paralleldrive/cuid2";
 import { z } from "zod";
 import { generateObject, embed } from "ai";
-import { groq } from "@ai-sdk/groq";
-import { google } from "@ai-sdk/google";
+import { chatModel, embeddingModel } from "@/constants/ai";
 import { AI_PROMPTS } from "@/features/aiAssistant/constants/aiPrompt.constants";
 import {
   withAuthAction,
@@ -157,7 +156,7 @@ export const generateProductNarrativeAction = withAuthAction(
       throw new Error("No images found for analysis");
 
     const { object } = await generateObject({
-      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+      model: chatModel,
       schema: z.object({
         title: z.string(),
         description: z.string(),
@@ -226,7 +225,7 @@ export const publishProductAction = withAuthAction(
     `.trim();
 
     const { embedding } = await embed({
-      model: google.embedding("gemini-embedding-001"),
+      model: embeddingModel,
       value: embeddingContext,
     });
 
@@ -260,7 +259,7 @@ export const refineProductNarrativeAction = withAuthAction(
     if (!product) throw new Error("Listing not found");
 
     const { object } = await generateObject({
-      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+      model: chatModel,
       schema: z.object({
         title: z.string(),
         description: z.string(),

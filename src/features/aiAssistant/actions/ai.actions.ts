@@ -1,7 +1,7 @@
 "use server";
 
 import { generateText } from 'ai';
-import { groq } from '@ai-sdk/groq';
+import { quickModel } from '@/constants/ai';
 import { CRAFT_OPTIONS } from '../../onboarding/constants/onboarding.constants';
 import { AI_CONFIG, AI_PROMPTS } from '../constants/aiPrompt.constants';
 import { withAuthAction } from '@/lib/actionMiddleware';
@@ -19,7 +19,7 @@ export const generateMakerQuote = withAuthAction(
       .join(', ');
 
     const { text } = await generateText({
-      model: groq(AI_CONFIG.MODEL),
+      model: quickModel,
       prompt: AI_PROMPTS.MAKER_QUOTE(shopName, craftNames),
     });
 
@@ -40,7 +40,7 @@ export const generateMakerStory = withAuthAction(
       .join(', ');
 
     const { text } = await generateText({
-      model: groq(AI_CONFIG.MODEL),
+      model: quickModel,
       prompt: AI_PROMPTS.MAKER_STORY(artisanName, shopName, craftNames),
     });
 

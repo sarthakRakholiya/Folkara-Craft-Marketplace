@@ -5,8 +5,8 @@
  * This keeps the API route file (route.ts) clean and focused purely on request orchestration.
  */
 
-import { google } from "@ai-sdk/google";
 import { tool } from "ai";
+import { embeddingModel } from "@/constants/ai";
 import { db } from "@/lib/db";
 import { products, cartItems, shops, users, favorites } from "@/db/schema";
 import { getSession } from "@/lib/session";
@@ -80,7 +80,7 @@ export const chatTools = {
 
         // Step 1: Convert the AI search term into a 768-dimensional vector embedding using Gemini
         const { embedding } = await embed({
-          model: google.embedding("gemini-embedding-001"),
+          model: embeddingModel,
           value: searchTerm,
         });
 
