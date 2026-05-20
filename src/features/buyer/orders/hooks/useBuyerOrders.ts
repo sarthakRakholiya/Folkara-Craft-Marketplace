@@ -5,10 +5,15 @@ import { getBuyerOrdersAction, getBuyerOrderByIdAction } from "../actions/buyerO
 /**
  * Hook to retrieve all buyer orders with React Query
  */
-export function useBuyerOrdersQuery() {
+export function useBuyerOrdersQuery(params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+  search?: string;
+}) {
   return useQuery({
-    queryKey: queryKeys.orders,
-    queryFn: () => getBuyerOrdersAction(),
+    queryKey: params ? [...queryKeys.orders, params.page, params.limit, params.status, params.search] : queryKeys.orders,
+    queryFn: () => getBuyerOrdersAction(params),
   });
 }
 

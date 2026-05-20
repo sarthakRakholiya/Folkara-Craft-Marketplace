@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { orders, orderItems } from "@/db/schema";
 import { getSession } from "@/lib/session";
-import { eq, desc, inArray } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { OrderItem, OrderStatus } from "../types/order";
 import Stripe from "stripe";
 
@@ -14,16 +14,126 @@ const stripe = process.env.STRIPE_SECRET_KEY
   : null;
 
 /**
- * Fetches all order items purchased by the active buyer, mapped for the UI layout
+ * Fetches all order items purchased by the active buyer, mapped for the UI layout with pagination
  */
-export async function getBuyerOrdersAction() {
+export async function getBuyerOrdersAction(params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+  search?: string;
+}) {
   const session = await getSession();
   if (!session) {
     throw new Error("Unauthorized");
   }
 
-  // 1. Fetch user orders
-  const userOrders = await db.query.orders.findMany({
+  // Dual-mode: If no pagination parameters are requested, return all orders as a flat list for dashboard compatibility
+  if (!params) {
+    const userOrders = await db.query.orders.findMany({
+      where: eq(orders.userId, session.userId),
+      orderBy: [desc(orders.createdAt)],
+      with: {
+        items: {
+          with: {
+            product: true,
+            shop: true,
+          },
+        },
+      },
+    });
+
+    if (userOrders.length === 0) {
+      return {
+        orders: [],
+        totalCount: 0,
+        totalPages: 0,
+        stats: { ALL: 0, PENDING: 0, IN_PROGRESS: 0, SHIPPED: 0, DELIVERED: 0, CANCELLED: 0 }
+      };
+    }
+
+    const mappedItems: OrderItem[] = [];
+
+    for (const order of userOrders) {
+      for (const item of order.items) {
+        if (!item.product) continue;
+
+        let uiStatus: OrderStatus = "PENDING";
+        if (order.status === "DELIVERED") {
+          uiStatus = "DELIVERED";
+        } else if (order.status === "CANCELLED") {
+          uiStatus = "CANCELLED";
+        } else if (order.status === "SHIPPED") {
+          uiStatus = "SHIPPED";
+        } else if (order.status === "IN_PROGRESS") {
+          uiStatus = "IN_PROGRESS";
+        }
+
+        const tags = (item.product.tags as string[]) || ["SLOW-MADE", "AUTHENTIC"];
+        
+        const orderDateStr = new Date(order.createdAt).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+
+        const arrivalDateStr = new Date(
+          new Date(order.createdAt).getTime() + 5 * 24 * 60 * 60 * 1000
+        ).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+
+        mappedItems.push({
+          id: item.id,
+          orderId: order.id,
+          title: item.product.title || "Craft Item",
+          price: parseFloat(item.price),
+          image: (item.product.images as { url: string }[] | undefined)?.[0]?.url || "/placeholder.jpg",
+          tags,
+          artisan: item.shop?.name || "Independent Artisan",
+          orderDate: orderDateStr,
+          arrivalDate: arrivalDateStr,
+          deliveredDate: order.status === "DELIVERED" ? orderDateStr : undefined,
+          trackingNumber: order.trackingNumber || `FLK-${item.id.slice(-5).toUpperCase()}`,
+          status: uiStatus,
+          stripeSessionId: order.stripeSessionId,
+          description: item.product.description || undefined,
+          artisanAnalysis: item.product.artisanAnalysis || undefined,
+        });
+      }
+    }
+
+    const stats = {
+      ALL: mappedItems.length,
+      PENDING: mappedItems.filter((i) => i.status === "PENDING").length,
+      IN_PROGRESS: mappedItems.filter((i) => i.status === "IN_PROGRESS").length,
+      SHIPPED: mappedItems.filter((i) => i.status === "SHIPPED").length,
+      DELIVERED: mappedItems.filter((i) => i.status === "DELIVERED").length,
+      CANCELLED: mappedItems.filter((i) => i.status === "CANCELLED").length,
+    };
+
+    return {
+      orders: mappedItems,
+      totalCount: mappedItems.length,
+      totalPages: 1,
+      stats,
+    };
+  }
+
+  const page = params.page || 1;
+  const limit = params.limit || 5;
+  const offset = (page - 1) * limit;
+
+  // We need to fetch items instead of orders, since mapping is per-item
+  // But wait, the existing code fetches orders and then maps items. This means pagination was on orders, not items.
+  // We'll keep pagination on orders for now, or maybe items if we want exact item counts.
+  // Since the UI renders items individually in the list, pagination should really be on orderItems!
+  
+  // Actually let's fetch all user orders and map them first, then filter, because we are using SQLite and nested filtering is hard.
+  // Oh wait, it's Postgres. But still, mapping is simple.
+  
+  const allUserOrders = await db.query.orders.findMany({
     where: eq(orders.userId, session.userId),
     orderBy: [desc(orders.createdAt)],
     with: {
@@ -36,18 +146,12 @@ export async function getBuyerOrdersAction() {
     },
   });
 
-  if (userOrders.length === 0) {
-    return [];
-  }
+  const allMappedItems: OrderItem[] = [];
 
-  // 2. Map relational Drizzle tables into flat OrderItem models
-  const mappedItems: OrderItem[] = [];
-
-  for (const order of userOrders) {
+  for (const order of allUserOrders) {
     for (const item of order.items) {
       if (!item.product) continue;
 
-      // Status mapping: DB -> UI
       let uiStatus: OrderStatus = "PENDING";
       if (order.status === "DELIVERED") {
         uiStatus = "DELIVERED";
@@ -75,7 +179,7 @@ export async function getBuyerOrdersAction() {
         year: "numeric",
       });
 
-      mappedItems.push({
+      allMappedItems.push({
         id: item.id,
         orderId: order.id,
         title: item.product.title || "Craft Item",
@@ -88,12 +192,45 @@ export async function getBuyerOrdersAction() {
         deliveredDate: order.status === "DELIVERED" ? orderDateStr : undefined,
         trackingNumber: order.trackingNumber || `FLK-${item.id.slice(-5).toUpperCase()}`,
         status: uiStatus,
-        stripeSessionId: (order as any).stripeSessionId,
+        stripeSessionId: order.stripeSessionId,
+        description: item.product.description || undefined,
+        artisanAnalysis: item.product.artisanAnalysis || undefined,
       });
     }
   }
 
-  return mappedItems;
+  // Filter items in memory
+  let filteredItems = allMappedItems;
+  if (params.status && params.status !== "ALL") {
+    filteredItems = filteredItems.filter((i) => i.status === params.status);
+  }
+
+  if (params.search) {
+    const s = params.search.toLowerCase();
+    filteredItems = filteredItems.filter((i) =>
+      (i.title || "").toLowerCase().includes(s) ||
+      (i.artisan || "").toLowerCase().includes(s) ||
+      (i.orderId || "").toLowerCase().includes(s)
+    );
+  }
+
+  const stats = {
+    ALL: allMappedItems.length,
+    PENDING: allMappedItems.filter((i) => i.status === "PENDING").length,
+    IN_PROGRESS: allMappedItems.filter((i) => i.status === "IN_PROGRESS").length,
+    SHIPPED: allMappedItems.filter((i) => i.status === "SHIPPED").length,
+    DELIVERED: allMappedItems.filter((i) => i.status === "DELIVERED").length,
+    CANCELLED: allMappedItems.filter((i) => i.status === "CANCELLED").length,
+  };
+
+  const paginatedItems = filteredItems.slice(offset, offset + limit);
+
+  return {
+    orders: paginatedItems,
+    totalCount: filteredItems.length,
+    totalPages: Math.ceil(filteredItems.length / limit),
+    stats,
+  };
 }
 
 /**
@@ -155,14 +292,14 @@ export async function getBuyerOrderByIdAction(orderItemId: string) {
     image: (item.product.images as { url: string }[] | undefined)?.[0]?.url || "/placeholder.jpg",
     tags,
     artisan: item.shop?.name || "Independent Artisan",
-    artisanNote: item.order.artisanNote || (item.product as any).story || item.product.artisanAnalysis || "A slow-crafted relic built to inspire daily living.",
+    artisanNote: item.order.artisanNote || item.product.artisanAnalysis || "A slow-crafted relic built to inspire daily living.",
     orderDate: orderDateStr,
     arrivalDate: arrivalDateStr,
     deliveredDate: item.order.status === "DELIVERED" ? orderDateStr : undefined,
     trackingNumber: item.order.trackingNumber || `FLK-${item.id.slice(-5).toUpperCase()}`,
     status: uiStatus,
     rawStatus: item.order.status,
-    stripeSessionId: (item.order as any).stripeSessionId,
+    stripeSessionId: item.order.stripeSessionId,
     
     // Additional receipt & transit details
     shippingName: item.order.shippingName,
@@ -194,7 +331,7 @@ export async function getBuyerOrderInvoiceUrlAction(orderItemId: string) {
     return { success: false, error: "Order item not found" };
   }
 
-  const stripeSessionId = (item.order as any).stripeSessionId;
+  const stripeSessionId = item.order.stripeSessionId;
   if (!stripeSessionId) {
     return { success: true, mock: true };
   }
@@ -228,7 +365,7 @@ export async function getBuyerOrderInvoiceUrlAction(orderItemId: string) {
     }
 
     return { success: true, mock: true };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Stripe receipt retrieval failed, using fallback:", error);
     return { success: true, mock: true };
   }

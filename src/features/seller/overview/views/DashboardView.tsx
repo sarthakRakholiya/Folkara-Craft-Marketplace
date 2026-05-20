@@ -7,14 +7,14 @@ import {
   Banknote,
   TrendingUp,
   Truck,
-  Eye,
   ArrowRight,
   Package,
 } from "lucide-react";
 import { useSellerOrdersQuery } from "@/features/seller/orders/hooks/useSellerOrders";
 
 export function DashboardView() {
-  const { data: orders = [], isLoading } = useSellerOrdersQuery();
+  const { data, isLoading } = useSellerOrdersQuery();
+  const orders = data?.orders || [];
 
   // 1. Calculate live totals from database orders
   const paidOrders = orders.filter((o) => o.paymentStatus === "PAID");
@@ -42,7 +42,7 @@ export function DashboardView() {
       <section className="grid grid-cols-1 lg:grid-cols-4 gap-gutter">
         
         {/* Total Revenue Card */}
-        <div className="lg:col-span-2 bg-slate-900 text-white p-8 md:p-12 rounded-[32px] md:rounded-[48px] shadow-sm relative overflow-hidden group min-h-[240px]">
+        <div className="lg:col-span-3 bg-slate-900 text-white p-8 md:p-12 rounded-[32px] md:rounded-[48px] shadow-sm relative overflow-hidden group min-h-[240px]">
           <div className="absolute -right-4 -top-4 p-8 opacity-10">
             <Banknote size={160} strokeWidth={1} />
           </div>
@@ -65,73 +65,27 @@ export function DashboardView() {
           </div>
         </div>
 
-        {/* Dynamic Metric Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:col-span-2 gap-gutter">
-          
-          {/* Active Orders Card */}
-          <div className="bg-surface-container-low p-6 md:p-8 rounded-[24px] md:rounded-[32px] border border-outline-variant/10 shadow-sm flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-center mb-4">
-                <p className="font-label-caps text-[10px] md:text-xs text-on-surface-variant">
-                  Active Orders
-                </p>
-                <Truck size={20} className="text-on-surface-variant/30" />
-              </div>
-              <h3 className="font-headline-md text-3xl md:text-4xl">
-                {isLoading ? "..." : activeOrdersCount}
-              </h3>
-            </div>
-            <div className="flex items-end gap-1 h-8 mt-6 opacity-60">
-              {[40, 70, 55, 100, 85].map((h, i) => (
-                <div
-                  key={i}
-                  className="w-1 bg-slate-900 rounded-full"
-                  style={{ height: `${h}%` }}
-                ></div>
-              ))}
-            </div>
-          </div>
-
-          {/* Store Views Card */}
-          <div className="bg-surface-container-low p-6 md:p-8 rounded-[24px] md:rounded-[32px] border border-outline-variant/10 shadow-sm flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-center mb-4">
-                <p className="font-label-caps text-[10px] md:text-xs text-on-surface-variant">
-                  Store Views
-                </p>
-                <Eye size={20} className="text-on-surface-variant/30" />
-              </div>
-              <h3 className="font-headline-md text-3xl md:text-4xl">1,480</h3>
-            </div>
-            <div className="flex items-end gap-1 h-8 mt-6 opacity-60">
-              {[30, 60, 80, 45, 70].map((h, i) => (
-                <div
-                  key={i}
-                  className="w-1 bg-slate-900 rounded-full"
-                  style={{ height: `${h}%` }}
-                ></div>
-              ))}
-            </div>
-          </div>
-
-          {/* Conversion Rate Card */}
-          <div className="bg-surface-container-low p-6 md:p-8 rounded-[24px] md:rounded-[32px] border border-outline-variant/10 shadow-sm sm:col-span-2 flex items-center justify-between">
-            <div>
-              <p className="font-label-caps text-[10px] md:text-xs text-on-surface-variant mb-1">
-                Conversion Rate
+        {/* Active Orders Card */}
+        <div className="lg:col-span-1 bg-surface-container-low p-8 rounded-[32px] border border-outline-variant/10 shadow-sm flex flex-col justify-between min-h-[240px]">
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <p className="font-label-caps text-xs text-on-surface-variant">
+                Active Orders
               </p>
-              <h3 className="font-headline-sm text-xl md:text-2xl">4.2%</h3>
+              <Truck size={24} className="text-on-surface-variant/30" />
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] md:text-xs text-on-surface-variant font-body-md italic hidden sm:block">
-                vs. 2.9% industry avg
-              </span>
-              <div className="flex items-center gap-1">
-                <div className="w-24 h-1.5 bg-slate-900/10 rounded-full overflow-hidden">
-                  <div className="w-[42%] h-full bg-slate-900 rounded-full"></div>
-                </div>
-              </div>
-            </div>
+            <h3 className="font-display-lg text-4xl md:text-5xl">
+              {isLoading ? "..." : activeOrdersCount}
+            </h3>
+          </div>
+          <div className="flex items-end gap-1 h-12 mt-6 opacity-60">
+            {[40, 70, 55, 100, 85].map((h, i) => (
+              <div
+                key={i}
+                className="w-1.5 bg-slate-900 rounded-full"
+                style={{ height: `${h}%` }}
+              ></div>
+            ))}
           </div>
         </div>
       </section>

@@ -10,12 +10,19 @@ import {
 import { toast } from "sonner";
 
 /**
- * Hook to query all incoming order items for the seller's active shop
+ * Hook to query all incoming order items for the seller's active shop, supports pagination & filters
  */
-export function useSellerOrdersQuery() {
+export function useSellerOrdersQuery(params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+  search?: string;
+}) {
   return useQuery({
-    queryKey: queryKeys.sellerOrders,
-    queryFn: () => getSellerOrdersAction(),
+    queryKey: params
+      ? [...queryKeys.sellerOrders, params.page, params.limit, params.status, params.search]
+      : queryKeys.sellerOrders,
+    queryFn: () => getSellerOrdersAction(params),
   });
 }
 

@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useTransition } from "react";
 import Image from "next/image";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { getShippingLabelHtml } from "../utils/shippingLabel";
 import {
   Search,
   Package,
@@ -23,6 +25,7 @@ import {
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Pagination } from "@/components/ui/Pagination";
 
 export interface SellerOrder {
   id: string;
@@ -117,191 +120,13 @@ function OrderDetailSubView({
         return;
       }
 
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Folkara Shipping Label - #${activeOrder.orderId.substring(0, 8).toUpperCase()}</title>
-            <style>
-              @page {
-                size: 4in 6in;
-                margin: 0;
-              }
-              body {
-                font-family: 'Courier New', Courier, monospace;
-                color: #000;
-                margin: 0;
-                padding: 20px;
-                box-sizing: border-box;
-                width: 100%;
-                height: 100vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                border: 4px solid #000;
-              }
-              .header {
-                border-bottom: 2px dashed #000;
-                padding-bottom: 8px;
-                text-align: center;
-              }
-              .logo {
-                font-size: 24px;
-                font-weight: bold;
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                margin-bottom: 4px;
-              }
-              .marketplace-text {
-                font-size: 9px;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-              }
-              .routing-row {
-                display: flex;
-                border-bottom: 2px dashed #000;
-                font-size: 11px;
-                padding: 8px 0;
-              }
-              .routing-block {
-                flex: 1;
-                border-right: 1px dashed #000;
-                padding-left: 4px;
-              }
-              .routing-block:last-child {
-                border-right: none;
-              }
-              .address-section {
-                padding: 12px 0;
-                font-size: 11px;
-                line-height: 1.4;
-                flex-grow: 1;
-              }
-              .sender-address {
-                font-size: 9px;
-                margin-bottom: 12px;
-                border-bottom: 1px dashed #000;
-                padding-bottom: 8px;
-              }
-              .recipient-address {
-                font-size: 12px;
-              }
-              .recipient-title {
-                font-weight: bold;
-                font-size: 10px;
-                text-transform: uppercase;
-                margin-bottom: 4px;
-              }
-              .recipient-name {
-                font-size: 16px;
-                font-weight: bold;
-                margin-bottom: 4px;
-              }
-              .barcode-section {
-                text-align: center;
-                border-top: 2px dashed #000;
-                padding-top: 12px;
-                margin-bottom: 12px;
-              }
-              .barcode {
-                width: 100%;
-                height: 60px;
-                background: linear-gradient(90deg, 
-                  #000 0%, #000 4%, transparent 4%, transparent 6%,
-                  #000 6%, #000 12%, transparent 12%, transparent 14%,
-                  #000 14%, #000 16%, transparent 16%, transparent 20%,
-                  #000 20%, #000 28%, transparent 28%, transparent 30%,
-                  #000 30%, #000 32%, transparent 32%, transparent 36%,
-                  #000 36%, #000 42%, transparent 42%, transparent 44%,
-                  #000 44%, #000 46%, transparent 46%, transparent 52%,
-                  #000 52%, #000 58%, transparent 58%, transparent 60%,
-                  #000 60%, #000 68%, transparent 68%, transparent 70%,
-                  #000 70%, #000 72%, transparent 72%, transparent 78%,
-                  #000 78%, #000 84%, transparent 84%, transparent 86%,
-                  #000 86%, #000 90%, transparent 90%, transparent 92%,
-                  #000 92%, #000 100%
-                );
-                margin-bottom: 6px;
-              }
-              .tracking-text {
-                font-size: 10px;
-                font-weight: bold;
-                letter-spacing: 2px;
-              }
-              .footer {
-                font-size: 9px;
-                text-align: center;
-                border-top: 1px dashed #000;
-                padding-top: 6px;
-                display: flex;
-                justify-content: space-between;
-              }
-              @media print {
-                body {
-                  border: none;
-                  padding: 10px;
-                }
-              }
-            </style>
-          </head>
-          <body>
-            <div class="header">
-              <div class="logo">FOLKARA</div>
-              <div class="marketplace-text">Slow-Made Craft Marketplace</div>
-            </div>
-            
-            <div class="routing-row">
-              <div class="routing-block">
-                <strong>METHOD:</strong><br/>
-                ${activeOrder.deliveryMethod}
-              </div>
-              <div class="routing-block">
-                <strong>ORDER ID:</strong><br/>
-                #${activeOrder.orderId.substring(0, 8).toUpperCase()}
-              </div>
-            </div>
-
-            <div class="address-section">
-              <div class="sender-address">
-                <strong>FROM:</strong><br/>
-                Folkara Artisan Studio Partner<br/>
-                Handcrafted Hub, Sector 4<br/>
-                Mumbai, MH 400051
-              </div>
-              <div class="recipient-address">
-                <div class="recipient-title">DELIVER TO:</div>
-                <div class="recipient-name">${activeOrder.customerName}</div>
-                <div>${activeOrder.shippingAddress}</div>
-              </div>
-            </div>
-
-            <div class="barcode-section">
-              <div class="barcode"></div>
-              <div class="tracking-text">FK-${activeOrder.orderId.substring(0, 8).toUpperCase()}-IN</div>
-            </div>
-
-            <div class="footer">
-              <span>Date: ${activeOrder.orderDate}</span>
-              <span>Qty: ${activeOrder.quantity} item(s)</span>
-            </div>
-            
-            <script>
-              window.onload = function() {
-                window.print();
-                setTimeout(function() {
-                  window.close();
-                }, 1000);
-              };
-            </script>
-          </body>
-        </html>
-      `);
+      printWindow.document.write(getShippingLabelHtml(activeOrder));
       printWindow.document.close();
     }, 1500);
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-[1400px] mx-auto p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 !pb-24">
       {/* Breadcrumb Back Button */}
       <div className="mb-6 flex items-center justify-between">
         <button
@@ -333,12 +158,12 @@ function OrderDetailSubView({
                 isDelivered
                   ? "bg-emerald-50 text-emerald-700 border-emerald-200/50 hover:bg-emerald-100"
                   : isShipped
-                  ? "bg-indigo-50 text-indigo-700 border-indigo-200/50 hover:bg-indigo-100"
-                  : isCancelled
-                  ? "bg-rose-50 text-rose-700 border-rose-200/50 hover:bg-rose-100"
-                  : isInProgress
-                  ? "bg-amber-50 text-amber-700 border-amber-200/50 hover:bg-amber-100"
-                  : "bg-surface-container text-primary border-outline-variant/30 hover:bg-surface-container-high"
+                    ? "bg-indigo-50 text-indigo-700 border-indigo-200/50 hover:bg-indigo-100"
+                    : isCancelled
+                      ? "bg-rose-50 text-rose-700 border-rose-200/50 hover:bg-rose-100"
+                      : isInProgress
+                        ? "bg-amber-50 text-amber-700 border-amber-200/50 hover:bg-amber-100"
+                        : "bg-surface-container text-primary border-outline-variant/30 hover:bg-surface-container-high"
               )}
             >
               <span>Fulfillment: {activeOrder.status.replace("_", " ")}</span>
@@ -369,8 +194,8 @@ function OrderDetailSubView({
             activeOrder.paymentStatus === "PAID"
               ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
               : activeOrder.paymentStatus === "FAILED"
-              ? "bg-rose-50 text-rose-700 border-rose-200/50"
-              : "bg-amber-50 text-amber-700 border-amber-200/50"
+                ? "bg-rose-50 text-rose-700 border-rose-200/50"
+                : "bg-amber-50 text-amber-700 border-amber-200/50"
           )}>
             <span>Billing: {activeOrder.paymentStatus}</span>
           </div>
@@ -548,9 +373,38 @@ function OrderDetailSubView({
   );
 }
 
-export function SellerOrdersView() {
-  const { data: orders = [], isLoading, error } = useSellerOrdersQuery();
-  
+interface SellerOrdersViewProps {
+  page: number;
+  limit: number;
+  status: string;
+  search: string;
+}
+
+export function SellerOrdersView({ page, limit, status, search }: SellerOrdersViewProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
+  const { data: ordersData, isLoading, error } = useSellerOrdersQuery({
+    page,
+    limit,
+    status,
+    search,
+  });
+
+  const orders = ordersData?.orders || [];
+  const totalCount = ordersData?.totalCount || 0;
+  const totalPages = ordersData?.totalPages || 0;
+  const stats = ordersData?.stats || {
+    ALL: 0,
+    PENDING: 0,
+    IN_PROGRESS: 0,
+    SHIPPED: 0,
+    DELIVERED: 0,
+    CANCELLED: 0,
+  };
+
   // Mutations
   const updateStatusMut = useUpdateOrderStatusMutation();
   const updateTrackingMut = useUpdateOrderTrackingMutation();
@@ -563,9 +417,49 @@ export function SellerOrdersView() {
     ? ((orders as SellerOrder[]).find((o) => o.id === selectedOrder.id) || selectedOrder)
     : null;
 
-  // Filters & Search State
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  // Filters & Search State synced with props
+  const [searchTerm, setSearchTerm] = useState(search);
+  const [statusFilter, setStatusFilter] = useState(status);
+
+  useEffect(() => {
+    setSearchTerm(search);
+  }, [search]);
+
+  useEffect(() => {
+    setStatusFilter(status);
+  }, [status]);
+
+  // Update query parameters in the URL with transitions
+  const updateQueryParams = useCallback(
+    (updates: Record<string, string | number>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      Object.entries(updates).forEach(([key, value]) => {
+        if (key === "page" && value === 1) {
+          params.delete(key);
+        } else if (value === "" || value === "ALL") {
+          params.delete(key);
+        } else {
+          params.set(key, String(value));
+        }
+      });
+
+      startTransition(() => {
+        router.push(`${pathname}?${params.toString()}`);
+      });
+    },
+    [router, pathname, searchParams]
+  );
+
+  // Debounce search input to update URL
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchTerm !== search) {
+        updateQueryParams({ search: searchTerm, page: 1 });
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, search, updateQueryParams]);
 
   // Menu Dropdown trackers
   const [activeStatusMenuOrderId, setActiveStatusMenuOrderId] = useState<string | null>(null);
@@ -584,18 +478,8 @@ export function SellerOrdersView() {
     };
   }, []);
 
-  // Filter logic
-  const filteredOrders = (orders as SellerOrder[]).filter((order) => {
-    const matchesSearch =
-      order.productTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.orderId.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "ALL" || order.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
+  // Filter logic (Server-side now handles this, but mapping to matches for compatibility)
+  const filteredOrders = orders;
 
   // Toggle status drop down
   const handleToggleStatusMenu = (orderId: string) => {
@@ -609,6 +493,22 @@ export function SellerOrdersView() {
   ) => {
     updateStatusMut.mutate({ orderId, status });
     setActiveStatusMenuOrderId(null);
+  };
+
+  // Tab change handler
+  const handleTabChange = (newStatus: string) => {
+    setStatusFilter(newStatus);
+    updateQueryParams({ status: newStatus, page: 1 });
+  };
+
+  // Limit change handler
+  const handleLimitChange = (newLimit: number) => {
+    updateQueryParams({ limit: newLimit, page: 1 });
+  };
+
+  // Page change handler
+  const handlePageChange = (newPage: number) => {
+    updateQueryParams({ page: newPage });
   };
 
   // Format currency
@@ -637,8 +537,8 @@ export function SellerOrdersView() {
   }
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 md:px-8 mt-10 space-y-10">
-      
+    <div className="max-w-[1440px] mx-auto px-4 md:px-8 mt-10 space-y-10 pb-24">
+
       {/* Page Title & AI Artisan Guide Pulse */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-8 md:mb-12 gap-6">
         <div className="space-y-2">
@@ -666,8 +566,8 @@ export function SellerOrdersView() {
                 Fulfillment Insight
               </p>
               <p className="font-body-md text-[12px] text-secondary/70 leading-relaxed">
-                {orders.filter((o) => o.status === "PENDING").length > 0
-                  ? `You have ${orders.filter((o) => o.status === "PENDING").length} pending orders waiting for preparation. Keep up the high standard!`
+                {stats.PENDING > 0
+                  ? `You have ${stats.PENDING} pending orders waiting for preparation. Keep up the high standard!`
                   : "All current incoming orders are fully processed and shipped."}
               </p>
             </div>
@@ -679,16 +579,16 @@ export function SellerOrdersView() {
       <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between border-b border-outline-variant/10 pb-4 gap-6">
         <div className="flex flex-wrap gap-4 md:gap-8">
           {[
-            { label: "All Orders", value: "ALL", count: orders.length },
-            { label: "Pending", value: "PENDING", count: orders.filter((o) => o.status === "PENDING").length },
-            { label: "In Progress", value: "IN_PROGRESS", count: orders.filter((o) => o.status === "IN_PROGRESS").length },
-            { label: "Shipped", value: "SHIPPED", count: orders.filter((o) => o.status === "SHIPPED").length },
-            { label: "Delivered", value: "DELIVERED", count: orders.filter((o) => o.status === "DELIVERED").length },
-            { label: "Cancelled", value: "CANCELLED", count: orders.filter((o) => o.status === "CANCELLED").length },
+            { label: "All Orders", value: "ALL", count: stats.ALL },
+            { label: "Pending", value: "PENDING", count: stats.PENDING },
+            { label: "In Progress", value: "IN_PROGRESS", count: stats.IN_PROGRESS },
+            { label: "Shipped", value: "SHIPPED", count: stats.SHIPPED },
+            { label: "Delivered", value: "DELIVERED", count: stats.DELIVERED },
+            { label: "Cancelled", value: "CANCELLED", count: stats.CANCELLED },
           ].map((tab) => (
             <button
               key={tab.value}
-              onClick={() => setStatusFilter(tab.value)}
+              onClick={() => handleTabChange(tab.value)}
               className={cn(
                 "font-label-caps text-[11px] md:text-sm pb-4 transition-all relative font-bold tracking-widest cursor-pointer bg-transparent border-none outline-none",
                 statusFilter === tab.value
@@ -708,16 +608,34 @@ export function SellerOrdersView() {
           ))}
         </div>
 
-        {/* Search Input Bar (Sleek layout matching listings) */}
+        {/* Search Input Bar & Items Per Page Dropdown (Sleek layout matching listings) */}
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
+          {/* Items Per Page Dropdown */}
+          <div className="relative w-full sm:w-auto shrink-0">
+            <select
+              value={limit}
+              onChange={(e) => handleLimitChange(Number(e.target.value))}
+              className="appearance-none w-full sm:w-auto bg-surface-container-low border border-outline-variant/30 px-6 pr-10 py-2.5 rounded-xl font-label-caps text-[11px] text-primary font-bold tracking-wider hover:border-primary transition-all focus:outline-none cursor-pointer h-11"
+            >
+              <option value={5}>5 PER PAGE</option>
+              <option value={10}>10 PER PAGE</option>
+              <option value={20}>20 PER PAGE</option>
+              <option value={50}>50 PER PAGE</option>
+            </select>
+            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary/40 text-[18px]">
+              expand_more
+            </span>
+          </div>
+
+          {/* Search Box */}
           <div className="relative group w-full sm:w-80">
-            <Search className="absolute left-3.5 top-3 w-4 h-4 text-outline" />
+            <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-outline" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search product, customer, or ID..."
-              className="appearance-none w-full bg-surface-container-low border border-outline-variant/30 pl-10 pr-4 py-2.5 rounded-xl font-body-md text-[13px] text-primary hover:border-primary transition-all focus:outline-none focus:border-primary"
+              className="appearance-none w-full bg-surface-container-low border border-outline-variant/30 pl-10 pr-4 py-2.5 rounded-xl font-body-md text-[13px] text-primary hover:border-primary transition-all focus:outline-none focus:border-primary h-11"
             />
           </div>
         </div>
@@ -731,7 +649,7 @@ export function SellerOrdersView() {
       )}
 
       {/* LOADING STATE */}
-      {isLoading && (
+      {(isLoading || isPending) && (
         <div className="space-y-4 animate-pulse">
           {[...Array(3)].map((_, idx) => (
             <div key={idx} className="bg-slate-100/60 border border-slate-200 rounded-2xl h-28 w-full"></div>
@@ -740,7 +658,7 @@ export function SellerOrdersView() {
       )}
 
       {/* EMPTY STATE */}
-      {!isLoading && !error && filteredOrders.length === 0 && (
+      {!isLoading && !isPending && !error && filteredOrders.length === 0 && (
         <div className="flex flex-col items-center justify-center py-24 min-h-[400px] text-center bg-surface-container-lowest/30 rounded-[3rem] border border-dashed border-outline-variant/30 max-w-xl mx-auto px-6">
           <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-6">
             <Package className="w-8 h-8 text-outline-variant" />
@@ -755,9 +673,9 @@ export function SellerOrdersView() {
       )}
 
       {/* ACTIVE SALES TABLE / GRID */}
-      {!isLoading && !error && filteredOrders.length > 0 && (
+      {!isLoading && !isPending && !error && filteredOrders.length > 0 && (
         <div className="bg-surface-container-lowest/30 rounded-[2.5rem] border border-outline-variant/30 overflow-visible shadow-sm backdrop-blur-sm">
-          
+
           {/* Desktop Table View */}
           <div className="hidden lg:block overflow-visible">
             <table className="w-full text-left border-collapse">
@@ -779,8 +697,8 @@ export function SellerOrdersView() {
                   const isInProgress = order.status === "IN_PROGRESS";
 
                   return (
-                    <motion.tr 
-                      key={order.id} 
+                    <motion.tr
+                      key={order.id}
                       initial={{ opacity: 0, y: 4 }}
                       animate={{ opacity: 1, y: 0 }}
                       onClick={(e) => {
@@ -855,8 +773,8 @@ export function SellerOrdersView() {
                             order.paymentStatus === "PAID"
                               ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
                               : order.paymentStatus === "FAILED"
-                              ? "bg-rose-50 text-rose-700 border-rose-200/50"
-                              : "bg-amber-50 text-amber-700 border-amber-200/50"
+                                ? "bg-rose-50 text-rose-700 border-rose-200/50"
+                                : "bg-amber-50 text-amber-700 border-amber-200/50"
                           )}
                         >
                           {order.paymentStatus}
@@ -872,12 +790,12 @@ export function SellerOrdersView() {
                             isDelivered
                               ? "bg-emerald-50 text-emerald-700 border-emerald-200/50 hover:bg-emerald-100"
                               : isShipped
-                              ? "bg-indigo-50 text-indigo-700 border-indigo-200/50 hover:bg-indigo-100"
-                              : isCancelled
-                              ? "bg-rose-50 text-rose-700 border-rose-200/50 hover:bg-rose-100"
-                              : isInProgress
-                              ? "bg-amber-50 text-amber-700 border-amber-200/50 hover:bg-amber-100"
-                              : "bg-surface-container text-primary border-outline-variant/30 hover:bg-surface-container-high"
+                                ? "bg-indigo-50 text-indigo-700 border-indigo-200/50 hover:bg-indigo-100"
+                                : isCancelled
+                                  ? "bg-rose-50 text-rose-700 border-rose-200/50 hover:bg-rose-100"
+                                  : isInProgress
+                                    ? "bg-amber-50 text-amber-700 border-amber-200/50 hover:bg-amber-100"
+                                    : "bg-surface-container text-primary border-outline-variant/30 hover:bg-surface-container-high"
                           )}
                         >
                           {order.status.replace("_", " ")}
@@ -886,7 +804,7 @@ export function SellerOrdersView() {
 
                         {/* Interactive Dropdown */}
                         {activeStatusMenuOrderId === order.id && (
-                          <motion.div 
+                          <motion.div
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
                             className="absolute top-14 left-6 bg-white border border-outline-variant/60 rounded-2xl shadow-2xl z-30 py-2 w-36 flex flex-col font-label-caps text-[10px] tracking-widest font-bold max-h-48 overflow-y-auto"
@@ -919,8 +837,8 @@ export function SellerOrdersView() {
               const isInProgress = order.status === "IN_PROGRESS";
 
               return (
-                <div 
-                  key={order.id} 
+                <div
+                  key={order.id}
                   onClick={(e) => {
                     const target = e.target as HTMLElement;
                     if (target.closest('button') || target.closest('input') || target.closest('.absolute')) {
@@ -971,12 +889,12 @@ export function SellerOrdersView() {
                             isDelivered
                               ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
                               : isShipped
-                              ? "bg-indigo-50 text-indigo-700 border-indigo-200/50"
-                              : isCancelled
-                              ? "bg-rose-50 text-rose-700 border-rose-200/50"
-                              : isInProgress
-                              ? "bg-amber-50 text-amber-700 border-amber-200/50"
-                              : "bg-surface-container text-primary border-outline-variant/30"
+                                ? "bg-indigo-50 text-indigo-700 border-indigo-200/50"
+                                : isCancelled
+                                  ? "bg-rose-50 text-rose-700 border-rose-200/50"
+                                  : isInProgress
+                                    ? "bg-amber-50 text-amber-700 border-amber-200/50"
+                                    : "bg-surface-container text-primary border-outline-variant/30"
                           )}
                         >
                           {order.status.replace("_", " ")}
@@ -985,7 +903,7 @@ export function SellerOrdersView() {
 
                         {/* Interactive Status Dropdown */}
                         {activeStatusMenuOrderId === order.id && (
-                          <motion.div 
+                          <motion.div
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
                             className="absolute left-0 bottom-full mb-1 bg-white border border-outline-variant/60 rounded-2xl shadow-2xl z-30 py-2 w-36 flex flex-col font-label-caps text-[10px] tracking-widest font-bold max-h-48 overflow-y-auto"
@@ -1012,8 +930,8 @@ export function SellerOrdersView() {
                             order.paymentStatus === "PAID"
                               ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
                               : order.paymentStatus === "FAILED"
-                              ? "bg-rose-50 text-rose-700 border-rose-200/50"
-                              : "bg-amber-50 text-amber-700 border-amber-200/50"
+                                ? "bg-rose-50 text-rose-700 border-rose-200/50"
+                                : "bg-amber-50 text-amber-700 border-amber-200/50"
                           )}
                         >
                           {order.paymentStatus}
@@ -1027,6 +945,17 @@ export function SellerOrdersView() {
             })}
           </div>
 
+        </div>
+      )}
+
+      {/* PAGINATION COMPONENT */}
+      {!isLoading && !isPending && !error && totalPages > 1 && (
+        <div className="mt-12 pt-8 border-t border-outline-variant/15 flex justify-center">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       )}
 

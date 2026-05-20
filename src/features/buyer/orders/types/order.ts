@@ -20,4 +20,6 @@ export interface OrderItem {
   rating?: number;
   status: OrderStatus;
   stripeSessionId?: string | null;
+  description?: string;
+  artisanAnalysis?: string;
 }
