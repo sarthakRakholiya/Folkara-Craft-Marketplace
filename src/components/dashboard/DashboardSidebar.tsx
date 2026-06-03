@@ -63,7 +63,7 @@ export function DashboardSidebar({ navItems, rootHref, isMobileOpen, onMobileClo
         {/* Logo Section */}
         <div className="h-24 flex items-center justify-between px-8 shrink-0">
           <Link
-            href={rootHref}
+            href="/"
             className="flex items-center gap-3 group"
           >
             <div className="w-12 h-12 relative">
