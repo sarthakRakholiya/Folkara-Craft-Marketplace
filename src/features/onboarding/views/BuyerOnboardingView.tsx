@@ -106,6 +106,37 @@ export const BuyerOnboardingView = ({ initialData }: { initialData?: Record<stri
     }
   };
 
+  const handleSkip = async () => {
+    if (currentStep === 3) {
+      setIsSaving(true);
+      try {
+        // Clear interests just to be safe
+        methods.setValue('interests', []);
+        const result = await saveOnboardingStep({ step: currentStep, data: methods.getValues() });
+        if ("error" in result) {
+          console.error("Failed to save onboarding step:", result.error);
+          setIsSaving(false);
+          return;
+        }
+
+        gsap.to(stepContainerRef.current, {
+          opacity: 0,
+          y: -20,
+          duration: 0.3,
+          ease: "power2.in",
+          onComplete: () => {
+            methods.reset(methods.getValues());
+            setCurrentStep(currentStep + 1);
+          },
+        });
+      } catch (error) {
+        console.error("Onboarding skip error:", error);
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  };
+
   const handleBack = () => {
     if (currentStep > 1) {
       gsap.to(stepContainerRef.current, {
@@ -135,6 +166,7 @@ export const BuyerOnboardingView = ({ initialData }: { initialData?: Record<stri
               <Step3BuyerInterests
                 onContinue={handleNext}
                 onBack={handleBack}
+                onSkip={handleSkip}
                 isSaving={isSaving}
               />
             )}

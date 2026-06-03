@@ -52,7 +52,15 @@ export const saveOnboardingStep = withAuthAction(
       .set({ currentStep: nextStep, onboardingData: mergedData })
       .where(eq(users.id, session.userId));
 
-    await setSession({ ...session, currentStep: nextStep });
+    await setSession({ 
+      ...session, 
+      currentStep: nextStep,
+      firstName: mergedData.firstName ?? session.firstName ?? null,
+      lastName: mergedData.lastName ?? session.lastName ?? null,
+      avatarUrl: mergedData.avatarUrl ?? session.avatarUrl ?? null,
+      // @ts-ignore - shopName may not be strictly typed in session but we can store it
+      shopName: mergedData.shopName ?? (session as any).shopName ?? null,
+    });
 
     return { success: true };
   }

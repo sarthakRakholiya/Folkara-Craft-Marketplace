@@ -283,12 +283,6 @@ export function ReviewAIData({
       {/* Action Area */}
       <div className="animate-in-item pt-12 border-t border-outline-variant/10 flex flex-col sm:flex-row items-center justify-end gap-8 pb-20 opacity-0">
         <div className="flex flex-col sm:flex-row items-center gap-8 w-full sm:w-auto">
-          {!isEdit && (
-            <button className="text-[11px] font-label-caps text-on-surface-variant hover:text-primary uppercase font-bold tracking-widest transition-all">
-              Save as Draft
-            </button>
-          )}
-
           <Button
             onClick={handleNextStep}
             variant="primary"

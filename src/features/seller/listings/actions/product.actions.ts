@@ -65,12 +65,12 @@ export const createDraftProductAction = withAuthAction(
       data.images.map(async (img) => {
         if (img.startsWith("data:")) {
           // Server-side size guard: decode base64 to measure actual binary bytes
-          const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+          const MAX_SIZE_BYTES = 2 * 1024 * 1024; // 2 MB
           const base64Data = img.split(",")[1] || img;
           const imageSize = Buffer.from(base64Data, "base64").length;
           if (imageSize > MAX_SIZE_BYTES) {
             throw new Error(
-              "One or more images exceed the maximum limit of 10 MB.",
+              "One or more images exceed the maximum limit of 2 MB.",
             );
           }
           const res = await uploadImage(img, "products");
@@ -225,6 +225,9 @@ export const publishProductAction = withAuthAction(
       };
     },
   ) => {
+    if (data.price > 500000) throw new Error("Price cannot exceed ₹5,00,000");
+    if (data.quantity > 100) throw new Error("Quantity cannot exceed 100");
+
     const embeddingContext = `
       Title: ${data.title}
       Category: ${data.category}
@@ -349,6 +352,9 @@ export const updateProductStockAction = withAuthAction(
   ) => {
     if (typeof newQuantity !== "number" || Number.isNaN(newQuantity) || !Number.isFinite(newQuantity) || newQuantity < 0) {
       throw new Error("Invalid stock quantity input");
+    }
+    if (newQuantity > 100) {
+      throw new Error("Quantity cannot exceed 100");
     }
 
     const product = await db.query.products.findFirst({

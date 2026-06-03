@@ -31,6 +31,14 @@ export function AIAnalysis({ form, onComplete, onBack }: AIAnalysisProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const auraRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const messages = [
     "Observing your craft...",
@@ -115,6 +123,8 @@ export function AIAnalysis({ form, onComplete, onBack }: AIAnalysisProps) {
           description: form.getValues("description"),
         });
 
+        if (!isMounted.current) return;
+
         if ("error" in draftResult || !("data" in draftResult)) {
           toast.error("Draft Creation Failed", { description: "error" in draftResult ? draftResult.error : "Unknown error" });
           onBack();
@@ -124,23 +134,27 @@ export function AIAnalysis({ form, onComplete, onBack }: AIAnalysisProps) {
         const id = draftResult.data;
 
         // 3. Generate Product Narrative (AI)
+        // We do not pass base64Images here to avoid Vercel 413 limit.
+        // The server action will automatically fetch the Cloudinary URLs from the DB draft.
         const aiResult = await generateProductNarrativeAction({
           productId: id,
-          imageBase64s: base64Images as string[]
         });
 
+        if (!isMounted.current) return;
+
         if ("success" in aiResult && aiResult.success && "data" in aiResult) {
-          form.setValue("title", aiResult.data.title);
-          form.setValue("description", aiResult.data.description);
-          form.setValue("category", aiResult.data.category);
-          form.setValue("tags", aiResult.data.tags);
+          if (!form.getValues("title")) form.setValue("title", aiResult.data.title);
+          if (!form.getValues("description")) form.setValue("description", aiResult.data.description);
+          if (!form.getValues("category")) form.setValue("category", aiResult.data.category);
+          if (!form.getValues("tags")?.length) form.setValue("tags", aiResult.data.tags);
           
           onComplete(id);
         } else if ("error" in aiResult) {
           toast.error("AI Analysis Failed", { description: aiResult.error });
-          onBack();
+          onComplete(id); // Continue anyway, keep blank
         }
       } catch (error) {
+        if (!isMounted.current) return;
         console.error("AI Analysis process error:", error);
         toast.error("Something went wrong");
         onBack();

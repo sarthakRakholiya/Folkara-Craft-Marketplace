@@ -64,13 +64,16 @@ export function Step4Pricing({
   const price = form.watch("price");
   const quantity = form.watch("quantity");
 
-  function handlePublish() {
+  async function handlePublish() {
+    // 1. Trigger react-hook-form validation to show errors below inputs
+    const isValid = await form.trigger(["price", "quantity"]);
+    if (!isValid) return;
+
+    // 2. Check for missing fields that aren't on this step
     const missing: string[] = [];
     if (!title?.trim()) missing.push("Title");
     if (!description?.trim()) missing.push("Description");
     if (!category?.trim()) missing.push("Category");
-    if (!(Number(price) > 0)) missing.push("Price");
-    if (!(Number(quantity) >= 1)) missing.push("Stock quantity");
 
     if (missing.length > 0) {
       toast.error("Listing Incomplete", {
@@ -78,6 +81,7 @@ export function Step4Pricing({
       });
       return;
     }
+    
     onSubmit();
   }
 

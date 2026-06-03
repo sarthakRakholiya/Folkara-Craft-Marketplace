@@ -7,6 +7,7 @@ import { Camera, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 import { FormInput } from "@/components/form/FormInput";
+import { FormSelect } from "@/components/form/FormSelect";
 import { FormTextarea } from "@/components/form/FormTextarea";
 import {
   buyerProfileSchema,
@@ -17,7 +18,7 @@ import { updateBuyerProfile } from "@/features/auth/actions/profile.actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import type { User } from "@/db/schemas/users.schema";
-import { CRAFT_OPTIONS } from "@/features/onboarding/constants/onboarding.constants";
+import { CRAFT_OPTIONS, COUNTRY_OPTIONS } from "@/features/onboarding/constants/onboarding.constants";
 import { cn } from "@/lib/utils";
 import type { BuyerProfileViewData } from "../types/profile.types";
 
@@ -38,7 +39,7 @@ export function ProfileView({ initialData }: ProfileViewProps) {
       firstName: initialData.firstName || onboardingData.firstName || "",
       lastName: initialData.lastName || onboardingData.lastName || "",
       bio: initialData.bio || onboardingData.bio || "",
-      country: onboardingData.country || "United Kingdom",
+      country: onboardingData.country || "",
       birthday: onboardingData.birthday || "",
       interests:
         onboardingData.interests && onboardingData.interests.length > 0
@@ -143,6 +144,15 @@ export function ProfileView({ initialData }: ProfileViewProps) {
                 label="Last Name"
                 placeholder="Thorne"
               />
+              <div className="md:col-span-2">
+                <FormSelect
+                  control={form.control}
+                  name="country"
+                  label="Country"
+                  placeholder="Select your location"
+                  options={COUNTRY_OPTIONS}
+                />
+              </div>
               <div className="md:col-span-2">
                 <div className="group">
                   <label className="text-[10px] tracking-widest font-semibold uppercase text-on-surface-variant block px-1 mb-3">

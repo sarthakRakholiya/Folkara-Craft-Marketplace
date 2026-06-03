@@ -11,12 +11,14 @@ import { Check } from "lucide-react";
 interface Step3BuyerInterestsProps {
   onContinue: () => void;
   onBack: () => void;
+  onSkip?: () => void;
   isSaving?: boolean;
 }
 
 export const Step3BuyerInterests = ({
   onContinue,
   onBack,
+  onSkip,
   isSaving,
 }: Step3BuyerInterestsProps) => {
   const {
@@ -85,7 +87,7 @@ export const Step3BuyerInterests = ({
       {/* Navigation Actions */}
       <footer className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t border-outline-variant/30">
         <button
-          onClick={onContinue} // Skip just goes to next for now as per design "Continue to Final Step"
+          onClick={onSkip} 
           className="text-xs md:text-sm font-bold text-on-surface-variant hover:text-primary transition-colors underline decoration-outline-variant/40 underline-offset-8 uppercase tracking-widest"
         >
           Skip for now

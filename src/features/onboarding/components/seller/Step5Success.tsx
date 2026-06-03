@@ -118,7 +118,7 @@ export const Step5Success = () => {
           shape="full"
           variant="primary"
           disabled={isFinishing}
-          onClick={() => handleComplete("/seller/listings/new")}
+          onClick={() => handleComplete("/seller/listings/create")}
           className="px-10 py-6 w-full sm:w-auto shadow-xl shadow-primary/20 font-sans text-xs font-bold uppercase tracking-widest"
         >
           {isFinishing ? (

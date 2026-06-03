@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const sellerProfileSchema = z.object({
-  firstName: z.string().min(2, "First name is too short"),
-  lastName: z.string().min(2, "Last name is too short"),
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
   bio: z.string().min(10, "Bio should be at least 10 characters"),
   avatarUrl: z.string().url().nullable().optional(),
   avatarPublicId: z.string().nullable().optional(),
@@ -10,8 +10,11 @@ export const sellerProfileSchema = z.object({
   
   // Location & Identity
   country: z.string().min(1, "Country is required"),
-  city: z.string().min(1, "City is required"),
-  birthday: z.string().nullable().optional(),
+  city: z.string().optional(),
+  birthday: z.string().nullable().optional().refine((date) => {
+    if (!date) return true;
+    return new Date(date) <= new Date();
+  }, { message: "Birthday cannot be in the future" }),
   
   // Shop fields
   shopName: z.string().min(2, "Shop name is too short"),

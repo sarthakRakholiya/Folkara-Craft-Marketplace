@@ -108,11 +108,6 @@ export const Step4BuyerCompletion = () => {
               "Enter Folkara"
             )}
           </Button>
-          <Link href="/explore">
-            <button className="text-[10px] font-bold text-on-surface-variant underline underline-offset-4 decoration-outline-variant/40 hover:decoration-secondary transition-all uppercase tracking-widest">
-              Explore Journal
-            </button>
-          </Link>
         </div>
       </div>
     </div>

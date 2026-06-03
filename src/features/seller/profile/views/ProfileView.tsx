@@ -11,15 +11,17 @@ import {
   Quote,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { ImageUpload } from "@/components/ui/ImageUpload";
 import { FormInput } from "@/components/form/FormInput";
+import { FormSelect } from "@/components/form/FormSelect";
 import { FormTextarea } from "@/components/form/FormTextarea";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import { updateSellerProfile } from "@/features/auth/actions/profile.actions";
 import { sellerProfileSchema, type SellerProfileInput } from "@/features/auth/schemas/seller.schema";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { generateMakerQuote, generateMakerStory } from "@/features/aiAssistant/actions/ai.actions";
+import { COUNTRY_OPTIONS } from "@/features/onboarding/constants/onboarding.constants";
 
 interface SellerProfileViewData {
   id: string;
@@ -244,11 +246,12 @@ export function ProfileView({ initialData }: ProfileViewProps) {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <FormInput
+            <FormSelect
               control={control}
               name="country"
               label="Country"
-              placeholder="e.g. United Kingdom"
+              placeholder="Select your location"
+              options={COUNTRY_OPTIONS}
             />
             <FormInput
               control={control}

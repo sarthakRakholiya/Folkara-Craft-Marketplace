@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Noto_Serif, Manrope } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Agentation } from "agentation";
+
 import "./globals.css";
 
 const notoSerif = Noto_Serif({
@@ -96,6 +98,8 @@ export default function RootLayout({
               {children}
               <AiAssistantSidebar />
               <Toaster richColors position="top-center" closeButton />
+              {process.env.NODE_ENV === "development" && <Agentation />}
+
             </NuqsAdapter>
           </Suspense>
         </QueryProvider>
